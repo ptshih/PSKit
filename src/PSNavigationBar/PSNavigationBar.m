@@ -11,7 +11,7 @@
 @implementation PSNavigationBar
 
 - (void)drawRect:(CGRect)rect  {
-  UIImage *image = [UIImage imageNamed:@"bg_navbar.png"];
+  UIImage *image = [UIImage imageNamed:@"BackgroundNavigationBar.png"];
   [image drawInRect:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
 }
 
