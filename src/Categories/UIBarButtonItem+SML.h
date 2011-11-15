@@ -14,7 +14,7 @@ enum {
   BarButtonTypeRed = 2,
   BarButtonTypeGreen = 3,
   BarButtonTypeSilver = 4,
-  BarButtonTypeGray = 5
+  BarButtonTypeBordered = 5
 };
 typedef uint32_t BarButtonType;
 
