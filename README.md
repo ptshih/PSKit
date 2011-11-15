@@ -25,7 +25,7 @@ External Modules
 
 Shared Centers (Singletons)
 ---
-* PSDatabaseCenter (requires egodatabase module, requires libsqlite3.framework)
+* PSDatabaseCenter (requires egodatabase module, requires libsqlite3.framework, requires a #define SQLITE_DB @"db_file_name" in Constants.h)
 * PSDataCenter (requires AFNetworking)
 * PSFacebookCenter (requires Facebook module)
 * PSImageCache (requires AFNetworking)
@@ -68,7 +68,7 @@ Usage
 ---
 1. Link required frameworks
 2. Create InitialDefaults.plist
-3. Create Constants.h (optional), import it in PCH
+3. Create Constants.h (REQUIRED), import it in PCH
 4. Create a custom stylesheet (optional), set it in AppDelegate
 5. Selectively add modules into project
 6. Selectively add vendor modules into project
