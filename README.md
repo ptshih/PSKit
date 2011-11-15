@@ -10,10 +10,13 @@ Required Frameworks
 External Modules
 ---
 * AFNetworking
+* AFURLCache
+* TTTAttributedLabel
+* FormatterKit
 * PullToRefresh
 * JSONKit
 * Reachability
-* MBProgressHUD
+* SVProgressHUD
 * Reachability (optional)
 * egodatabase (optional)
 * Facebook (optional, modified to use JSONKit)
