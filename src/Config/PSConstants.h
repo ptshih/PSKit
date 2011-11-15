@@ -26,11 +26,6 @@
 #define USER_LOCALE [[NSLocale autoupdatingCurrentLocale] localeIdentifier]
 
 /**
- SQLite3 File
- */
-#define SQLITE_DB @"mealtime_v2"
-
-/**
  Core Data (FILL THIS IN LOCAL CONSTANTS)
  */
 //#define CORE_DATA_SQL_FILE
