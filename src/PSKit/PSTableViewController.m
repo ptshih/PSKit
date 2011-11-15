@@ -128,13 +128,13 @@
 }
 
 // SUBCLASS SHOULD CALL THIS
-- (void)setupTableViewWithFrame:(CGRect)frame andStyle:(UITableViewStyle)style andSeparatorStyle:(UITableViewCellSeparatorStyle)separatorStyle {
+- (void)setupTableViewWithFrame:(CGRect)frame style:(UITableViewStyle)style separatorStyle:(UITableViewCellSeparatorStyle)separatorStyle separatorColor:(UIColor *)separatorColor {
   _tableView = [[UITableView alloc] initWithFrame:frame style:style];
   _tableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
   _tableView.delegate = self;
   _tableView.dataSource = self;
   _tableView.separatorStyle = separatorStyle;
-  _tableView.separatorColor = SEPARATOR_COLOR;
+  _tableView.separatorColor = separatorColor;
   _tableView.backgroundColor = [UIColor clearColor];
   _tableView.backgroundView = nil;
   _tableView.opaque = NO;

@@ -7,17 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PSImageCacheDelegate.h"
 #import "PSObject.h"
-
-@class ASIHTTPRequest;
-@class PSNetworkQueue;
+#import "PSImageCacheDelegate.h"
+#import "AFNetworking.h"
 
 @interface PSImageCache : PSObject <NSCacheDelegate> {
   NSCache *_buffer;
   NSString *_cachePath;
   NSSearchPathDirectory _cacheDirectory;
-  PSNetworkQueue *_requestQueue;
+  NSOperationQueue *_requestQueue;
 }
 
 @property (nonatomic, retain) NSString *cachePath;
@@ -27,15 +25,14 @@
 - (void)setupCachePathWithCacheDirectory:(NSSearchPathDirectory)cacheDirectory;
 
 // Image Cache
-- (void)cacheImage:(NSData *)imageData forURLPath:(NSString *)urlPath;
+- (void)cacheImage:(UIImage *)image forURLPath:(NSString *)urlPath;
+- (void)cacheImageData:(NSData *)imageData forURLPath:(NSString *)urlPath;
 - (UIImage *)imageForURLPath:(NSString *)urlPath shouldDownload:(BOOL)shouldDownload withDelegate:(id)delegate;
 - (BOOL)hasImageForURLPath:(NSString *)urlPath;
 - (void)cacheImageForURLPath:(NSString *)urlPath withDelegate:(id)delegate;
 
 // Remote Request
 - (BOOL)downloadImageForURLPath:(NSString *)urlPath withDelegate:(id)delegate;
-- (void)downloadImageRequestFinished:(ASIHTTPRequest *)request;
-- (void)downloadImageRequestFailed:(ASIHTTPRequest *)request;
 
 - (void)cancelDownloadForURLPath:(NSString *)urlPath;
 

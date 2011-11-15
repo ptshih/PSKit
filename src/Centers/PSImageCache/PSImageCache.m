@@ -7,9 +7,6 @@
 //
 
 #import "PSImageCache.h"
-#import "NSString+SML.h"
-#import "ASIHTTPRequest.h"
-#import "PSNetworkQueue.h"
 
 @implementation PSImageCache
 
@@ -31,8 +28,8 @@
     [_buffer setDelegate:self];
 //    [_buffer setTotalCostLimit:100];
     
-    _requestQueue = [[PSNetworkQueue alloc] init];
-    _requestQueue.maxConcurrentOperationCount = 10;
+    _requestQueue = [[NSOperationQueue alloc] init];
+    _requestQueue.maxConcurrentOperationCount = 8;
     
     // Set to NSDocumentDirectory by default
     [self setupCachePathWithCacheDirectory:NSCachesDirectory];
@@ -41,7 +38,7 @@
 }
 
 - (void)setupCachePathWithCacheDirectory:(NSSearchPathDirectory)cacheDirectory {
-  self.cachePath = [[NSSearchPathForDirectoriesInDomains(cacheDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"psimagecache"];
+  self.cachePath = [[NSSearchPathForDirectoriesInDomains(cacheDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"PSImageCache"];
   
   BOOL isDir = NO;
   NSError *error;
@@ -69,8 +66,22 @@
   [super dealloc];
 }
 
+// Cache UIImage
+- (void)cacheImage:(UIImage *)image forURLPath:(NSString *)urlPath {
+  NSString *md5Path = [urlPath stringFromMD5Hash];
+  if (image) {
+    // Memcache
+    [_buffer setObject:image forKey:md5Path cost:1];
+    
+    // Diskcache
+    [UIImageJPEGRepresentation(image, 1.0) writeToFile:[_cachePath stringByAppendingPathComponent:md5Path] atomically:YES];
+    
+    VLog(@"PSImageCache CACHE: %@", urlPath);
+  }
+}
+
 // Cache Image Data
-- (void)cacheImage:(NSData *)imageData forURLPath:(NSString *)urlPath {
+- (void)cacheImageData:(NSData *)imageData forURLPath:(NSString *)urlPath {
   NSString *md5Path = [urlPath stringFromMD5Hash];
   if (imageData) {
     [imageData retain];
@@ -87,14 +98,6 @@
       
       dispatch_async(dispatch_get_main_queue(), ^{
         VLog(@"PSImageCache CACHE: %@", urlPath);
-        
-        // fire notification
-        [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[image autorelease], @"image", urlPath, @"urlPath", nil]];
-        
-        // Notify delegate
-        //    if (delegate && [delegate respondsToSelector:@selector(imageCacheDidLoad:forURLPath:)]) {
-        //      [delegate performSelector:@selector(imageCacheDidLoad:forURLPath:) withObject:[image autorelease] withObject:urlPath];
-        //    }
       });
     });
   }
@@ -153,60 +156,33 @@
 #pragma mark Remote Image Load Request
 - (BOOL)downloadImageForURLPath:(NSString *)urlPath withDelegate:(id)delegate {
   // Check to make sure urlPath is not already pending
-  for (ASIHTTPRequest *request in [_requestQueue operations]) {
-    if ([[request.originalURL absoluteString] isEqualToString:urlPath]) {
+  for (NSURLRequest *request in [_requestQueue operations]) {
+    if ([request.URL.absoluteString isEqualToString:urlPath]) {
       VLog(@"urlpath: %@ already enqueued to download", urlPath);
       return NO;
     }
   }
   
   VLog(@"Downloading image at url: %@", urlPath)
+  NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlPath]];
   
-  ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:urlPath]];
-  request.numberOfTimesToRetryOnTimeout = 3;
-  request.requestMethod = @"GET";
-  request.allowCompressedResponse = YES;
-  request.userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:0] forKey:@"retryCount"];
-  
-  // Request Completion Block
-  [request setDelegate:self];
-  [request setDidFinishSelector:@selector(downloadImageRequestFinished:)];
-  [request setDidFailSelector:@selector(downloadImageRequestFailed:)];
-  
+  AFHTTPRequestOperation *op = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+  [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+    [self cacheImageData:operation.responseData forURLPath:operation.request.URL.absoluteString];
+  } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    
+  }];
+
   // Start the Request
-  [_requestQueue addOperation:request];
+  [_requestQueue addOperation:op];
   
   return YES;
 }
 
-- (void)downloadImageRequestFinished:(ASIHTTPRequest *)request {
-  NSString *urlPath = [[request originalURL] absoluteString];
-//  id delegate = [request.userInfo objectForKey:@"delegate"];
-  
-  if ([request responseData]) {
-    [self cacheImage:[request responseData] forURLPath:urlPath];
-  } else {
-    // something bad happened
-  }
-}
-
-- (void)downloadImageRequestFailed:(ASIHTTPRequest *)request {
-  
-//  NSInteger retryCount = [[request.userInfo objectForKey:@"retryCount"] integerValue];
-//  
-//  // something bad happened, retry if < 3 attempts
-//  if (retryCount < 3) {
-//    ASIHTTPRequest *retryRequest = [[request copy] autorelease];
-//    retryRequest.userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:retryCount + 1] forKey:@"retryCount"];
-//    [_requestQueue addOperation:retryRequest];
-//    DLog(@"Retrying request: %d", retryCount + 1);
-//  }
-}
-
 - (void)cancelDownloadForURLPath:(NSString *)urlPath {
-  for (ASIHTTPRequest *request in [_requestQueue operations]) {
-    if ([[request.originalURL absoluteString] isEqualToString:urlPath]) {
-      [request clearDelegatesAndCancel];
+  for (AFHTTPRequestOperation *op in [_requestQueue operations]) {
+    if ([op.request.URL.absoluteString isEqualToString:urlPath]) {
+      [op cancel];
     }
   }
 }

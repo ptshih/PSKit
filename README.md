@@ -3,15 +3,17 @@ Required Frameworks
 * QuartzCore
 * SystemConfiguration
 * MobileCoreServices
-* libz
-* libsqlite3 (optional)
 * CoreLocation
+* CoreText
+* MessageUI
+* libsqlite3
+* libz (optional, unused)
 
 External Modules
 ---
 * AFNetworking
 * AFURLCache
-* TTTAttributedLabel
+* TTTAttributedLabel (requires CoreText.framework)
 * FormatterKit
 * PullToRefresh
 * JSONKit
@@ -23,12 +25,12 @@ External Modules
 
 Shared Centers (Singletons)
 ---
-* PSDatabaseCenter (requires egodatabase module)
+* PSDatabaseCenter (requires egodatabase module, requires libsqlite3.framework)
 * PSDataCenter (requires AFNetworking)
 * PSFacebookCenter (requires Facebook module)
 * PSImageCache (requires AFNetworking)
 * PSLocationCenter (requires CoreLocation.framework)
-* PSMailCenter
+* PSMailCenter (requires MessageUI.framework)
 * PSReachabilityCenter (requires Reachability module)
 * PSSearchCenter
 * PSStyleSheet

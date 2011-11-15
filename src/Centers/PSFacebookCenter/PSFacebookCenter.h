@@ -10,6 +10,11 @@
 #import "PSObject.h"
 #import "Facebook.h"
 
+// Facebook
+#define FB_APP_ID @"APP_ID_HERE"
+#define FB_PERMISSIONS_PUBLISH @"publish_stream"
+#define FB_BASIC_PERMISISONS [NSArray arrayWithObjects:@"offline_access", nil]
+
 #define kPSFacebookCenterDialogDidSucceed @"PSFacebookCenterDialogDidSucceed"
 #define kPSFacebookCenterDialogDidFail @"PSFacebookCenterDialogDidFail"
 
