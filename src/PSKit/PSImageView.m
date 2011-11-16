@@ -7,7 +7,6 @@
 //
 
 #import "PSImageView.h"
-#import "UIImage+SML.h"
 
 @implementation PSImageView
 

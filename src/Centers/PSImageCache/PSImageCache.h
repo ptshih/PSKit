@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PSObject.h"
 #import "PSImageCacheDelegate.h"
 #import "AFNetworking.h"
 

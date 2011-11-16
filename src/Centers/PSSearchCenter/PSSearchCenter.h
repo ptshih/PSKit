@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PSObject.h"
 
 @interface PSSearchCenter : PSObject {
   NSMutableDictionary *_terms;

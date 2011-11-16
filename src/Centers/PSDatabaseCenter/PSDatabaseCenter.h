@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PSObject.h"
 #import "EGODatabase.h"
 
 @interface PSDatabaseCenter : PSObject {

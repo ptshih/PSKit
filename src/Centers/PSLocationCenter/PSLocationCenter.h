@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
-#import "PSObject.h"
 
 #define kLocationAcquired @"LocationAcquired"
 #define kLocationUnchanged @"LocationUnchanged"

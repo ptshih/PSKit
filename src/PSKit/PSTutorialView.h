@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PSView.h"
 
 @protocol PSTutorialViewDelegate <NSObject>
 

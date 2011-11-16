@@ -8,14 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
-#import "PSConstants.h"
-#import "PSStyleSheet.h"
-#import "PSImageView.h"
-#import "UIView+SML.h"
-#import "UILabel+SML.h"
-#import "UIImage+SML.h"
-#import "NSDate+SML.h"
-#import "NSDate+Helper.h"
 
 #define MARGIN_X 10.0
 #define MARGIN_Y 5.0

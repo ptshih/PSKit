@@ -7,8 +7,6 @@
 //
 
 #import "PSSearchField.h"
-#import "PSStyleSheet.h"
-#import "UIView+SML.h"
 
 #define MARGIN_X 10.0
 

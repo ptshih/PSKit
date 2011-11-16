@@ -7,8 +7,6 @@
 //
 
 #import "PSTutorialView.h"
-#import "UIImage+SML.h"
-#import "UIButton+SML.h"
 
 @implementation PSTutorialView
 

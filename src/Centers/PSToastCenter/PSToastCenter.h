@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PSObject.h"
 
 typedef enum {
   PSToastTypeAlert = 0,

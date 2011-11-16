@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>
-#import "PSConstants.h"
-#import "NSString+SML.h"
 #import "PSImageViewDelegate.h"
 
 @interface PSImageView : UIImageView {

@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PSObject.h"
 #import "PSDataCenterDelegate.h"
 
 #define SINCE_SAFETY_NET 300 // 5 minutes

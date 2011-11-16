@@ -8,8 +8,6 @@
 
 #import "PSToastCenter.h"
 #import <QuartzCore/QuartzCore.h>
-#import "UIView+SML.h"
-#import "UIButton+SML.h"
 
 @interface PSToastCenter (Private)
 

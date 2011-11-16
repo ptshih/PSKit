@@ -8,7 +8,6 @@
 
 #import "PSImageArrayView.h"
 #import "PSImageCache.h"
-#import "UIImage+SML.h"
 
 @implementation PSImageArrayView
 

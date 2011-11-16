@@ -13,21 +13,21 @@
 		283818CD14723F1D007E4827 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 283818CB14723F1D007E4827 /* InfoPlist.strings */; };
 		283818CF14723F1D007E4827 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 283818CE14723F1D007E4827 /* main.m */; };
 		283818D314723F1D007E4827 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 283818D214723F1D007E4827 /* AppDelegate.m */; };
-		2838197E1472ECB9007E4827 /* NSArray+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819611472ECB9007E4827 /* NSArray+SML.m */; };
-		2838197F1472ECB9007E4827 /* NSData+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819631472ECB9007E4827 /* NSData+SML.m */; };
+		2838197E1472ECB9007E4827 /* NSArray+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819611472ECB9007E4827 /* NSArray+PSKit.m */; };
+		2838197F1472ECB9007E4827 /* NSData+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819631472ECB9007E4827 /* NSData+PSKit.m */; };
 		283819801472ECB9007E4827 /* NSDate+Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819651472ECB9007E4827 /* NSDate+Helper.m */; };
-		283819811472ECB9007E4827 /* NSDate+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819671472ECB9007E4827 /* NSDate+SML.m */; };
-		283819821472ECB9007E4827 /* NSObject+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819691472ECB9007E4827 /* NSObject+SML.m */; };
-		283819831472ECB9007E4827 /* NSString+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838196B1472ECB9007E4827 /* NSString+SML.m */; };
-		283819841472ECB9007E4827 /* NSURL+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838196D1472ECB9007E4827 /* NSURL+SML.m */; };
-		283819851472ECB9007E4827 /* UIBarButtonItem+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838196F1472ECB9007E4827 /* UIBarButtonItem+SML.m */; };
-		283819861472ECB9007E4827 /* UIButton+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819711472ECB9007E4827 /* UIButton+SML.m */; };
-		283819871472ECB9007E4827 /* UIColor+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819731472ECB9007E4827 /* UIColor+SML.m */; };
-		283819881472ECB9007E4827 /* UIDevice-Hardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819751472ECB9007E4827 /* UIDevice-Hardware.m */; };
-		283819891472ECB9007E4827 /* UIImage+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819771472ECB9007E4827 /* UIImage+SML.m */; };
-		2838198A1472ECB9007E4827 /* UILabel+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819791472ECB9007E4827 /* UILabel+SML.m */; };
-		2838198B1472ECB9007E4827 /* UIScreen+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838197B1472ECB9007E4827 /* UIScreen+SML.m */; };
-		2838198C1472ECB9007E4827 /* UIView+SML.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838197D1472ECB9007E4827 /* UIView+SML.m */; };
+		283819811472ECB9007E4827 /* NSDate+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819671472ECB9007E4827 /* NSDate+PSKit.m */; };
+		283819821472ECB9007E4827 /* NSObject+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819691472ECB9007E4827 /* NSObject+PSKit.m */; };
+		283819831472ECB9007E4827 /* NSString+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838196B1472ECB9007E4827 /* NSString+PSKit.m */; };
+		283819841472ECB9007E4827 /* NSURL+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838196D1472ECB9007E4827 /* NSURL+PSKit.m */; };
+		283819851472ECB9007E4827 /* UIBarButtonItem+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838196F1472ECB9007E4827 /* UIBarButtonItem+PSKit.m */; };
+		283819861472ECB9007E4827 /* UIButton+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819711472ECB9007E4827 /* UIButton+PSKit.m */; };
+		283819871472ECB9007E4827 /* UIColor+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819731472ECB9007E4827 /* UIColor+PSKit.m */; };
+		283819881472ECB9007E4827 /* UIDevice+Hardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819751472ECB9007E4827 /* UIDevice+Hardware.m */; };
+		283819891472ECB9007E4827 /* UIImage+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819771472ECB9007E4827 /* UIImage+PSKit.m */; };
+		2838198A1472ECB9007E4827 /* UILabel+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819791472ECB9007E4827 /* UILabel+PSKit.m */; };
+		2838198B1472ECB9007E4827 /* UIScreen+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838197B1472ECB9007E4827 /* UIScreen+PSKit.m */; };
+		2838198C1472ECB9007E4827 /* UIView+PSKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 2838197D1472ECB9007E4827 /* UIView+PSKit.m */; };
 		28381A111472ECFA007E4827 /* PSBaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819911472ECFA007E4827 /* PSBaseViewController.m */; };
 		28381A121472ECFA007E4827 /* PSCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819931472ECFA007E4827 /* PSCell.m */; };
 		28381A131472ECFA007E4827 /* PSImageArrayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819951472ECFA007E4827 /* PSImageArrayView.m */; };
@@ -48,8 +48,6 @@
 		28381A221472ECFA007E4827 /* PSView.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819B51472ECFA007E4827 /* PSView.m */; };
 		28381A231472ECFA007E4827 /* PSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819B71472ECFA007E4827 /* PSViewController.m */; };
 		28381A241472ECFA007E4827 /* PSKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 283819B81472ECFA007E4827 /* PSKit.bundle */; };
-		28381A251472ECFA007E4827 /* bg_navbar.png in Resources */ = {isa = PBXBuildFile; fileRef = 283819BA1472ECFA007E4827 /* bg_navbar.png */; };
-		28381A261472ECFA007E4827 /* bg_navbar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 283819BB1472ECFA007E4827 /* bg_navbar@2x.png */; };
 		28381A271472ECFA007E4827 /* PSNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819BD1472ECFA007E4827 /* PSNavigationBar.m */; };
 		28381A281472ECFA007E4827 /* PSNavigationController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 283819BE1472ECFA007E4827 /* PSNavigationController.xib */; };
 		28381A291472ECFA007E4827 /* AFHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 283819C21472ECFA007E4827 /* AFHTTPClient.m */; };
@@ -91,8 +89,6 @@
 		28381A751472ED01007E4827 /* PSMailCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 28381A5D1472ED01007E4827 /* PSMailCenter.m */; };
 		28381A761472ED01007E4827 /* PSReachabilityCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 28381A601472ED01007E4827 /* PSReachabilityCenter.m */; };
 		28381A771472ED01007E4827 /* PSSearchCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 28381A631472ED01007E4827 /* PSSearchCenter.m */; };
-		28381A781472ED01007E4827 /* PSStyleSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 28381A661472ED01007E4827 /* PSStyleSheet.m */; };
-		28381A791472ED01007E4827 /* PSStyleSheet.plist in Resources */ = {isa = PBXBuildFile; fileRef = 28381A671472ED01007E4827 /* PSStyleSheet.plist */; };
 		28381A7A1472ED01007E4827 /* bg_toast.png in Resources */ = {isa = PBXBuildFile; fileRef = 28381A691472ED01007E4827 /* bg_toast.png */; };
 		28381A7B1472ED01007E4827 /* bg_toast@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 28381A6A1472ED01007E4827 /* bg_toast@2x.png */; };
 		28381A7C1472ED01007E4827 /* PSToastCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 28381A6C1472ED01007E4827 /* PSToastCenter.m */; };
@@ -106,6 +102,18 @@
 		28381A981472F8C8007E4827 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28381A971472F8C8007E4827 /* CoreText.framework */; };
 		28381A9A1472F8EF007E4827 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28381A991472F8EF007E4827 /* CoreLocation.framework */; };
 		28381A9C1472F914007E4827 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28381A9B1472F914007E4827 /* MessageUI.framework */; };
+		2869870A1473101100B40860 /* PSNavigationBar.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 286987091473101100B40860 /* PSNavigationBar.bundle */; };
+		2869870F1473108400B40860 /* PSStyleSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 2869870D1473108400B40860 /* PSStyleSheet.m */; };
+		286987101473108400B40860 /* PSStyleSheet.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2869870E1473108400B40860 /* PSStyleSheet.plist */; };
+		286987251473139E00B40860 /* BackgroundBlueprint.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2869871C1473139E00B40860 /* BackgroundBlueprint.jpg */; };
+		286987261473139E00B40860 /* BackgroundBlueprint@2x.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2869871D1473139E00B40860 /* BackgroundBlueprint@2x.jpg */; };
+		286987271473139E00B40860 /* BackgroundBlueprint~ipad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2869871E1473139E00B40860 /* BackgroundBlueprint~ipad.jpg */; };
+		286987281473139E00B40860 /* BackgroundLeather.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2869871F1473139E00B40860 /* BackgroundLeather.jpg */; };
+		286987291473139E00B40860 /* BackgroundLeather@2x.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 286987201473139E00B40860 /* BackgroundLeather@2x.jpg */; };
+		2869872A1473139E00B40860 /* BackgroundLeather~ipad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 286987211473139E00B40860 /* BackgroundLeather~ipad.jpg */; };
+		2869872B1473139E00B40860 /* Default.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 286987221473139E00B40860 /* Default.jpg */; };
+		2869872C1473139E00B40860 /* Default@2x.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 286987231473139E00B40860 /* Default@2x.jpg */; };
+		2869872D1473139E00B40860 /* Default~ipad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 286987241473139E00B40860 /* Default~ipad.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -119,36 +127,36 @@
 		283818D014723F1D007E4827 /* PSKitDemo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PSKitDemo-Prefix.pch"; sourceTree = "<group>"; };
 		283818D114723F1D007E4827 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		283818D214723F1D007E4827 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		283819601472ECB9007E4827 /* NSArray+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+SML.h"; sourceTree = "<group>"; };
-		283819611472ECB9007E4827 /* NSArray+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+SML.m"; sourceTree = "<group>"; };
-		283819621472ECB9007E4827 /* NSData+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+SML.h"; sourceTree = "<group>"; };
-		283819631472ECB9007E4827 /* NSData+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+SML.m"; sourceTree = "<group>"; };
+		283819601472ECB9007E4827 /* NSArray+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+PSKit.h"; sourceTree = "<group>"; };
+		283819611472ECB9007E4827 /* NSArray+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+PSKit.m"; sourceTree = "<group>"; };
+		283819621472ECB9007E4827 /* NSData+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+PSKit.h"; sourceTree = "<group>"; };
+		283819631472ECB9007E4827 /* NSData+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+PSKit.m"; sourceTree = "<group>"; };
 		283819641472ECB9007E4827 /* NSDate+Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Helper.h"; sourceTree = "<group>"; };
 		283819651472ECB9007E4827 /* NSDate+Helper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Helper.m"; sourceTree = "<group>"; };
-		283819661472ECB9007E4827 /* NSDate+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+SML.h"; sourceTree = "<group>"; };
-		283819671472ECB9007E4827 /* NSDate+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+SML.m"; sourceTree = "<group>"; };
-		283819681472ECB9007E4827 /* NSObject+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SML.h"; sourceTree = "<group>"; };
-		283819691472ECB9007E4827 /* NSObject+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SML.m"; sourceTree = "<group>"; };
-		2838196A1472ECB9007E4827 /* NSString+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+SML.h"; sourceTree = "<group>"; };
-		2838196B1472ECB9007E4827 /* NSString+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+SML.m"; sourceTree = "<group>"; };
-		2838196C1472ECB9007E4827 /* NSURL+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+SML.h"; sourceTree = "<group>"; };
-		2838196D1472ECB9007E4827 /* NSURL+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+SML.m"; sourceTree = "<group>"; };
-		2838196E1472ECB9007E4827 /* UIBarButtonItem+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBarButtonItem+SML.h"; sourceTree = "<group>"; };
-		2838196F1472ECB9007E4827 /* UIBarButtonItem+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBarButtonItem+SML.m"; sourceTree = "<group>"; };
-		283819701472ECB9007E4827 /* UIButton+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+SML.h"; sourceTree = "<group>"; };
-		283819711472ECB9007E4827 /* UIButton+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+SML.m"; sourceTree = "<group>"; };
-		283819721472ECB9007E4827 /* UIColor+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+SML.h"; sourceTree = "<group>"; };
-		283819731472ECB9007E4827 /* UIColor+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+SML.m"; sourceTree = "<group>"; };
-		283819741472ECB9007E4827 /* UIDevice-Hardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice-Hardware.h"; sourceTree = "<group>"; };
-		283819751472ECB9007E4827 /* UIDevice-Hardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice-Hardware.m"; sourceTree = "<group>"; };
-		283819761472ECB9007E4827 /* UIImage+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+SML.h"; sourceTree = "<group>"; };
-		283819771472ECB9007E4827 /* UIImage+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+SML.m"; sourceTree = "<group>"; };
-		283819781472ECB9007E4827 /* UILabel+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+SML.h"; sourceTree = "<group>"; };
-		283819791472ECB9007E4827 /* UILabel+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+SML.m"; sourceTree = "<group>"; };
-		2838197A1472ECB9007E4827 /* UIScreen+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIScreen+SML.h"; sourceTree = "<group>"; };
-		2838197B1472ECB9007E4827 /* UIScreen+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScreen+SML.m"; sourceTree = "<group>"; };
-		2838197C1472ECB9007E4827 /* UIView+SML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+SML.h"; sourceTree = "<group>"; };
-		2838197D1472ECB9007E4827 /* UIView+SML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+SML.m"; sourceTree = "<group>"; };
+		283819661472ECB9007E4827 /* NSDate+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+PSKit.h"; sourceTree = "<group>"; };
+		283819671472ECB9007E4827 /* NSDate+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+PSKit.m"; sourceTree = "<group>"; };
+		283819681472ECB9007E4827 /* NSObject+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+PSKit.h"; sourceTree = "<group>"; };
+		283819691472ECB9007E4827 /* NSObject+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+PSKit.m"; sourceTree = "<group>"; };
+		2838196A1472ECB9007E4827 /* NSString+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+PSKit.h"; sourceTree = "<group>"; };
+		2838196B1472ECB9007E4827 /* NSString+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+PSKit.m"; sourceTree = "<group>"; };
+		2838196C1472ECB9007E4827 /* NSURL+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+PSKit.h"; sourceTree = "<group>"; };
+		2838196D1472ECB9007E4827 /* NSURL+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+PSKit.m"; sourceTree = "<group>"; };
+		2838196E1472ECB9007E4827 /* UIBarButtonItem+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBarButtonItem+PSKit.h"; sourceTree = "<group>"; };
+		2838196F1472ECB9007E4827 /* UIBarButtonItem+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBarButtonItem+PSKit.m"; sourceTree = "<group>"; };
+		283819701472ECB9007E4827 /* UIButton+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+PSKit.h"; sourceTree = "<group>"; };
+		283819711472ECB9007E4827 /* UIButton+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+PSKit.m"; sourceTree = "<group>"; };
+		283819721472ECB9007E4827 /* UIColor+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+PSKit.h"; sourceTree = "<group>"; };
+		283819731472ECB9007E4827 /* UIColor+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+PSKit.m"; sourceTree = "<group>"; };
+		283819741472ECB9007E4827 /* UIDevice+Hardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+Hardware.h"; sourceTree = "<group>"; };
+		283819751472ECB9007E4827 /* UIDevice+Hardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+Hardware.m"; sourceTree = "<group>"; };
+		283819761472ECB9007E4827 /* UIImage+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+PSKit.h"; sourceTree = "<group>"; };
+		283819771472ECB9007E4827 /* UIImage+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+PSKit.m"; sourceTree = "<group>"; };
+		283819781472ECB9007E4827 /* UILabel+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+PSKit.h"; sourceTree = "<group>"; };
+		283819791472ECB9007E4827 /* UILabel+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+PSKit.m"; sourceTree = "<group>"; };
+		2838197A1472ECB9007E4827 /* UIScreen+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIScreen+PSKit.h"; sourceTree = "<group>"; };
+		2838197B1472ECB9007E4827 /* UIScreen+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScreen+PSKit.m"; sourceTree = "<group>"; };
+		2838197C1472ECB9007E4827 /* UIView+PSKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+PSKit.h"; sourceTree = "<group>"; };
+		2838197D1472ECB9007E4827 /* UIView+PSKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+PSKit.m"; sourceTree = "<group>"; };
 		2838198E1472ECFA007E4827 /* PSConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSConstants.h; sourceTree = "<group>"; };
 		283819901472ECFA007E4827 /* PSBaseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSBaseViewController.h; sourceTree = "<group>"; };
 		283819911472ECFA007E4827 /* PSBaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSBaseViewController.m; sourceTree = "<group>"; };
@@ -191,8 +199,6 @@
 		283819B61472ECFA007E4827 /* PSViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSViewController.h; sourceTree = "<group>"; };
 		283819B71472ECFA007E4827 /* PSViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSViewController.m; sourceTree = "<group>"; };
 		283819B81472ECFA007E4827 /* PSKit.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = PSKit.bundle; path = ../src/PSKit.bundle; sourceTree = "<group>"; };
-		283819BA1472ECFA007E4827 /* bg_navbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bg_navbar.png; sourceTree = "<group>"; };
-		283819BB1472ECFA007E4827 /* bg_navbar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bg_navbar@2x.png"; sourceTree = "<group>"; };
 		283819BC1472ECFA007E4827 /* PSNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSNavigationBar.h; sourceTree = "<group>"; };
 		283819BD1472ECFA007E4827 /* PSNavigationBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSNavigationBar.m; sourceTree = "<group>"; };
 		283819BE1472ECFA007E4827 /* PSNavigationController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PSNavigationController.xib; sourceTree = "<group>"; };
@@ -277,9 +283,6 @@
 		28381A601472ED01007E4827 /* PSReachabilityCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSReachabilityCenter.m; sourceTree = "<group>"; };
 		28381A621472ED01007E4827 /* PSSearchCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSSearchCenter.h; sourceTree = "<group>"; };
 		28381A631472ED01007E4827 /* PSSearchCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSSearchCenter.m; sourceTree = "<group>"; };
-		28381A651472ED01007E4827 /* PSStyleSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSStyleSheet.h; sourceTree = "<group>"; };
-		28381A661472ED01007E4827 /* PSStyleSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSStyleSheet.m; sourceTree = "<group>"; };
-		28381A671472ED01007E4827 /* PSStyleSheet.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PSStyleSheet.plist; sourceTree = "<group>"; };
 		28381A691472ED01007E4827 /* bg_toast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bg_toast.png; sourceTree = "<group>"; };
 		28381A6A1472ED01007E4827 /* bg_toast@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bg_toast@2x.png"; sourceTree = "<group>"; };
 		28381A6B1472ED01007E4827 /* PSToastCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSToastCenter.h; sourceTree = "<group>"; };
@@ -296,6 +299,21 @@
 		28381A971472F8C8007E4827 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		28381A991472F8EF007E4827 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		28381A9B1472F914007E4827 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
+		2869870814730F7200B40860 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		286987091473101100B40860 /* PSNavigationBar.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = PSNavigationBar.bundle; sourceTree = "<group>"; };
+		2869870C1473108400B40860 /* PSStyleSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSStyleSheet.h; sourceTree = "<group>"; };
+		2869870D1473108400B40860 /* PSStyleSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSStyleSheet.m; sourceTree = "<group>"; };
+		2869870E1473108400B40860 /* PSStyleSheet.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PSStyleSheet.plist; sourceTree = "<group>"; };
+		2869871C1473139E00B40860 /* BackgroundBlueprint.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = BackgroundBlueprint.jpg; sourceTree = "<group>"; };
+		2869871D1473139E00B40860 /* BackgroundBlueprint@2x.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "BackgroundBlueprint@2x.jpg"; sourceTree = "<group>"; };
+		2869871E1473139E00B40860 /* BackgroundBlueprint~ipad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "BackgroundBlueprint~ipad.jpg"; sourceTree = "<group>"; };
+		2869871F1473139E00B40860 /* BackgroundLeather.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = BackgroundLeather.jpg; sourceTree = "<group>"; };
+		286987201473139E00B40860 /* BackgroundLeather@2x.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "BackgroundLeather@2x.jpg"; sourceTree = "<group>"; };
+		286987211473139E00B40860 /* BackgroundLeather~ipad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "BackgroundLeather~ipad.jpg"; sourceTree = "<group>"; };
+		286987221473139E00B40860 /* Default.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Default.jpg; sourceTree = "<group>"; };
+		286987231473139E00B40860 /* Default@2x.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Default@2x.jpg"; sourceTree = "<group>"; };
+		286987241473139E00B40860 /* Default~ipad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Default~ipad.jpg"; sourceTree = "<group>"; };
+		2869872F147385AC00B40860 /* PSCategories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSCategories.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -324,6 +342,7 @@
 			children = (
 				283819591472EC62007E4827 /* PSKit */,
 				283818C814723F1D007E4827 /* PSKitDemo */,
+				28698713147312EC00B40860 /* Resources */,
 				283818C114723F1D007E4827 /* Frameworks */,
 				283818BF14723F1D007E4827 /* Products */,
 			);
@@ -371,6 +390,7 @@
 				283818CB14723F1D007E4827 /* InfoPlist.strings */,
 				283818CE14723F1D007E4827 /* main.m */,
 				283818D014723F1D007E4827 /* PSKitDemo-Prefix.pch */,
+				2869870814730F7200B40860 /* Constants.h */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -378,6 +398,7 @@
 		283819591472EC62007E4827 /* PSKit */ = {
 			isa = PBXGroup;
 			children = (
+				2869870B1473108400B40860 /* PSStyleSheet */,
 				28381A491472ED01007E4827 /* Centers */,
 				2838198D1472ECFA007E4827 /* Config */,
 				2838198F1472ECFA007E4827 /* PSKit */,
@@ -392,36 +413,36 @@
 		2838195F1472ECB9007E4827 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				283819601472ECB9007E4827 /* NSArray+SML.h */,
-				283819611472ECB9007E4827 /* NSArray+SML.m */,
-				283819621472ECB9007E4827 /* NSData+SML.h */,
-				283819631472ECB9007E4827 /* NSData+SML.m */,
+				283819601472ECB9007E4827 /* NSArray+PSKit.h */,
+				283819611472ECB9007E4827 /* NSArray+PSKit.m */,
+				283819621472ECB9007E4827 /* NSData+PSKit.h */,
+				283819631472ECB9007E4827 /* NSData+PSKit.m */,
 				283819641472ECB9007E4827 /* NSDate+Helper.h */,
 				283819651472ECB9007E4827 /* NSDate+Helper.m */,
-				283819661472ECB9007E4827 /* NSDate+SML.h */,
-				283819671472ECB9007E4827 /* NSDate+SML.m */,
-				283819681472ECB9007E4827 /* NSObject+SML.h */,
-				283819691472ECB9007E4827 /* NSObject+SML.m */,
-				2838196A1472ECB9007E4827 /* NSString+SML.h */,
-				2838196B1472ECB9007E4827 /* NSString+SML.m */,
-				2838196C1472ECB9007E4827 /* NSURL+SML.h */,
-				2838196D1472ECB9007E4827 /* NSURL+SML.m */,
-				2838196E1472ECB9007E4827 /* UIBarButtonItem+SML.h */,
-				2838196F1472ECB9007E4827 /* UIBarButtonItem+SML.m */,
-				283819701472ECB9007E4827 /* UIButton+SML.h */,
-				283819711472ECB9007E4827 /* UIButton+SML.m */,
-				283819721472ECB9007E4827 /* UIColor+SML.h */,
-				283819731472ECB9007E4827 /* UIColor+SML.m */,
-				283819741472ECB9007E4827 /* UIDevice-Hardware.h */,
-				283819751472ECB9007E4827 /* UIDevice-Hardware.m */,
-				283819761472ECB9007E4827 /* UIImage+SML.h */,
-				283819771472ECB9007E4827 /* UIImage+SML.m */,
-				283819781472ECB9007E4827 /* UILabel+SML.h */,
-				283819791472ECB9007E4827 /* UILabel+SML.m */,
-				2838197A1472ECB9007E4827 /* UIScreen+SML.h */,
-				2838197B1472ECB9007E4827 /* UIScreen+SML.m */,
-				2838197C1472ECB9007E4827 /* UIView+SML.h */,
-				2838197D1472ECB9007E4827 /* UIView+SML.m */,
+				283819661472ECB9007E4827 /* NSDate+PSKit.h */,
+				283819671472ECB9007E4827 /* NSDate+PSKit.m */,
+				283819681472ECB9007E4827 /* NSObject+PSKit.h */,
+				283819691472ECB9007E4827 /* NSObject+PSKit.m */,
+				2838196A1472ECB9007E4827 /* NSString+PSKit.h */,
+				2838196B1472ECB9007E4827 /* NSString+PSKit.m */,
+				2838196C1472ECB9007E4827 /* NSURL+PSKit.h */,
+				2838196D1472ECB9007E4827 /* NSURL+PSKit.m */,
+				2838196E1472ECB9007E4827 /* UIBarButtonItem+PSKit.h */,
+				2838196F1472ECB9007E4827 /* UIBarButtonItem+PSKit.m */,
+				283819701472ECB9007E4827 /* UIButton+PSKit.h */,
+				283819711472ECB9007E4827 /* UIButton+PSKit.m */,
+				283819721472ECB9007E4827 /* UIColor+PSKit.h */,
+				283819731472ECB9007E4827 /* UIColor+PSKit.m */,
+				283819741472ECB9007E4827 /* UIDevice+Hardware.h */,
+				283819751472ECB9007E4827 /* UIDevice+Hardware.m */,
+				283819761472ECB9007E4827 /* UIImage+PSKit.h */,
+				283819771472ECB9007E4827 /* UIImage+PSKit.m */,
+				283819781472ECB9007E4827 /* UILabel+PSKit.h */,
+				283819791472ECB9007E4827 /* UILabel+PSKit.m */,
+				2838197A1472ECB9007E4827 /* UIScreen+PSKit.h */,
+				2838197B1472ECB9007E4827 /* UIScreen+PSKit.m */,
+				2838197C1472ECB9007E4827 /* UIView+PSKit.h */,
+				2838197D1472ECB9007E4827 /* UIView+PSKit.m */,
 			);
 			name = Categories;
 			path = ../src/Categories;
@@ -431,6 +452,7 @@
 			isa = PBXGroup;
 			children = (
 				2838198E1472ECFA007E4827 /* PSConstants.h */,
+				2869872F147385AC00B40860 /* PSCategories.h */,
 			);
 			name = Config;
 			path = ../src/Config;
@@ -487,8 +509,7 @@
 		283819B91472ECFA007E4827 /* PSNavigationBar */ = {
 			isa = PBXGroup;
 			children = (
-				283819BA1472ECFA007E4827 /* bg_navbar.png */,
-				283819BB1472ECFA007E4827 /* bg_navbar@2x.png */,
+				286987091473101100B40860 /* PSNavigationBar.bundle */,
 				283819BC1472ECFA007E4827 /* PSNavigationBar.h */,
 				283819BD1472ECFA007E4827 /* PSNavigationBar.m */,
 				283819BE1472ECFA007E4827 /* PSNavigationController.xib */,
@@ -700,7 +721,6 @@
 				28381A5B1472ED01007E4827 /* PSMailCenter */,
 				28381A5E1472ED01007E4827 /* PSReachabilityCenter */,
 				28381A611472ED01007E4827 /* PSSearchCenter */,
-				28381A641472ED01007E4827 /* PSStyleSheet */,
 				28381A681472ED01007E4827 /* PSToastCenter */,
 				28381A6D1472ED01007E4827 /* PSURLCache */,
 			);
@@ -782,16 +802,6 @@
 			path = PSSearchCenter;
 			sourceTree = "<group>";
 		};
-		28381A641472ED01007E4827 /* PSStyleSheet */ = {
-			isa = PBXGroup;
-			children = (
-				28381A651472ED01007E4827 /* PSStyleSheet.h */,
-				28381A661472ED01007E4827 /* PSStyleSheet.m */,
-				28381A671472ED01007E4827 /* PSStyleSheet.plist */,
-			);
-			path = PSStyleSheet;
-			sourceTree = "<group>";
-		};
 		28381A681472ED01007E4827 /* PSToastCenter */ = {
 			isa = PBXGroup;
 			children = (
@@ -820,6 +830,33 @@
 				28381A831472EF41007E4827 /* PullToRefresh.bundle */,
 			);
 			path = PullToRefresh;
+			sourceTree = "<group>";
+		};
+		2869870B1473108400B40860 /* PSStyleSheet */ = {
+			isa = PBXGroup;
+			children = (
+				2869870C1473108400B40860 /* PSStyleSheet.h */,
+				2869870D1473108400B40860 /* PSStyleSheet.m */,
+				2869870E1473108400B40860 /* PSStyleSheet.plist */,
+			);
+			name = PSStyleSheet;
+			path = ../src/PSStyleSheet;
+			sourceTree = "<group>";
+		};
+		28698713147312EC00B40860 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2869871C1473139E00B40860 /* BackgroundBlueprint.jpg */,
+				2869871D1473139E00B40860 /* BackgroundBlueprint@2x.jpg */,
+				2869871E1473139E00B40860 /* BackgroundBlueprint~ipad.jpg */,
+				2869871F1473139E00B40860 /* BackgroundLeather.jpg */,
+				286987201473139E00B40860 /* BackgroundLeather@2x.jpg */,
+				286987211473139E00B40860 /* BackgroundLeather~ipad.jpg */,
+				286987221473139E00B40860 /* Default.jpg */,
+				286987231473139E00B40860 /* Default@2x.jpg */,
+				286987241473139E00B40860 /* Default~ipad.jpg */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -874,15 +911,23 @@
 			files = (
 				283818CD14723F1D007E4827 /* InfoPlist.strings in Resources */,
 				28381A241472ECFA007E4827 /* PSKit.bundle in Resources */,
-				28381A251472ECFA007E4827 /* bg_navbar.png in Resources */,
-				28381A261472ECFA007E4827 /* bg_navbar@2x.png in Resources */,
 				28381A281472ECFA007E4827 /* PSNavigationController.xib in Resources */,
 				28381A391472ECFA007E4827 /* FBDialog.bundle in Resources */,
 				28381A461472ECFA007E4827 /* SVProgressHUD.bundle in Resources */,
-				28381A791472ED01007E4827 /* PSStyleSheet.plist in Resources */,
 				28381A7A1472ED01007E4827 /* bg_toast.png in Resources */,
 				28381A7B1472ED01007E4827 /* bg_toast@2x.png in Resources */,
 				28381A851472EF41007E4827 /* PullToRefresh.bundle in Resources */,
+				2869870A1473101100B40860 /* PSNavigationBar.bundle in Resources */,
+				286987101473108400B40860 /* PSStyleSheet.plist in Resources */,
+				286987251473139E00B40860 /* BackgroundBlueprint.jpg in Resources */,
+				286987261473139E00B40860 /* BackgroundBlueprint@2x.jpg in Resources */,
+				286987271473139E00B40860 /* BackgroundBlueprint~ipad.jpg in Resources */,
+				286987281473139E00B40860 /* BackgroundLeather.jpg in Resources */,
+				286987291473139E00B40860 /* BackgroundLeather@2x.jpg in Resources */,
+				2869872A1473139E00B40860 /* BackgroundLeather~ipad.jpg in Resources */,
+				2869872B1473139E00B40860 /* Default.jpg in Resources */,
+				2869872C1473139E00B40860 /* Default@2x.jpg in Resources */,
+				2869872D1473139E00B40860 /* Default~ipad.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -895,21 +940,21 @@
 			files = (
 				283818CF14723F1D007E4827 /* main.m in Sources */,
 				283818D314723F1D007E4827 /* AppDelegate.m in Sources */,
-				2838197E1472ECB9007E4827 /* NSArray+SML.m in Sources */,
-				2838197F1472ECB9007E4827 /* NSData+SML.m in Sources */,
+				2838197E1472ECB9007E4827 /* NSArray+PSKit.m in Sources */,
+				2838197F1472ECB9007E4827 /* NSData+PSKit.m in Sources */,
 				283819801472ECB9007E4827 /* NSDate+Helper.m in Sources */,
-				283819811472ECB9007E4827 /* NSDate+SML.m in Sources */,
-				283819821472ECB9007E4827 /* NSObject+SML.m in Sources */,
-				283819831472ECB9007E4827 /* NSString+SML.m in Sources */,
-				283819841472ECB9007E4827 /* NSURL+SML.m in Sources */,
-				283819851472ECB9007E4827 /* UIBarButtonItem+SML.m in Sources */,
-				283819861472ECB9007E4827 /* UIButton+SML.m in Sources */,
-				283819871472ECB9007E4827 /* UIColor+SML.m in Sources */,
-				283819881472ECB9007E4827 /* UIDevice-Hardware.m in Sources */,
-				283819891472ECB9007E4827 /* UIImage+SML.m in Sources */,
-				2838198A1472ECB9007E4827 /* UILabel+SML.m in Sources */,
-				2838198B1472ECB9007E4827 /* UIScreen+SML.m in Sources */,
-				2838198C1472ECB9007E4827 /* UIView+SML.m in Sources */,
+				283819811472ECB9007E4827 /* NSDate+PSKit.m in Sources */,
+				283819821472ECB9007E4827 /* NSObject+PSKit.m in Sources */,
+				283819831472ECB9007E4827 /* NSString+PSKit.m in Sources */,
+				283819841472ECB9007E4827 /* NSURL+PSKit.m in Sources */,
+				283819851472ECB9007E4827 /* UIBarButtonItem+PSKit.m in Sources */,
+				283819861472ECB9007E4827 /* UIButton+PSKit.m in Sources */,
+				283819871472ECB9007E4827 /* UIColor+PSKit.m in Sources */,
+				283819881472ECB9007E4827 /* UIDevice+Hardware.m in Sources */,
+				283819891472ECB9007E4827 /* UIImage+PSKit.m in Sources */,
+				2838198A1472ECB9007E4827 /* UILabel+PSKit.m in Sources */,
+				2838198B1472ECB9007E4827 /* UIScreen+PSKit.m in Sources */,
+				2838198C1472ECB9007E4827 /* UIView+PSKit.m in Sources */,
 				28381A111472ECFA007E4827 /* PSBaseViewController.m in Sources */,
 				28381A121472ECFA007E4827 /* PSCell.m in Sources */,
 				28381A131472ECFA007E4827 /* PSImageArrayView.m in Sources */,
@@ -967,10 +1012,10 @@
 				28381A751472ED01007E4827 /* PSMailCenter.m in Sources */,
 				28381A761472ED01007E4827 /* PSReachabilityCenter.m in Sources */,
 				28381A771472ED01007E4827 /* PSSearchCenter.m in Sources */,
-				28381A781472ED01007E4827 /* PSStyleSheet.m in Sources */,
 				28381A7C1472ED01007E4827 /* PSToastCenter.m in Sources */,
 				28381A7D1472ED01007E4827 /* PSURLCache.m in Sources */,
 				28381A841472EF41007E4827 /* EGORefreshTableHeaderView.m in Sources */,
+				2869870F1473108400B40860 /* PSStyleSheet.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1007,7 +1052,7 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1024,7 +1069,7 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -1037,6 +1082,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "PSKitDemo/PSKitDemo-Prefix.pch";
 				INFOPLIST_FILE = "PSKitDemo/PSKitDemo-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1048,6 +1094,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "PSKitDemo/PSKitDemo-Prefix.pch";
 				INFOPLIST_FILE = "PSKitDemo/PSKitDemo-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

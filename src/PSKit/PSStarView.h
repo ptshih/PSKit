@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PSView.h"
 
 @interface PSStarView : PSView {
   CGFloat _rating;
