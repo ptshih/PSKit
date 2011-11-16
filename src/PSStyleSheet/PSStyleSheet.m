@@ -13,7 +13,7 @@ static NSDictionary *_styles = nil;
 @implementation PSStyleSheet
 
 + (void)initialize {
-  NSString *styleSheetPath = [[NSBundle mainBundle] pathForResource:@"PSStyleSheet" ofType:@"plist"];
+  NSString *styleSheetPath = [[NSBundle mainBundle] pathForResource:@"PSStyleSheet-Default" ofType:@"plist"];
   assert(styleSheetPath != nil);
   
   NSDictionary *styleSheetDict = [NSDictionary dictionaryWithContentsOfFile:styleSheetPath];

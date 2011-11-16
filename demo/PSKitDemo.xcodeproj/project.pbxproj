@@ -104,7 +104,7 @@
 		28381A9C1472F914007E4827 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28381A9B1472F914007E4827 /* MessageUI.framework */; };
 		2869870A1473101100B40860 /* PSNavigationBar.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 286987091473101100B40860 /* PSNavigationBar.bundle */; };
 		2869870F1473108400B40860 /* PSStyleSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 2869870D1473108400B40860 /* PSStyleSheet.m */; };
-		286987101473108400B40860 /* PSStyleSheet.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2869870E1473108400B40860 /* PSStyleSheet.plist */; };
+		286987101473108400B40860 /* PSStyleSheet-Default.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2869870E1473108400B40860 /* PSStyleSheet-Default.plist */; };
 		286987251473139E00B40860 /* BackgroundBlueprint.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2869871C1473139E00B40860 /* BackgroundBlueprint.jpg */; };
 		286987261473139E00B40860 /* BackgroundBlueprint@2x.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2869871D1473139E00B40860 /* BackgroundBlueprint@2x.jpg */; };
 		286987271473139E00B40860 /* BackgroundBlueprint~ipad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2869871E1473139E00B40860 /* BackgroundBlueprint~ipad.jpg */; };
@@ -114,6 +114,7 @@
 		2869872B1473139E00B40860 /* Default.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 286987221473139E00B40860 /* Default.jpg */; };
 		2869872C1473139E00B40860 /* Default@2x.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 286987231473139E00B40860 /* Default@2x.jpg */; };
 		2869872D1473139E00B40860 /* Default~ipad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 286987241473139E00B40860 /* Default~ipad.jpg */; };
+		28698731147387C200B40860 /* PSStyleSheet.plist in Resources */ = {isa = PBXBuildFile; fileRef = 28698730147387C200B40860 /* PSStyleSheet.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -303,7 +304,7 @@
 		286987091473101100B40860 /* PSNavigationBar.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = PSNavigationBar.bundle; sourceTree = "<group>"; };
 		2869870C1473108400B40860 /* PSStyleSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSStyleSheet.h; sourceTree = "<group>"; };
 		2869870D1473108400B40860 /* PSStyleSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSStyleSheet.m; sourceTree = "<group>"; };
-		2869870E1473108400B40860 /* PSStyleSheet.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PSStyleSheet.plist; sourceTree = "<group>"; };
+		2869870E1473108400B40860 /* PSStyleSheet-Default.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "PSStyleSheet-Default.plist"; sourceTree = "<group>"; };
 		2869871C1473139E00B40860 /* BackgroundBlueprint.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = BackgroundBlueprint.jpg; sourceTree = "<group>"; };
 		2869871D1473139E00B40860 /* BackgroundBlueprint@2x.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "BackgroundBlueprint@2x.jpg"; sourceTree = "<group>"; };
 		2869871E1473139E00B40860 /* BackgroundBlueprint~ipad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "BackgroundBlueprint~ipad.jpg"; sourceTree = "<group>"; };
@@ -314,6 +315,7 @@
 		286987231473139E00B40860 /* Default@2x.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Default@2x.jpg"; sourceTree = "<group>"; };
 		286987241473139E00B40860 /* Default~ipad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Default~ipad.jpg"; sourceTree = "<group>"; };
 		2869872F147385AC00B40860 /* PSCategories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSCategories.h; sourceTree = "<group>"; };
+		28698730147387C200B40860 /* PSStyleSheet.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PSStyleSheet.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -391,6 +393,7 @@
 				283818CE14723F1D007E4827 /* main.m */,
 				283818D014723F1D007E4827 /* PSKitDemo-Prefix.pch */,
 				2869870814730F7200B40860 /* Constants.h */,
+				28698730147387C200B40860 /* PSStyleSheet.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -837,7 +840,7 @@
 			children = (
 				2869870C1473108400B40860 /* PSStyleSheet.h */,
 				2869870D1473108400B40860 /* PSStyleSheet.m */,
-				2869870E1473108400B40860 /* PSStyleSheet.plist */,
+				2869870E1473108400B40860 /* PSStyleSheet-Default.plist */,
 			);
 			name = PSStyleSheet;
 			path = ../src/PSStyleSheet;
@@ -918,7 +921,7 @@
 				28381A7B1472ED01007E4827 /* bg_toast@2x.png in Resources */,
 				28381A851472EF41007E4827 /* PullToRefresh.bundle in Resources */,
 				2869870A1473101100B40860 /* PSNavigationBar.bundle in Resources */,
-				286987101473108400B40860 /* PSStyleSheet.plist in Resources */,
+				286987101473108400B40860 /* PSStyleSheet-Default.plist in Resources */,
 				286987251473139E00B40860 /* BackgroundBlueprint.jpg in Resources */,
 				286987261473139E00B40860 /* BackgroundBlueprint@2x.jpg in Resources */,
 				286987271473139E00B40860 /* BackgroundBlueprint~ipad.jpg in Resources */,
@@ -928,6 +931,7 @@
 				2869872B1473139E00B40860 /* Default.jpg in Resources */,
 				2869872C1473139E00B40860 /* Default@2x.jpg in Resources */,
 				2869872D1473139E00B40860 /* Default~ipad.jpg in Resources */,
+				28698731147387C200B40860 /* PSStyleSheet.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

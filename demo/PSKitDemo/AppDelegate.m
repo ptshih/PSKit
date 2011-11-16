@@ -22,7 +22,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   // Set application stylesheet
-//  [PSStyleSheet setStyleSheet:@"PSAppStyleSheet"];
+  [PSStyleSheet setStyleSheet:@"PSStyleSheet"];
   
   // Start Reachability
   [PSReachabilityCenter defaultCenter];

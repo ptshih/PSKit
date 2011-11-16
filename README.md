@@ -67,20 +67,18 @@ PSKit Core
 Usage
 ---
 1. Link required frameworks
-2. Create InitialDefaults.plist
-3. Create Constants.h (REQUIRED), import it in PCH
-4. Create a custom stylesheet (optional), set it in AppDelegate
-5. Selectively add modules into project
-6. Selectively add vendor modules into project
+2. If using PSStylesheet, Create PSStyleSheet.plist and add to project. In application didFinishLaunching add "[PSStyleSheet setStyleSheet:@"PSStyleSheet"];" to set the new style sheet. Look at PSStyleSheet-Default.plist for examples
+3. Import PSConstants.h where PSKit is needed. It's recommended to create a Constants.h and import it in the PCH file.
  
 Config
 ---
 PSConstants.h contains #defines for lots of PSKit's configuration
+It also imports PSCategories.h which is required by PSKit
 
 PSStyleSheet
 ---
 This is a custom stylesheet driven by a plist file
-This reads from PSStyleSheet.plist by default
+This reads from PSStyleSheet-Default.plist by default
 Set a new one: PSStyleSheet setStyleSheet:@"YOUR_STYLESHEET_NAME"];
 
 LICENSE
