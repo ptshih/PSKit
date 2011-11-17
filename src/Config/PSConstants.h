@@ -61,6 +61,8 @@
 /**
  Notifications
  */
+#define kApplicationBackgrounded @"ApplicationBackgrounded"
+#define kApplicationForegrounded @"ApplicationForegrounded"
 #define kApplicationResumed @"ApplicationResumed"
 #define kApplicationSuspended @"ApplicationSuspended"
 #define kCoreDataDidReset @"CoreDataDidReset"
