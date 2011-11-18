@@ -32,31 +32,72 @@ static NSDictionary *_styles = nil;
   _styles = [styleSheetDict retain];
 }
 
+#pragma mark - Configure Label
++ (void)applyStyle:(NSString *)style forLabel:(UILabel *)label {
+  label.font = [PSStyleSheet fontForStyle:style];
+  label.textColor = [PSStyleSheet textColorForStyle:style];
+  label.highlightedTextColor = [PSStyleSheet highlightedTextColorForStyle:style];
+  label.shadowColor = [PSStyleSheet shadowColorForStyle:style];
+  label.shadowOffset = [PSStyleSheet shadowOffsetForStyle:style];
+  label.textAlignment = [PSStyleSheet textAlignmentForStyle:style];
+}
+
 #pragma mark - Fonts
 + (UIFont *)fontForStyle:(NSString *)style {
   UIFont *font = nil;
-  font = [UIFont fontWithName:[[_styles objectForKey:style] objectForKey:@"fontName"] size:[[[_styles objectForKey:style] objectForKey:@"fontSize"] integerValue]];
+  if ([[_styles objectForKey:style] objectForKey:@"fontName"] && [[_styles objectForKey:style] objectForKey:@"fontSize"]) {
+    font = [UIFont fontWithName:[[_styles objectForKey:style] objectForKey:@"fontName"] size:[[[_styles objectForKey:style] objectForKey:@"fontSize"] integerValue]];
+  }
   return font;
 }
 
 #pragma mark - Colors
 + (UIColor *)textColorForStyle:(NSString *)style {
   UIColor *color = nil;
-  color = [UIColor colorWithHexString:[[_styles objectForKey:style] objectForKey:@"textColor"]];
+  if ([[_styles objectForKey:style] objectForKey:@"textColor"]) {
+    color = [UIColor colorWithHexString:[[_styles objectForKey:style] objectForKey:@"textColor"]];
+  }
+  return color;
+}
+
++ (UIColor *)highlightedTextColorForStyle:(NSString *)style {
+  UIColor *color = nil;
+  if ([[_styles objectForKey:style] objectForKey:@"highlightedTextColor"]) {
+    color = [UIColor colorWithHexString:[[_styles objectForKey:style] objectForKey:@"highlightedTextColor"]];
+  }
   return color;
 }
 
 + (UIColor *)shadowColorForStyle:(NSString *)style {
   UIColor *color = nil;
-  color = [UIColor colorWithHexString:[[_styles objectForKey:style] objectForKey:@"shadowColor"]];
+  if ([[_styles objectForKey:style] objectForKey:@"shadowColor"]) {
+    color = [UIColor colorWithHexString:[[_styles objectForKey:style] objectForKey:@"shadowColor"]];
+  }
   return color;
 }
 
 #pragma mark - Offsets
 + (CGSize)shadowOffsetForStyle:(NSString *)style {
   CGSize offset = CGSizeZero;
-  offset = CGSizeFromString([[_styles objectForKey:style] objectForKey:@"shadowOffset"]);
+  if ([[_styles objectForKey:style] objectForKey:@"shadowOffset"]) {
+    offset = CGSizeFromString([[_styles objectForKey:style] objectForKey:@"shadowOffset"]);
+  }
   return offset;
+}
+
+#pragma mark - Text Alignment
++ (UITextAlignment)textAlignmentForStyle:(NSString *)style {
+  // Defaults to UITextAlignmentLeft if undefined
+  if ([[_styles objectForKey:style] objectForKey:@"textAlignment"]) {
+    NSString *textAlignmentString = [[_styles objectForKey:style] objectForKey:@"textAlignment"];
+    if ([textAlignmentString isEqualToString:@"center"]) {
+      return UITextAlignmentCenter;
+    } else if ([textAlignmentString isEqualToString:@"right"]) {
+      return  UITextAlignmentRight;
+    } else return UITextAlignmentLeft;
+  } else {
+    return UITextAlignmentLeft;
+  }
 }
 
 @end

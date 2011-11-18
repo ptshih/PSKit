@@ -14,7 +14,6 @@
 
 @implementation PSBaseViewController
 
-@synthesize navTitleLabel = _navTitleLabel;
 @synthesize viewHasLoadedOnce = _viewHasLoadedOnce;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -30,24 +29,19 @@
 
 - (void)viewDidUnload {
   RELEASE_SAFELY(_nullView);
-  RELEASE_SAFELY(_navTitleLabel);
   [super viewDidUnload];
 }
 
 - (void)dealloc {
   RELEASE_SAFELY(_nullView);
-  RELEASE_SAFELY(_navTitleLabel);
   [super dealloc];
-}
-
-#pragma mark - View Config
-- (UIView *)backgroundView {
-  return nil;
 }
 
 #pragma mark - View
 - (void)loadView {
   [super loadView];
+  
+  self.view.autoresizingMask = ~UIViewAutoresizingNone;
   
   // Background
   UIView *bgView = [self backgroundView];
@@ -96,10 +90,6 @@
 - (void)viewWillDisappear:(BOOL)animated {
   [super viewWillDisappear:animated];
 //  [[NSNotificationCenter defaultCenter] removeObserver:self name:kApplicationResumed object:nil];
-}
-
-- (void)orientationChangedFromNotification:(NSNotification *)notification {
-  // may should implement
 }
 
 - (void)back {
@@ -187,5 +177,7 @@
     _activeScrollView.scrollsToTop = isEnabled;
   }
 }
+
+
 
 @end

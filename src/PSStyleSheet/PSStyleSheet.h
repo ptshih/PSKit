@@ -11,9 +11,15 @@
 @interface PSStyleSheet : NSObject
 
 + (void)setStyleSheet:(NSString *)styleSheet;
++ (void)applyStyle:(NSString *)style forLabel:(UILabel *)label;
+
 + (UIFont *)fontForStyle:(NSString *)style;
 + (UIColor *)textColorForStyle:(NSString *)style;
++ (UIColor *)highlightedTextColorForStyle:(NSString *)style;
 + (UIColor *)shadowColorForStyle:(NSString *)style;
 + (CGSize)shadowOffsetForStyle:(NSString *)style;
++ (UITextAlignment)textAlignmentForStyle:(NSString *)style;
+
+// TODO: Add UILineBreakMode
 
 @end
