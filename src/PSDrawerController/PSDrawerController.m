@@ -17,8 +17,10 @@
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     _state = PSDrawerStateClosed;
+    _hidden = NO;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(slide:) name:kPSDrawerSlide object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hide:) name:kPSDrawerHide object:nil];
   }
   return self;
 }
@@ -75,7 +77,7 @@
     _state = PSDrawerStateOpen;
     [_bottomViewController viewWillAppear:YES];
   } else if (_state == PSDrawerStateOpen) {
-    animationOptions = UIViewAnimationOptionCurveEaseIn;
+    animationOptions = UIViewAnimationOptionCurveEaseOut;
     left = 0;
     _state = PSDrawerStateClosed;
     [_bottomViewController viewWillDisappear:NO];
@@ -93,6 +95,32 @@
                      } else if (_state == PSDrawerStateClosed) {
                        [_bottomViewController viewDidDisappear:YES];
                      }
+                   }];
+}
+
+- (void)hide:(NSNotification *)notification {
+  UIViewAnimationOptions animationOptions;
+  animationOptions = UIViewAnimationOptionCurveEaseOut;
+  
+  [UIView animateWithDuration:0.4
+                        delay:0.0
+                      options:animationOptions
+                   animations:^{
+                     if (_hidden) {
+                       _bottomViewController.view.width = DRAWER_WIDTH;
+                       if (_state == PSDrawerStateOpen) {
+                         _topViewController.view.left = DRAWER_WIDTH;
+                       } else if (_state == PSDrawerStateClosed) {
+                         _topViewController.view.left = 0;
+                       }
+                       _hidden = NO;
+                     } else {
+                       _bottomViewController.view.width = self.view.width;
+                       _topViewController.view.left = self.view.width;
+                       _hidden = YES;
+                     }
+                   }
+                   completion:^(BOOL finished){
                    }];
 }
 

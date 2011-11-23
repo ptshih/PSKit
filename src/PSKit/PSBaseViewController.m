@@ -103,6 +103,7 @@
 
 - (void)dataSourceDidLoad {
   _reloading = NO;
+  _dataDidError = NO;
   [self updateState];
 }
 

@@ -10,6 +10,7 @@
 #import "PSViewController.h"
 
 #define kPSDrawerSlide @"PSDrawerSlide"
+#define kPSDrawerHide @"PSDrawerHide"
 
 typedef enum {
   PSDrawerStateClosed = 1,
@@ -18,6 +19,7 @@ typedef enum {
 
 @interface PSDrawerController : PSViewController {
   PSDrawerState _state;
+  BOOL _hidden;
   
   UIViewController *_bottomViewController;
   UIViewController *_topViewController;
@@ -31,4 +33,8 @@ typedef enum {
 
 #pragma mark - Slide Drawer
 - (void)slide:(NSNotification *)notification;
+
+#pragma mark - Hide Drawer
+- (void)hide:(NSNotification *)notification;
+
 @end

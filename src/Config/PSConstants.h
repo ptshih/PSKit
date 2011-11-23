@@ -23,6 +23,7 @@
 #import "PSCategories.h"
 
 // Import any project-specific constants here
+#import "AppDelegate.h"
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
@@ -31,7 +32,7 @@
 #define RADIANS(degrees) ((degrees * M_PI) / 180.0)
 
 // App Delegate Macro
-#define APP_DELEGATE ((AppDelegate *)[[UIApplication sharedApplication] delegate])
+#define APP_DELEGATE (AppDelegate *)[[UIApplication sharedApplication] delegate]
 
 /**
  Alert Tags
