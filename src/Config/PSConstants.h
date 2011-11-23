@@ -3,7 +3,7 @@
 //  SevenMinuteLibrary
 //
 //  Created by Peter Shih on 8/9/11.
-//  Copyright 2011 Seven Minute Labs. All rights reserved.
+//  Copyright (c) 2011 Peter Shih.. All rights reserved.
 //
 
 // Global Imports
