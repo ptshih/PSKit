@@ -8,7 +8,8 @@
 
 #import "PSDrawerController.h"
 
-#define DRAWER_WIDTH 260
+#define DRAWER_WIDTH 260.0
+#define DRAWER_GAP 60.0
 
 @implementation PSDrawerController
 
@@ -50,7 +51,7 @@
       
       // Set Frame
       _bottomViewController.view.frame = self.view.bounds;
-      _bottomViewController.view.width = DRAWER_WIDTH;
+      _bottomViewController.view.width = self.view.width - DRAWER_GAP;
       
       [self.view insertSubview:_bottomViewController.view atIndex:0];
     }
@@ -73,7 +74,7 @@
   CGFloat left = 0;
   if (_state == PSDrawerStateClosed) {
     animationOptions = UIViewAnimationOptionCurveEaseOut;
-    left = DRAWER_WIDTH;
+    left = self.view.width - DRAWER_GAP;
     _state = PSDrawerStateOpen;
     [_bottomViewController viewWillAppear:YES];
   } else if (_state == PSDrawerStateOpen) {
@@ -98,6 +99,7 @@
                    }];
 }
 
+#pragma mark - Hide Drawer
 - (void)hide:(NSNotification *)notification {
   UIViewAnimationOptions animationOptions;
   animationOptions = UIViewAnimationOptionCurveEaseOut;
@@ -107,9 +109,9 @@
                       options:animationOptions
                    animations:^{
                      if (_hidden) {
-                       _bottomViewController.view.width = DRAWER_WIDTH;
+                       _bottomViewController.view.width = self.view.width - DRAWER_GAP;
                        if (_state == PSDrawerStateOpen) {
-                         _topViewController.view.left = DRAWER_WIDTH;
+                         _topViewController.view.left = self.view.width - DRAWER_GAP;
                        } else if (_state == PSDrawerStateClosed) {
                          _topViewController.view.left = 0;
                        }

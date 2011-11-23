@@ -32,9 +32,15 @@ typedef enum {
 - (void)setViewControllers:(NSArray *)viewControllers;
 
 #pragma mark - Slide Drawer
+/**
+ This method slides the top controller partially off the screen.
+ */
 - (void)slide:(NSNotification *)notification;
 
 #pragma mark - Hide Drawer
+/**
+ This method slides the top controller completely off the screen.
+ */
 - (void)hide:(NSNotification *)notification;
 
 @end
