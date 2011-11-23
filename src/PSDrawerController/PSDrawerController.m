@@ -110,7 +110,7 @@
     animationOptions = UIViewAnimationOptionCurveEaseOut;
     left = 0;
     _state = PSDrawerStateClosed;
-    [_bottomViewController viewWillDisappear:NO];
+    [_bottomViewController viewWillDisappear:YES];
   }
   
   [UIView animateWithDuration:0.4
