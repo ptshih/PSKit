@@ -17,6 +17,7 @@
 #import "PSNullView.h"
 #import "PSTextField.h"
 #import "PSTextView.h"
+#import "PSSearchField.h"
 
 // Import PSKit Categories
 #import "PSCategories.h"

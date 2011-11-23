@@ -59,7 +59,6 @@
       
       // Set Frame
       _topViewController.view.frame = self.view.bounds;
-//      _topViewController.view.left = DRAWER_WIDTH;
       
       [self.view insertSubview:_topViewController.view atIndex:1];
     }
@@ -68,18 +67,33 @@
 
 #pragma mark - Slide Drawer
 - (void)slide:(NSNotification *)notification {
+  UIViewAnimationOptions animationOptions;
   CGFloat left = 0;
   if (_state == PSDrawerStateClosed) {
-    _state = PSDrawerStateOpen;
+    animationOptions = UIViewAnimationOptionCurveEaseOut;
     left = DRAWER_WIDTH;
+    _state = PSDrawerStateOpen;
+    [_bottomViewController viewWillAppear:YES];
   } else if (_state == PSDrawerStateOpen) {
-    _state = PSDrawerStateClosed;
+    animationOptions = UIViewAnimationOptionCurveEaseIn;
     left = 0;
+    _state = PSDrawerStateClosed;
+    [_bottomViewController viewWillDisappear:NO];
   }
   
-  [UIView animateWithDuration:0.4 animations:^{
-    _topViewController.view.left = left;
-  }];
+  [UIView animateWithDuration:0.4
+                        delay:0.0
+                      options:animationOptions
+                   animations:^{
+                     _topViewController.view.left = left;
+                   }
+                   completion:^(BOOL finished){
+                     if (_state == PSDrawerStateOpen) {
+                       [_bottomViewController viewDidAppear:YES];
+                     } else if (_state == PSDrawerStateClosed) {
+                       [_bottomViewController viewDidDisappear:YES];
+                     }
+                   }];
 }
 
 @end

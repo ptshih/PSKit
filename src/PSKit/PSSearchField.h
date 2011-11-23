@@ -10,12 +10,12 @@
 
 enum {
   PSSearchFieldStyleBlack = 0,
-  PSSearchFieldStyleWhite = 1,
-  PSSearchFieldStyleCell = 2
+  PSSearchFieldStyleWhite = 1
 };
 typedef uint32_t PSSearchFieldStyle;
 
 @interface PSSearchField : UITextField {
+  PSSearchFieldStyle _searchFieldStyle;
 }
 
 - (id)initWithFrame:(CGRect)frame style:(PSSearchFieldStyle)style;

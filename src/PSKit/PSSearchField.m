@@ -15,22 +15,26 @@
 - (id)initWithFrame:(CGRect)frame style:(PSSearchFieldStyle)style {
   self = [super initWithFrame:frame];
   if (self) {
+    _searchFieldStyle = style;
     if (style == PSSearchFieldStyleBlack) {
-      self.background = [[UIImage imageNamed:@"bg_searchfield.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:15];
+      self.background = [[UIImage imageNamed:@"PSKit.bundle/BackgroundSearchFieldBlack.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:15];
       self.font = [PSStyleSheet fontForStyle:@"searchField"];
       self.textColor = [PSStyleSheet textColorForStyle:@"searchField"];
     } else if (style == PSSearchFieldStyleWhite) {
-      self.background = [[UIImage imageNamed:@"bg_searchfield.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:15];
-      self.font = [PSStyleSheet fontForStyle:@"searchField"];
-      self.textColor = [PSStyleSheet textColorForStyle:@"searchField"];
-    } else if (style == PSSearchFieldStyleCell) {
-      self.background = [[UIImage imageNamed:@"grouped_full_cell.png"] stretchableImageWithLeftCapWidth:6 topCapHeight:6];
+      self.background = [[UIImage imageNamed:@"PSKit.bundle/BackgroundSearchFieldWhite.png"] stretchableImageWithLeftCapWidth:18 topCapHeight:15];
       self.font = [PSStyleSheet fontForStyle:@"searchField"];
       self.textColor = [PSStyleSheet textColorForStyle:@"searchField"];
     }
+    self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     self.returnKeyType = UIReturnKeySearch;
+    self.autocorrectionType = UITextAutocorrectionTypeNo;
     self.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     self.keyboardAppearance = UIKeyboardAppearanceAlert;
+    self.clearButtonMode = UITextFieldViewModeWhileEditing;
+    self.leftViewMode = UITextFieldViewModeAlways;
+    UIImageView *mag = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/IconMagnifier.png"]] autorelease];
+    mag.contentMode = UIViewContentModeCenter;
+    self.leftView = mag;
   }
   return self;
 }
@@ -42,7 +46,9 @@
 // This overrides the default image for a clear button
 - (UIButton *)clearButton {
   UIButton *clearButton = [super clearButton];
-  [clearButton setImage:[UIImage imageNamed:@"icon_clear.png"] forState:UIControlStateNormal];
+  if (_searchFieldStyle == PSSearchFieldStyleBlack) {
+    [clearButton setImage:[UIImage imageNamed:@"PSKit.bundle/IconClear.png"] forState:UIControlStateNormal];
+  }
   return clearButton;
 }
 
