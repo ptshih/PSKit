@@ -37,16 +37,10 @@
 }
 
 #pragma mark - View
-- (void)loadView {
-  [super loadView];
+- (void)viewDidLoad {
+  [super viewDidLoad];
   
   self.view.autoresizingMask = ~UIViewAutoresizingNone;
-  
-  // Background
-  UIView *bgView = [self backgroundView];
-  if (bgView) {
-    [self.view addSubview:bgView];
-  }
   
   // Set navigation title view
   if (self.title) {
@@ -61,10 +55,7 @@
   
   // Configure Empty View
   // Configure Loading View
-  }
-
-- (void)viewDidLoad {
-  [super viewDidLoad];
+  
   _viewHasLoadedOnce = YES;
 }
 

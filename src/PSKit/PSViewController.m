@@ -48,6 +48,12 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   VLog(@"Called by class: %@", [self class]);
+  
+  // Background
+  UIView *bgView = [self backgroundView];
+  if (bgView) {
+    [self.view insertSubview:bgView atIndex:0];
+  }
 }
 
 - (void)viewWillAppear:(BOOL)animated

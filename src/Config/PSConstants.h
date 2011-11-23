@@ -29,6 +29,9 @@
 
 #define RADIANS(degrees) ((degrees * M_PI) / 180.0)
 
+// App Delegate Macro
+#define APP_DELEGATE ((AppDelegate *)[[UIApplication sharedApplication] delegate])
+
 /**
  Alert Tags
  */
