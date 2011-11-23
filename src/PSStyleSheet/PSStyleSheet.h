@@ -12,6 +12,7 @@
 
 + (void)setStyleSheet:(NSString *)styleSheet;
 + (void)applyStyle:(NSString *)style forLabel:(UILabel *)label;
++ (void)applyStyle:(NSString *)style forButton:(UIButton *)button;
 
 + (UIFont *)fontForStyle:(NSString *)style;
 + (UIColor *)textColorForStyle:(NSString *)style;

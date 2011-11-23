@@ -206,11 +206,7 @@
   l.backgroundColor = [UIColor clearColor];
   l.autoresizingMask = UIViewAutoresizingFlexibleWidth;
   l.text = @"Loading More...";
-  l.textAlignment = UITextAlignmentCenter;
-  l.font = [PSStyleSheet fontForStyle:@"loadMoreLabel"];
-  l.textColor = [PSStyleSheet textColorForStyle:@"loadMoreLabel"];
-  l.shadowColor = [PSStyleSheet shadowColorForStyle:@"loadMoreLabel"];
-  l.shadowOffset = [PSStyleSheet shadowOffsetForStyle:@"loadMoreLabel"];
+  [PSStyleSheet applyStyle:@"loadMoreLabel" forLabel:l];
   
   // Activity
   UIActivityIndicatorView *av = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite] autorelease];
