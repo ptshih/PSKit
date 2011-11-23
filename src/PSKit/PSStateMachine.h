@@ -27,11 +27,6 @@
  */
 - (void)updateState;
 
-/**
- Used to update the currently active scrollview (for scrollsToTop fix)
- */
-- (void)updateScrollsToTop:(BOOL)isEnabled;
-
 @optional
 /**
  Initiates loading of the dataSource

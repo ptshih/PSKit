@@ -20,7 +20,6 @@
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     _reloading = NO;
-    _activeScrollView = nil;
     _dataDidError = NO;
     _viewHasLoadedOnce = NO;
   }
@@ -49,6 +48,11 @@
     [self.view addSubview:bgView];
   }
   
+  // Set navigation title view
+  if (self.title) {
+    self.navigationItem.titleView = [self navigationTitleView];
+  }
+  
   // NullView
   _nullView = [[PSNullView alloc] initWithFrame:self.view.bounds];
   _nullView.autoresizingMask = ~UIViewAutoresizingNone;
@@ -57,39 +61,11 @@
   
   // Configure Empty View
   // Configure Loading View
-  
-  // Setup Nav Bar
-  UIView *navTitleView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.navigationController.navigationBar.width - 160, self.navigationController.navigationBar.height)];
-//  navTitleView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
-  _navTitleLabel = [[UILabel alloc] initWithFrame:navTitleView.bounds];
-  _navTitleLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight;
-  _navTitleLabel.textAlignment = UITextAlignmentCenter;
-  _navTitleLabel.numberOfLines = 3;
-  _navTitleLabel.text = self.title;
-  _navTitleLabel.font = [PSStyleSheet fontForStyle:@"navigationTitle"];
-  _navTitleLabel.textColor = [PSStyleSheet textColorForStyle:@"navigationTitle"];
-  _navTitleLabel.shadowColor = [PSStyleSheet shadowColorForStyle:@"navigationTitle"];
-  _navTitleLabel.shadowOffset = CGSizeMake(0, 1);
-  _navTitleLabel.backgroundColor = [UIColor clearColor];
-  [navTitleView addSubview:_navTitleLabel];
-  
-  self.navigationItem.titleView = navTitleView;
-  [navTitleView release];
-}
+  }
 
 - (void)viewDidLoad {
   [super viewDidLoad];
   _viewHasLoadedOnce = YES;
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-  [super viewWillAppear:animated];
-//  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadDataSource) name:kApplicationResumed object:nil];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-  [super viewWillDisappear:animated];
-//  [[NSNotificationCenter defaultCenter] removeObserver:self name:kApplicationResumed object:nil];
 }
 
 - (void)back {
@@ -98,6 +74,7 @@
 
 #pragma mark - PSNullViewDelegate
 - (void)nullViewTapped:(id)sender {
+  // When a nullView is tapped, reload the dataSource
   [self reloadDataSource];
 }
 
@@ -171,13 +148,5 @@
     }
   }
 }
-
-- (void)updateScrollsToTop:(BOOL)isEnabled {
-  if (_activeScrollView) {
-    _activeScrollView.scrollsToTop = isEnabled;
-  }
-}
-
-
 
 @end

@@ -14,6 +14,7 @@
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
+    _activeScrollView = nil;
     VLog(@"Called by class: %@", [self class]);
   }
   return self;
@@ -61,6 +62,17 @@
   VLog(@"Called by class: %@", [self class]);
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  VLog(@"Called by class: %@", [self class]);
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  VLog(@"Called by class: %@", [self class]);
+}
 
 #pragma mark - View Config
 - (UIView *)backgroundView {
@@ -71,13 +83,14 @@
   UIView *v = [[[UIView alloc] initWithFrame:self.navigationItem.titleView.bounds] autorelease];
   v.autoresizingMask = self.navigationItem.titleView.autoresizingMask;
   UILabel *l = [[[UILabel alloc] initWithFrame:v.bounds] autorelease];
-  l.text = [[self.navigationItem.title copy] autorelease];
+  l.text = [[self.title copy] autorelease];
   self.navigationItem.title = nil;
   l.numberOfLines = 3;
+  l.backgroundColor = [UIColor clearColor];
   [PSStyleSheet applyStyle:@"navigationTitleLabel" forLabel:l];
   [v addSubview:l];
   
-  return nil;
+  return v;
 }
 
 #pragma mark - Rotation
@@ -88,6 +101,13 @@
 
 - (void)orientationChangedFromNotification:(NSNotification *)notification {
   // may should implement
+}
+
+#pragma mark - Scroll State
+- (void)updateScrollsToTop:(BOOL)isEnabled {
+  if (_activeScrollView) {
+    _activeScrollView.scrollsToTop = isEnabled;
+  }
 }
 
 @end

@@ -14,11 +14,20 @@
   UIScrollView *_activeScrollView; // subclasses should set this if they have a scrollView
 }
 
-// View Config
+/**
+ Used to configure the view right after it is loaded
+ */
 - (UIView *)backgroundView;
 - (UIView *)navigationTitleView;
 
-// Orientation
+/**
+ Used to update the view when the orientation changes
+ */
 - (void)orientationChangedFromNotification:(NSNotification *)notification;
+
+/**
+ Used to update the currently active scrollview (for scrollsToTop fix)
+ */
+- (void)updateScrollsToTop:(BOOL)isEnabled;
 
 @end
