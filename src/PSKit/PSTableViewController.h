@@ -44,7 +44,7 @@
 @property (nonatomic, retain) NSMutableArray *items;
 @property (nonatomic, retain) NSMutableArray *searchItems;
 
-// View Config
+// TableView Config
 - (UIView *)tableView:(UITableView *)tableView rowBackgroundViewForIndexPath:(NSIndexPath *)indexPath selected:(BOOL)selected;
 
 // View Setup
