@@ -39,12 +39,6 @@
 }
 
 #pragma mark - View
-- (void)loadView
-{
-  [super loadView];
-  VLog(@"Called by class: %@", [self class]);
-}
-
 - (void)viewDidLoad {
   [super viewDidLoad];
   VLog(@"Called by class: %@", [self class]);

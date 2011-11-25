@@ -42,20 +42,12 @@
     
     _titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _titleLabel.backgroundColor = [UIColor clearColor];
-    _titleLabel.textAlignment = UITextAlignmentCenter;
-    _titleLabel.font = [PSStyleSheet fontForStyle:@"nullTitle"];
-    _titleLabel.textColor = [PSStyleSheet textColorForStyle:@"nullTitle"];
-    _titleLabel.shadowColor = [PSStyleSheet shadowColorForStyle:@"nullTitle"];
-    _titleLabel.shadowOffset = [PSStyleSheet shadowOffsetForStyle:@"nullTitle"];
+    [PSStyleSheet applyStyle:@"nullViewTitle" forLabel:_titleLabel];
     
     _subtitleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _subtitleLabel.numberOfLines = 0;
     _subtitleLabel.backgroundColor = [UIColor clearColor];
-    _subtitleLabel.textAlignment = UITextAlignmentCenter;
-    _subtitleLabel.font = [PSStyleSheet fontForStyle:@"nullSubtitle"];
-    _subtitleLabel.textColor = [PSStyleSheet textColorForStyle:@"nullSubtitle"];
-    _subtitleLabel.shadowColor = [PSStyleSheet shadowColorForStyle:@"nullSubtitle"];
-    _subtitleLabel.shadowOffset = [PSStyleSheet shadowOffsetForStyle:@"nullSubtitle"];
+    [PSStyleSheet applyStyle:@"nullViewSubtitle" forLabel:_subtitleLabel];
     
     _aiv = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     _aiv.hidesWhenStopped = YES;
