@@ -8,7 +8,7 @@
 
 #import "PSCollectionView.h"
 
-#define CARD_SPACING 10
+#define CARD_SPACING 10.0
 
 @implementation PSCollectionView
 
@@ -43,22 +43,24 @@
 - (void)updateCells {
   NSInteger numCards = [self.collectionViewDataSource numberOfCardsInCollectionView:self];
   
-  CGFloat visibleTop = self.contentOffset.y;
-  CGFloat visibleBottom = self.contentOffset.y + self.height;
+  CGFloat yOffset = self.contentOffset.y - (CARD_SPACING / 2);
+  CGFloat visibleTop = yOffset;
+  CGFloat visibleBottom = yOffset + self.height;
+  NSInteger cardHeight = (NSInteger)_rowHeight + (NSInteger)CARD_SPACING;
   
-  NSInteger topIndex = (NSInteger)visibleTop / (NSInteger)_rowHeight;
+  NSInteger topIndex = (NSInteger)visibleTop / cardHeight;
   if (topIndex < 0) topIndex = 0;
-  NSInteger bottomIndex = (NSInteger)visibleBottom / (NSInteger)_rowHeight;
+  NSInteger bottomIndex = (NSInteger)visibleBottom / cardHeight;
   if (bottomIndex >= numCards) bottomIndex = numCards - 1;
   
-//  NSLog(@"visibleTop: %f, visibleBottom: %f, topIndex: %d, bottomIndex: %d", visibleTop, visibleBottom, topIndex, bottomIndex);
+//  NSLog(@"visibleTop: %f, visibleBottom: %f, topIndex: %d, bottomIndex: %d, yOffset: %f", visibleTop, visibleBottom, topIndex, bottomIndex, yOffset);
   
   // Add new cell that just scrolled onto the screen
   if (topIndex < _topIndex) {
     NSString *cardKey = [[self class] cardKeyForIndex:topIndex];
     CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:topIndex];
     [_visibleCards setObject:newCardView forKey:cardKey];
-    newCardView.top = topIndex * _rowHeight + CARD_SPACING;
+    newCardView.top = (topIndex * _rowHeight) + ((topIndex + 1) * CARD_SPACING);
     newCardView.left = ceilf((self.width - newCardView.width) / 2);
     [self addSubview:newCardView];
     NSLog(@"add top card");
@@ -68,8 +70,8 @@
     NSString *cardKey = [[self class] cardKeyForIndex:bottomIndex];
     CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:bottomIndex];
     [_visibleCards setObject:newCardView forKey:cardKey];
-    newCardView.top = bottomIndex * _rowHeight + CARD_SPACING;
-    newCardView.left = ceilf((self.width - newCardView.width) / 2);
+    newCardView.top = (bottomIndex * _rowHeight) + ((bottomIndex + 1) * CARD_SPACING);
+    newCardView.left = floorf((self.width - newCardView.width) / 2);
     [self addSubview:newCardView];
     NSLog(@"add bottom card");
   }
@@ -114,15 +116,20 @@
   [_visibleCards removeAllObjects];
   
   // Calculate expected total height
-  CGFloat totalHeight = _rowHeight * numCards;
+  CGFloat totalHeight = (_rowHeight * numCards) + ((numCards + 1) * CARD_SPACING);
   self.contentSize = CGSizeMake(self.width, totalHeight);
   self.contentOffset = CGPointZero; // go back to top
   
-  CGFloat visibleTop = self.contentOffset.y;
-  CGFloat visibleBottom = self.contentOffset.y + self.height;
+  CGFloat yOffset = self.contentOffset.y - (CARD_SPACING / 2);
+  CGFloat visibleTop = yOffset;
+  CGFloat visibleBottom = yOffset + self.height;
   
-  NSInteger topIndex = (NSInteger)visibleTop / (NSInteger)_rowHeight;
-  NSInteger bottomIndex = (NSInteger)visibleBottom / (NSInteger)_rowHeight;
+  NSInteger cardHeight = (NSInteger)_rowHeight + CARD_SPACING;
+  
+  NSInteger topIndex = (NSInteger)visibleTop / cardHeight;
+  if (topIndex < 0) topIndex = 0;
+  NSInteger bottomIndex = (NSInteger)visibleBottom / cardHeight;
+  if (bottomIndex >= numCards) bottomIndex = numCards - 1;
   
   // Add initially visible cards
   NSInteger numVisible = bottomIndex + 1;
@@ -134,7 +141,7 @@
   for (int i = 0; i < numVisible; i++) {
     CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:i];
     [_visibleCards setObject:newCardView forKey:[[self class] cardKeyForIndex:i]];
-    newCardView.top = i * _rowHeight + CARD_SPACING;
+    newCardView.top = (i * _rowHeight) + ((i + 1) * CARD_SPACING);
     newCardView.left = ceilf((self.width - newCardView.width) / 2);
     [self addSubview:newCardView];
   }
