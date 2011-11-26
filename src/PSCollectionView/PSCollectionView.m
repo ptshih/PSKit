@@ -8,6 +8,8 @@
 
 #import "PSCollectionView.h"
 
+#define CARD_SPACING 10
+
 @implementation PSCollectionView
 
 @synthesize rowHeight = _rowHeight;
@@ -56,7 +58,8 @@
     NSString *cardKey = [[self class] cardKeyForIndex:topIndex];
     CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:topIndex];
     [_visibleCards setObject:newCardView forKey:cardKey];
-    newCardView.top = topIndex * _rowHeight;
+    newCardView.top = topIndex * _rowHeight + CARD_SPACING;
+    newCardView.left = ceilf((self.width - newCardView.width) / 2);
     [self addSubview:newCardView];
     NSLog(@"add top card");
   }
@@ -65,7 +68,8 @@
     NSString *cardKey = [[self class] cardKeyForIndex:bottomIndex];
     CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:bottomIndex];
     [_visibleCards setObject:newCardView forKey:cardKey];
-    newCardView.top = bottomIndex * _rowHeight;
+    newCardView.top = bottomIndex * _rowHeight + CARD_SPACING;
+    newCardView.left = ceilf((self.width - newCardView.width) / 2);
     [self addSubview:newCardView];
     NSLog(@"add bottom card");
   }
@@ -130,7 +134,8 @@
   for (int i = 0; i < numVisible; i++) {
     CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:i];
     [_visibleCards setObject:newCardView forKey:[[self class] cardKeyForIndex:i]];
-    newCardView.top = i * _rowHeight;
+    newCardView.top = i * _rowHeight + CARD_SPACING;
+    newCardView.left = ceilf((self.width - newCardView.width) / 2);
     [self addSubview:newCardView];
   }
   
@@ -149,12 +154,24 @@
     [cardView retain];
     [_reusableCards removeObject:cardView];
     [cardView autorelease];
+  } else {
+    cardView = [[[CardView alloc] initWithFrame:CGRectZero] autorelease];
+    
+    // Setup gesture recognizer
+    UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectCard:)] autorelease];
+    [cardView addGestureRecognizer:gr];
   }
+  
   return cardView;
 }
 
 - (void)enqueueReusableCardView:(CardView *)cardView {
   [_reusableCards addObject:cardView];
+}
+
+#pragma mark - Gesture Recognizer
+- (void)didSelectCard:(UITapGestureRecognizer *)gestureRecognizer {
+  NSLog(@"card tapped: %@", gestureRecognizer.view);
 }
 
 @end

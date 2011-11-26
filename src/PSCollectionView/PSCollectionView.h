@@ -11,7 +11,7 @@
 
 @protocol PSCollectionViewDelegate, PSCollectionViewDataSource;
 
-@interface PSCollectionView : UIScrollView <NSCoding> {
+@interface PSCollectionView : UIScrollView <NSCoding, UIGestureRecognizerDelegate> {
   NSMutableSet *_reusableCards;
   NSMutableDictionary *_visibleCards;
   
@@ -44,6 +44,8 @@
 
 
 @protocol PSCollectionViewDelegate <NSObject>
+@optional
+- (void)collectionView:(PSCollectionView *)collectionView didSelectCardAtIndex:(NSInteger)index;
 
 @end
 
