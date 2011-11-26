@@ -14,11 +14,9 @@
 @interface PSCollectionView : UIScrollView <NSCoding, UIGestureRecognizerDelegate> {
   NSMutableSet *_reusableCards;
   NSMutableDictionary *_visibleCards;
+  NSMutableArray *_cardKeysToRemove;
   
   CGFloat _rowHeight;
-  
-  NSInteger _topIndex;
-  NSInteger _bottomIndex;
   
   id <PSCollectionViewDelegate> _collectionViewDelegate;
   id <PSCollectionViewDataSource> _collectionViewDataSource;
@@ -35,7 +33,7 @@
 #pragma mark - Reusing Card Views
 - (CardView *)dequeueReusableCardView;
 - (void)enqueueReusableCardView:(CardView *)cardView;
-- (void)updateCells;
+- (void)removeAndAddCellsIfNecessary;
 
 
 + (NSString *)cardKeyForIndex:(NSInteger)index;

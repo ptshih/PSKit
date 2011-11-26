@@ -21,6 +21,7 @@
   if (self) {
     _reusableCards = [[NSMutableSet alloc] initWithCapacity:1];
     _visibleCards = [[NSMutableDictionary alloc] initWithCapacity:1];
+    _cardKeysToRemove = [[NSMutableArray alloc] initWithCapacity:1];
     
     _rowHeight = 0.0;
   }
@@ -30,6 +31,7 @@
 - (void)dealloc {
   RELEASE_SAFELY(_reusableCards);
   RELEASE_SAFELY(_visibleCards);
+  RELEASE_SAFELY(_cardKeysToRemove);
   [super dealloc];
 }
 
@@ -37,67 +39,54 @@
 - (void)layoutSubviews {
   [super layoutSubviews];
   
-  [self updateCells];
+  [self removeAndAddCellsIfNecessary];
 }
 
-- (void)updateCells {
+- (void)removeAndAddCellsIfNecessary {
   NSInteger numCards = [self.collectionViewDataSource numberOfCardsInCollectionView:self];
   
   CGFloat yOffset = self.contentOffset.y - (CARD_SPACING / 2);
   CGFloat visibleTop = yOffset;
   CGFloat visibleBottom = yOffset + self.height;
-  NSInteger cardHeight = (NSInteger)_rowHeight + (NSInteger)CARD_SPACING;
   
+  // Remove cells if they are off screen
+  [_cardKeysToRemove removeAllObjects];
+  [_visibleCards enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop){
+    CardView *card = (CardView *)obj;
+    NSString *cardKey = (NSString *)key;
+    CGFloat cardTop = card.top - CARD_SPACING;
+    CGFloat cardBottom = card.bottom + CARD_SPACING;
+    if (cardBottom < visibleTop || cardTop > visibleBottom) {
+      CardView *discardedCard = [_visibleCards objectForKey:cardKey];
+      [self enqueueReusableCardView:discardedCard];
+      [discardedCard removeFromSuperview];
+      [_cardKeysToRemove addObject:cardKey];
+      NSLog(@"### Removing card at index: %@ ###", cardKey);
+    }
+  }];
+  [_visibleCards removeObjectsForKeys:_cardKeysToRemove];
+  
+  // Add cells if necessary
+  NSInteger cardHeight = (NSInteger)_rowHeight + (NSInteger)CARD_SPACING;
   NSInteger topIndex = (NSInteger)visibleTop / cardHeight;
   if (topIndex < 0) topIndex = 0;
   NSInteger bottomIndex = (NSInteger)visibleBottom / cardHeight;
   if (bottomIndex >= numCards) bottomIndex = numCards - 1;
   
-//  NSLog(@"visibleTop: %f, visibleBottom: %f, topIndex: %d, bottomIndex: %d, yOffset: %f", visibleTop, visibleBottom, topIndex, bottomIndex, yOffset);
-  
-  // Add new cell that just scrolled onto the screen
-  if (topIndex < _topIndex) {
-    NSString *cardKey = [[self class] cardKeyForIndex:topIndex];
-    CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:topIndex];
-    [_visibleCards setObject:newCardView forKey:cardKey];
-    newCardView.top = (topIndex * _rowHeight) + ((topIndex + 1) * CARD_SPACING);
-    newCardView.left = ceilf((self.width - newCardView.width) / 2);
-    [self addSubview:newCardView];
-    NSLog(@"add top card");
+  for (int i = topIndex; i <= bottomIndex; i++) {
+    NSString *cardKey = [[self class] cardKeyForIndex:i];
+    CardView *visibleCard = [_visibleCards objectForKey:cardKey];
+    if (!visibleCard) {
+      CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:i];
+      [_visibleCards setObject:newCardView forKey:cardKey];
+      newCardView.top = (i * _rowHeight) + ((i + 1) * CARD_SPACING);
+      newCardView.left = ceilf((self.width - newCardView.width) / 2);
+      [self addSubview:newCardView];
+      NSLog(@"### Adding card at index: %@ ###", cardKey);
+    }
   }
   
-  if (bottomIndex > _bottomIndex) {
-    NSString *cardKey = [[self class] cardKeyForIndex:bottomIndex];
-    CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:bottomIndex];
-    [_visibleCards setObject:newCardView forKey:cardKey];
-    newCardView.top = (bottomIndex * _rowHeight) + ((bottomIndex + 1) * CARD_SPACING);
-    newCardView.left = floorf((self.width - newCardView.width) / 2);
-    [self addSubview:newCardView];
-    NSLog(@"add bottom card");
-  }
-
-  // Remove cells scrolled off top of the screen
-  if (topIndex > _topIndex) {
-    NSString *cardKey = [[self class] cardKeyForIndex:_topIndex];
-    CardView *discardedCard = [_visibleCards objectForKey:cardKey];
-    [self enqueueReusableCardView:discardedCard];
-    [discardedCard removeFromSuperview];
-    [_visibleCards removeObjectForKey:cardKey];
-    NSLog(@"remove top card");
-  }
-  
-  // Remove cells scrolled off bottom of the screen
-  if (bottomIndex < _bottomIndex) {
-    NSString *cardKey = [[self class] cardKeyForIndex:_bottomIndex];
-    CardView *discardedCard = [_visibleCards objectForKey:cardKey];
-    [self enqueueReusableCardView:discardedCard];
-    [discardedCard removeFromSuperview];
-    [_visibleCards removeObjectForKey:cardKey];
-    NSLog(@"remove bottom card");
-  }
-
-  _topIndex = topIndex;
-  _bottomIndex = bottomIndex;
+//  NSLog(@"visible cards: %@", _visibleCards);
 }
 
 #pragma mark - Card DataSource
@@ -134,9 +123,6 @@
   // Add initially visible cards
   NSInteger numVisible = bottomIndex + 1;
   if (numVisible > numCards) numVisible = numCards;
-  
-  _topIndex = topIndex;
-  _bottomIndex = bottomIndex;
   
   for (int i = 0; i < numVisible; i++) {
     CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:i];
