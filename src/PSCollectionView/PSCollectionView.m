@@ -78,6 +78,7 @@
     CardView *visibleCard = [_visibleCards objectForKey:cardKey];
     if (!visibleCard) {
       CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:i];
+      [newCardView setNeedsLayout];
       [_visibleCards setObject:newCardView forKey:cardKey];
       newCardView.top = (i * _rowHeight) + ((i + 1) * CARD_SPACING);
       newCardView.left = ceilf((self.width - newCardView.width) / 2);
@@ -126,6 +127,7 @@
   
   for (int i = 0; i < numVisible; i++) {
     CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:i];
+    [newCardView setNeedsLayout];
     [_visibleCards setObject:newCardView forKey:[[self class] cardKeyForIndex:i]];
     newCardView.top = (i * _rowHeight) + ((i + 1) * CARD_SPACING);
     newCardView.left = ceilf((self.width - newCardView.width) / 2);
