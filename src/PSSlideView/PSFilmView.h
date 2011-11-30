@@ -36,7 +36,7 @@ typedef enum {
 - (void)reloadSlides;
 
 #pragma mark - Transition Previous or Next
-- (void)slideWithDirection:(PSFilmSlideDirection)direction;
+- (void)slideView:(PSSlideView *)slideView shouldSlideInDirection:(PSFilmSlideDirection)direction;
 
 #pragma mark - Reusing Slide Views
 - (id)dequeueReusableSlideView;

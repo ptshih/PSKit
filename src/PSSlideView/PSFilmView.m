@@ -97,9 +97,10 @@
 }
 
 #pragma mark - Transition Previous or Next
-- (void)slideWithDirection:(PSFilmSlideDirection)direction {
+- (void)slideView:(PSSlideView *)slideView shouldSlideInDirection:(PSFilmSlideDirection)direction {
   PSSlideView *newSlide = nil;
   CGFloat slideToY = 0.0;
+  CGFloat emptyHeight = 0.0;
   
   // Find out how many slides are in the dataSource
   NSInteger numSlides = 0;
@@ -110,32 +111,44 @@
   if (direction == PSFilmSlideDirectionUp) {
     if (_slideIndex == 0) return;
     _slideIndex--;
+    
+    // Calculate empty height
+    emptyHeight = 0 - slideView.contentOffset.y;
+    
     // Get the previous slide
     if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
       newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
       newSlide.top = 0 - self.height;
       [self addSubview:newSlide];
-      slideToY = 0 + self.height;
+      slideToY = 0 + self.height + emptyHeight;
     }
   } else if (direction == PSFilmSlideDirectionDown) {
     if (_slideIndex == (numSlides - 1)) return;
     _slideIndex++;
+    
+    // Calculate empty height
+    emptyHeight = (slideView.contentOffset.y + slideView.height) - slideView.contentSize.height;
+    
     // Get the next slide
     if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
       newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
       newSlide.top = self.bottom;
       [self addSubview:newSlide];
-      slideToY = 0 - self.height;
+      slideToY = 0 - self.height - emptyHeight;
     }
   }
   
   // Animate the current slide off the screen and the new slide onto the screen
+  _headerView.hidden = YES;
+  _footerView.hidden = YES;
   [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
     _activeSlide.frame = CGRectMake(0, slideToY, _activeSlide.width, _activeSlide.height);
     newSlide.frame = CGRectMake(0, 0, newSlide.width, newSlide.height);
   } completion:^(BOOL finished){
     [self enqueueReusableSlideView:_activeSlide];
     _activeSlide = newSlide;
+    _headerView.hidden = NO;
+    _footerView.hidden = NO;
   }];
   
 }
@@ -200,9 +213,9 @@
     PSSlideView *slideView = (PSSlideView *)scrollView;
     NSLog(@"Slide View State: %d", slideView.state);
     if (slideView.state == PSSlideViewStateDown) {
-      [self slideWithDirection:PSFilmSlideDirectionDown];
+      [self slideView:slideView shouldSlideInDirection:PSFilmSlideDirectionDown];
     } else if (slideView.state == PSSlideViewStateUp) {
-      [self slideWithDirection:PSFilmSlideDirectionUp];
+      [self slideView:slideView shouldSlideInDirection:PSFilmSlideDirectionUp];
     }
   }
 }
