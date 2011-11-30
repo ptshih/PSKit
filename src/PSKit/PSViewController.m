@@ -44,9 +44,11 @@
   VLog(@"Called by class: %@", [self class]);
   
   // Background
-  UIView *bgView = [self backgroundView];
-  if (bgView) {
-    [self.view insertSubview:bgView atIndex:0];
+  if ([self respondsToSelector:@selector(baseBackgroundView)]) {
+    UIView *bgView = [self baseBackgroundView];
+    if (bgView) {
+      [self.view insertSubview:bgView atIndex:0];
+    }
   }
 }
 
@@ -75,10 +77,6 @@
 }
 
 #pragma mark - View Config
-- (UIView *)backgroundView {
-  return nil;
-}
-
 - (UIView *)navigationTitleView {
   UIView *v = [[[UIView alloc] initWithFrame:self.navigationItem.titleView.bounds] autorelease];
   v.autoresizingMask = self.navigationItem.titleView.autoresizingMask;

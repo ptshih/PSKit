@@ -92,11 +92,6 @@
   [super dealloc];
 }
 
-#pragma mark - View Config
-- (UIView *)tableView:(UITableView *)tableView rowBackgroundViewForIndexPath:(NSIndexPath *)indexPath selected:(BOOL)selected {
-  return nil;
-}
-
 #pragma mark - View
 // SUBCLASS CAN OPTIONALLY IMPLEMENT IF THEY WANT A SEARCH BAR
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles {
@@ -472,8 +467,10 @@
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-  cell.backgroundView = [self tableView:tableView rowBackgroundViewForIndexPath:indexPath selected:NO];
-  cell.selectedBackgroundView = [self tableView:tableView rowBackgroundViewForIndexPath:indexPath selected:YES];
+  if ([self respondsToSelector:@selector(rowBackgroundViewForIndexPath:selected:)]) {
+    cell.backgroundView = [self rowBackgroundViewForIndexPath:indexPath selected:NO];
+    cell.selectedBackgroundView = [self rowBackgroundViewForIndexPath:indexPath selected:YES];
+  }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

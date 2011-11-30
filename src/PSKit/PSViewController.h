@@ -8,17 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
+#import "PSStateMachine.h"
 
-
-@interface PSViewController : UIViewController {
+@interface PSViewController : UIViewController <PSStateMachine> {
   UIScrollView *_activeScrollView; // subclasses should set this if they have a scrollView
 }
-
-/**
- Used to configure the view right after it is loaded
- */
-- (UIView *)backgroundView;
-- (UIView *)navigationTitleView;
 
 /**
  Used to update the view when the orientation changes

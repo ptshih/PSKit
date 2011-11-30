@@ -11,7 +11,7 @@
 
 @protocol PSStateMachine <NSObject>
 
-@required
+@optional
 
 /**
  Helps determine if a loading/empty screen is shown
@@ -27,7 +27,6 @@
  */
 - (void)updateState;
 
-@optional
 /**
  Initiates loading of the dataSource
  */
@@ -47,6 +46,13 @@
  */
 - (void)loadMore;
 - (BOOL)shouldLoadMore;
+
+/**
+ Used to configure the view right after it is loaded
+ */
+- (UIView *)navigationTitleView;
+- (UIView *)baseBackgroundView;
+- (UIView *)rowBackgroundViewForIndexPath:(NSIndexPath *)indexPath selected:(BOOL)selected;
 
 /**
  Remotely fetch data

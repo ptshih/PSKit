@@ -8,9 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "PSViewController.h"
-#import "PSStateMachine.h"
 
-@interface PSBaseViewController : PSViewController <PSStateMachine, PSNullViewDelegate> {
+@interface PSBaseViewController : PSViewController <PSNullViewDelegate> {
   PSNullView *_nullView;
   
   BOOL _reloading;
