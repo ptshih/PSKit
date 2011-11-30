@@ -1,3 +1,7 @@
+# This is a WORK IN PROGRESS
+
+### For a demo project that uses PSKit, visit http://github.com/ptshih/Rolodex
+
 Required Frameworks
 ---
 * QuartzCore
