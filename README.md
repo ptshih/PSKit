@@ -1,6 +1,6 @@
 # This is a WORK IN PROGRESS
 
-### For a demo, visit http://github.com/ptshih/Rolodex
+### For a demo project that uses PSKit, visit http://github.com/ptshih/Rolodex
 
 Required Frameworks
 ---
