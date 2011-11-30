@@ -18,6 +18,7 @@
   if (self) {
     _state = PSSlideViewStateNormal;
     self.alwaysBounceVertical = YES;
+    self.autoresizingMask = ~UIViewAutoresizingNone;
     
     _slideContentView = [[UIView alloc] initWithFrame:frame];
     [self addSubview:_slideContentView];

@@ -19,6 +19,7 @@ typedef enum {
 @interface PSFilmView : PSView <UIScrollViewDelegate> {
   NSMutableSet *_reusableSlides;
   PSSlideView *_activeSlide; // Just a pointer
+  NSInteger _slideIndex;
   
   // Views
   UIView *_headerView;

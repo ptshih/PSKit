@@ -26,6 +26,8 @@
   if (self) {
     _reusableSlides = [[NSMutableSet alloc] initWithCapacity:2];
     
+    _slideIndex = 0;
+    
     // Setup Header and Footer
     [self setupHeaderAndFooter];
   }
@@ -67,8 +69,6 @@
   
   _headerView.frame = CGRectMake(0, 0, self.width, HF_HEIGHT);
   _footerView.frame = CGRectMake(0, self.height - HF_HEIGHT, self.width, HF_HEIGHT);
-  
-  _activeSlide.frame = self.bounds;
 }
 
 #pragma mark - Public Methods
@@ -86,6 +86,9 @@
     _activeSlide = nil;
   }
   
+  // Reset slide index
+  _slideIndex = 0;
+  
   // Load the first slide (top)
   if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
     _activeSlide = [self.filmViewDataSource filmView:self slideAtIndex:0];
@@ -95,6 +98,45 @@
 
 #pragma mark - Transition Previous or Next
 - (void)slideWithDirection:(PSFilmSlideDirection)direction {
+  PSSlideView *newSlide = nil;
+  CGFloat slideToY = 0.0;
+  
+  // Find out how many slides are in the dataSource
+  NSInteger numSlides = 0;
+  if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(numberOfSlidesInFilmView:)]) {
+    numSlides = [self.filmViewDataSource numberOfSlidesInFilmView:self];
+  }
+  
+  if (direction == PSFilmSlideDirectionUp) {
+    if (_slideIndex == 0) return;
+    _slideIndex--;
+    // Get the previous slide
+    if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
+      newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
+      newSlide.top = 0 - self.height;
+      [self addSubview:newSlide];
+      slideToY = 0 + self.height;
+    }
+  } else if (direction == PSFilmSlideDirectionDown) {
+    if (_slideIndex == (numSlides - 1)) return;
+    _slideIndex++;
+    // Get the next slide
+    if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
+      newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
+      newSlide.top = self.bottom;
+      [self addSubview:newSlide];
+      slideToY = 0 - self.height;
+    }
+  }
+  
+  // Animate the current slide off the screen and the new slide onto the screen
+  [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+    _activeSlide.frame = CGRectMake(0, slideToY, _activeSlide.width, _activeSlide.height);
+    newSlide.frame = CGRectMake(0, 0, newSlide.width, newSlide.height);
+  } completion:^(BOOL finished){
+    [self enqueueReusableSlideView:_activeSlide];
+    _activeSlide = newSlide;
+  }];
   
 }
 
@@ -157,6 +199,11 @@
   if (decelerate) {
     PSSlideView *slideView = (PSSlideView *)scrollView;
     NSLog(@"Slide View State: %d", slideView.state);
+    if (slideView.state == PSSlideViewStateDown) {
+      [self slideWithDirection:PSFilmSlideDirectionDown];
+    } else if (slideView.state == PSSlideViewStateUp) {
+      [self slideWithDirection:PSFilmSlideDirectionUp];
+    }
   }
 }
 
