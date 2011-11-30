@@ -59,7 +59,6 @@
     if (cardBottom < visibleTop || cardTop > visibleBottom) {
       CardView *discardedCard = [_visibleCards objectForKey:cardKey];
       [self enqueueReusableCardView:discardedCard];
-      [discardedCard removeFromSuperview];
       [_cardKeysToRemove addObject:cardKey];
       NSLog(@"### Removing card at index: %@ ###", cardKey);
     }
@@ -101,7 +100,6 @@
   // Remove all existing cards
   for (CardView *cardView in _visibleCards) {
     [self enqueueReusableCardView:cardView];
-    [cardView removeFromSuperview];
   }
   [_visibleCards removeAllObjects];
   
@@ -162,6 +160,7 @@
 
 - (void)enqueueReusableCardView:(CardView *)cardView {
   [_reusableCards addObject:cardView];
+  [cardView removeFromSuperview];
 }
 
 #pragma mark - Gesture Recognizer
