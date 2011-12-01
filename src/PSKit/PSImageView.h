@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>
-#import "PSImageViewDelegate.h"
 
 @interface PSImageView : UIImageView {
   UIActivityIndicatorView *_loadingIndicator;
@@ -16,7 +15,6 @@
   
   BOOL _shouldScale;
   BOOL _shouldAnimate;
-  id <PSImageViewDelegate> _delegate;
 }
 
 - (void)animateImageFade:(UIImage *)image;
@@ -24,6 +22,5 @@
 @property (nonatomic, retain) UIImage *placeholderImage;
 @property (nonatomic, assign) BOOL shouldScale;
 @property (nonatomic, assign) BOOL shouldAnimate;
-@property (nonatomic, assign) id <PSImageViewDelegate> delegate;
 
 @end

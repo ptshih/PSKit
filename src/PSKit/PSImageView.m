@@ -13,7 +13,6 @@
 @synthesize placeholderImage = _placeholderImage;
 @synthesize shouldScale = _shouldScale;
 @synthesize shouldAnimate = _shouldAnimate;
-@synthesize delegate = _delegate;
 
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
