@@ -7,8 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PSImageCacheDelegate.h"
 #import "AFNetworking.h"
+
+#define kPSImageCacheDidCacheImage @"PSImageCacheDidCacheImage"
 
 @interface PSImageCache : PSObject <NSCacheDelegate> {
   NSCache *_buffer;
@@ -26,12 +27,12 @@
 // Image Cache
 - (void)cacheImage:(UIImage *)image forURLPath:(NSString *)urlPath;
 - (void)cacheImageData:(NSData *)imageData forURLPath:(NSString *)urlPath;
-- (UIImage *)imageForURLPath:(NSString *)urlPath shouldDownload:(BOOL)shouldDownload withDelegate:(id)delegate;
+- (UIImage *)imageForURLPath:(NSString *)urlPath shouldDownload:(BOOL)shouldDownload;
 - (BOOL)hasImageForURLPath:(NSString *)urlPath;
-- (void)cacheImageForURLPath:(NSString *)urlPath withDelegate:(id)delegate;
+- (void)cacheImageForURLPath:(NSString *)urlPath;
 
 // Remote Request
-- (BOOL)downloadImageForURLPath:(NSString *)urlPath withDelegate:(id)delegate;
+- (BOOL)downloadImageForURLPath:(NSString *)urlPath;
 
 - (void)cancelDownloadForURLPath:(NSString *)urlPath;
 

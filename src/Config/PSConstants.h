@@ -74,7 +74,6 @@
 #define kApplicationResumed @"ApplicationResumed"
 #define kApplicationSuspended @"ApplicationSuspended"
 #define kCoreDataDidReset @"CoreDataDidReset"
-#define kPSImageCacheDidCacheImage @"PSImageCacheDidCacheImage"
 
 
 /**

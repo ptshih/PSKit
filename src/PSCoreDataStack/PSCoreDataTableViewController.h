@@ -34,8 +34,6 @@ typedef enum {
 @property (nonatomic, retain) NSPredicate *searchPredicate;
 
 
-- (void)tableView:(UITableView *)tableView configureCell:(id)cell atIndexPath:(NSIndexPath *)indexPath;
-
 - (void)delayedFilterContentWithTimer:(NSTimer *)timer;
 
 - (void)resetFetchedResultsController;

@@ -1,5 +1,5 @@
 //
-//  PSURLCacheImageView.h
+//  PSCachedImageView.h
 //  SevenMinuteLibrary
 //
 //  Created by Peter Shih on 5/19/11.
@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "PSImageCache.h"
 
-@interface PSURLCacheImageView : PSImageView {
+@interface PSCachedImageView : PSImageView {
   NSString *_urlPath;
 }
 

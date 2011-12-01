@@ -7,7 +7,7 @@
 //
 
 #import "PSRollupView.h"
-#import "PSURLCacheImageView.h"
+#import "PSCachedImageView.h"
 
 #define MARGIN 5.0
 #define PICTURE_SIZE 30.0
@@ -131,10 +131,10 @@
   _pictureURLArray = [pictureURLArray retain];
   
   // Update pictureScrollView
-  PSURLCacheImageView *profileImage = nil;
+  PSCachedImageView *profileImage = nil;
   int i = 0;
   for (NSString *pictureURLPath in _pictureURLArray) {
-    profileImage = [[[PSURLCacheImageView alloc] initWithFrame:CGRectMake(0, 0, PICTURE_SIZE, PICTURE_SIZE)] autorelease];
+    profileImage = [[[PSCachedImageView alloc] initWithFrame:CGRectMake(0, 0, PICTURE_SIZE, PICTURE_SIZE)] autorelease];
     profileImage.urlPath = pictureURLPath;
     [profileImage loadImageAndDownload:YES];
     

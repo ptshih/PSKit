@@ -98,13 +98,16 @@
       
       dispatch_async(dispatch_get_main_queue(), ^{
         VLog(@"PSImageCache CACHE: %@", urlPath);
+        // fire notification
+        [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:[NSDictionary dictionaryWithObjectsAndKeys:urlPath, @"urlPath", nil]];
+        
       });
     });
   }
 }
 
 // Read Cached Image
-- (UIImage *)imageForURLPath:(NSString *)urlPath shouldDownload:(BOOL)shouldDownload withDelegate:(id)delegate {
+- (UIImage *)imageForURLPath:(NSString *)urlPath shouldDownload:(BOOL)shouldDownload {
   if (!urlPath) return nil;
   
   // First check NSCache buffer
@@ -129,7 +132,7 @@
       VLog(@"PSImageCache DISK MISS: %@", urlPath);
       if (shouldDownload) {
         // Download the image data from the source URL
-        [self downloadImageForURLPath:urlPath withDelegate:delegate];
+        [self downloadImageForURLPath:urlPath];
       }
       return nil;
     }
@@ -147,14 +150,14 @@
   }
 }
 
-- (void)cacheImageForURLPath:(NSString *)urlPath withDelegate:(id)delegate {
+- (void)cacheImageForURLPath:(NSString *)urlPath {
   if (![self hasImageForURLPath:urlPath]) {
-    [self downloadImageForURLPath:urlPath withDelegate:delegate];
+    [self downloadImageForURLPath:urlPath];
   }
 }
 
 #pragma mark Remote Image Load Request
-- (BOOL)downloadImageForURLPath:(NSString *)urlPath withDelegate:(id)delegate {
+- (BOOL)downloadImageForURLPath:(NSString *)urlPath {
   // Check to make sure urlPath is not already pending
   for (NSURLRequest *request in [_requestQueue operations]) {
     if ([request.URL.absoluteString isEqualToString:urlPath]) {
@@ -169,9 +172,6 @@
   AFHTTPRequestOperation *op = [[AFHTTPRequestOperation alloc] initWithRequest:request];
   [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
     [self cacheImageData:operation.responseData forURLPath:operation.request.URL.absoluteString];
-    
-    // fire notification
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:[NSDictionary dictionaryWithObjectsAndKeys:operation.responseData, @"imageData", urlPath, @"urlPath", nil]];
   } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
     // Something bad happened
   }];

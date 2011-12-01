@@ -1,14 +1,14 @@
 //
-//  PSURLCacheImageView.m
+//  PSCachedImageView.m
 //  SevenMinuteLibrary
 //
 //  Created by Peter Shih on 5/19/11.
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.
 //
 
-#import "PSURLCacheImageView.h"
+#import "PSCachedImageView.h"
 
-@implementation PSURLCacheImageView
+@implementation PSCachedImageView
 
 @synthesize urlPath = _urlPath;
 
@@ -29,7 +29,7 @@
 
 - (void)loadImageAndDownload:(BOOL)download {
   if (_urlPath) {
-    UIImage *image = [[PSImageCache sharedCache] imageForURLPath:_urlPath shouldDownload:download withDelegate:nil];
+    UIImage *image = [[PSImageCache sharedCache] imageForURLPath:_urlPath shouldDownload:download];
     if (image) { 
       self.image = image;
     } else {
@@ -49,9 +49,9 @@
 - (void)imageCacheDidLoad:(NSNotification *)notification {
   NSDictionary *userInfo = [notification userInfo];
   NSString *urlPath = [userInfo objectForKey:@"urlPath"];
-  UIImage *image = [userInfo objectForKey:@"image"];
   
   if ([urlPath isEqualToString:_urlPath]) {
+    UIImage *image = [[PSImageCache sharedCache] imageForURLPath:urlPath shouldDownload:NO];
     if (image) {
       if (image && ![image isEqual:self.image]) {
         self.image = image;
@@ -61,16 +61,5 @@
     }
   }
 }
-
-#pragma mark - PSImageCacheDelegate
-//- (void)imageCacheDidLoad:(UIImage *)image forURLPath:(NSString *)urlPath {
-//  if (image && [urlPath isEqualToString:_urlPath]) {
-//    if (image && ![image isEqual:self.image]) {
-//      self.image = image;
-//    } else {
-//      self.image = _placeholderImage;
-//    }
-//  }
-//}
 
 @end

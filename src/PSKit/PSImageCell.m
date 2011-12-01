@@ -13,7 +13,7 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
   self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
   if (self) {
-    _psImageView = [[PSURLCacheImageView alloc] initWithFrame:CGRectZero];
+    _psImageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
     
     [self.contentView addSubview:_psImageView];
     

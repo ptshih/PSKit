@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PSURLCacheImageView.h"
+#import "PSCachedImageView.h"
 
-@interface PSImageArrayView : PSURLCacheImageView {
+@interface PSImageArrayView : PSCachedImageView {
   NSArray *_urlPathArray;
   NSMutableArray *_images;
   

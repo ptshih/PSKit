@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PSURLCacheImageView.h"
+#import "PSCachedImageView.h"
 
 @interface PSImageCell : PSCell {
-  PSURLCacheImageView *_psImageView;
+  PSCachedImageView *_psImageView;
 }
 
 - (void)loadImage;

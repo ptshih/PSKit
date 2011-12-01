@@ -40,7 +40,7 @@
 - (void)loadImageArray {
   // Download all images
   for (NSString *urlPath in _urlPathArray) {
-    UIImage *image = [[PSImageCache sharedCache] imageForURLPath:urlPath shouldDownload:YES withDelegate:nil];
+    UIImage *image = [[PSImageCache sharedCache] imageForURLPath:urlPath shouldDownload:YES];
     if (image && ![_images containsObject:image]) {
       [_images addObject:image];
       [self prepareImageArray];

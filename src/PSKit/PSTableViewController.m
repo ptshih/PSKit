@@ -444,12 +444,11 @@
   return NO;
 }
 
-#pragma mark - UITableViewDelegate
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-  [tableView deselectRowAtIndexPath:indexPath animated:YES];
+#pragma mark - UITableView
+- (void)tableView:(UITableView *)tableView configureCell:(id)cell atIndexPath:(NSIndexPath *)indexPath {
+  
 }
 
-#pragma mark - UITableViewDataSource
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
   if (tableView == self.searchDisplayController.searchResultsTableView) {
     return [_searchItems count];
