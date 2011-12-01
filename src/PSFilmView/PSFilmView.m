@@ -119,9 +119,11 @@
     if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
       newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
       newSlide.top = 0 - self.height;
-      newSlide.contentOffset = CGPointMake(0, 0); // reset reused slide's contentOffset to top
       [self addSubview:newSlide];
       slideToY = 0 + self.height + emptyHeight;
+      
+      // NOT IMPLEMENTED
+      // Because we are going upwards, we need to simulate sliding thru the entire content not just the frame
     }
   } else if (direction == PSFilmSlideDirectionDown) {
     if (_slideIndex == (numSlides - 1)) return;
@@ -134,7 +136,6 @@
     if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
       newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
       newSlide.top = self.bottom;
-      newSlide.contentOffset = CGPointMake(0, 0); // reset reused slide's contentOffset to top
       [self addSubview:newSlide];
       slideToY = 0 - self.height - emptyHeight;
     }
@@ -166,6 +167,7 @@
   PSSlideView *slideView = [_reusableSlides anyObject];
   if (slideView) {
     [slideView retain];
+    [slideView prepareForReuse];
     [_reusableSlides removeObject:slideView];
     [slideView autorelease];
   } else {

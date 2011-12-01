@@ -37,4 +37,8 @@
   self.contentSize = _slideContentView.bounds.size;
 }
 
+- (void)prepareForReuse {
+  self.contentOffset = CGPointMake(0, 0); // reset reused slide's contentOffset to top
+}
+
 @end

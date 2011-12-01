@@ -24,4 +24,6 @@ typedef enum {
 
 @property (nonatomic, assign) PSSlideViewState state;
 
+- (void)prepareForReuse;
+
 @end
