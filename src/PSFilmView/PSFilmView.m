@@ -8,7 +8,7 @@
 
 #import "PSFilmView.h"
 
-#define HF_HEIGHT 44.0
+#define HF_HEIGHT 60.0
 
 @interface PSFilmView (Private)
 
@@ -119,6 +119,7 @@
     if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
       newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
       newSlide.top = 0 - self.height;
+      newSlide.contentOffset = CGPointMake(0, 0); // reset reused slide's contentOffset to top
       [self addSubview:newSlide];
       slideToY = 0 + self.height + emptyHeight;
     }
@@ -133,6 +134,7 @@
     if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
       newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
       newSlide.top = self.bottom;
+      newSlide.contentOffset = CGPointMake(0, 0); // reset reused slide's contentOffset to top
       [self addSubview:newSlide];
       slideToY = 0 - self.height - emptyHeight;
     }
@@ -141,12 +143,18 @@
   // Animate the current slide off the screen and the new slide onto the screen
   _headerView.hidden = YES;
   _footerView.hidden = YES;
-  [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+  BOOL shouldShowVerticalScrollIndicator = _activeSlide.showsVerticalScrollIndicator;
+  BOOL shouldShowHorizontalScrollIndicator = _activeSlide.showsHorizontalScrollIndicator;
+  _activeSlide.showsVerticalScrollIndicator = NO;
+  _activeSlide.showsHorizontalScrollIndicator = NO;
+  [UIView animateWithDuration:0.4 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
     _activeSlide.frame = CGRectMake(0, slideToY, _activeSlide.width, _activeSlide.height);
     newSlide.frame = CGRectMake(0, 0, newSlide.width, newSlide.height);
   } completion:^(BOOL finished){
     [self enqueueReusableSlideView:_activeSlide];
     _activeSlide = newSlide;
+    _activeSlide.showsVerticalScrollIndicator = shouldShowVerticalScrollIndicator;
+    _activeSlide.showsHorizontalScrollIndicator = shouldShowHorizontalScrollIndicator;
     _headerView.hidden = NO;
     _footerView.hidden = NO;
   }];
