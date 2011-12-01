@@ -1,6 +1,6 @@
 //
 //  PSRollupView.m
-//  SevenMinuteLibrary
+//  PSKit
 //
 //  Created by Peter Shih on 6/22/11.
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.

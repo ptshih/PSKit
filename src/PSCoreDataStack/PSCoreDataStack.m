@@ -1,9 +1,9 @@
 //
 //  PSCoreDataStack.m
-//  SevenMinuteLibrary
+//  PSKit
 //
 //  Created by Peter Shih on 2/16/11.
-//  Copyright 2011 Seven Minute Labs. All rights reserved.
+//  Copyright 2011 Peter Shih. All rights reserved.
 //
 
 #import "PSCoreDataStack.h"

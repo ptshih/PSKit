@@ -1,6 +1,6 @@
 //
 //  PSCachedImageView.h
-//  SevenMinuteLibrary
+//  PSKit
 //
 //  Created by Peter Shih on 5/19/11.
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.

@@ -1,6 +1,6 @@
 //
 //  PSView.m
-//  SevenMinuteLibrary
+//  PSKit
 //
 //  Created by Peter Shih on 3/26/11.
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.
