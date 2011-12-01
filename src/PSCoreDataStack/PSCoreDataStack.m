@@ -8,9 +8,6 @@
 
 #import "PSCoreDataStack.h"
 
-#define CORE_DATA_MOM @"YourCoreDataMoM"
-#define CORE_DATA_SQL_FILE @"your_core_data.sqlite"
-
 static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 static NSManagedObjectModel *_managedObjectModel = nil;
 static NSManagedObjectContext *_mainThreadContext = nil;

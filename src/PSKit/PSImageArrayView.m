@@ -7,7 +7,6 @@
 //
 
 #import "PSImageArrayView.h"
-#import "PSImageCache.h"
 
 @implementation PSImageArrayView
 
@@ -112,21 +111,12 @@
 - (void)imageCacheDidLoad:(NSNotification *)notification {
   NSDictionary *userInfo = [notification userInfo];
   NSString *urlPath = [userInfo objectForKey:@"urlPath"];
-  UIImage *image = [userInfo objectForKey:@"image"];
+  UIImage *image = [[PSImageCache sharedCache] imageForURLPath:urlPath shouldDownload:NO];
   
   if (image && [_urlPathArray containsObject:urlPath] && ![_images containsObject:image]) {
     [_images addObject:image];
     [self prepareImageArray];
   }
 }
-
-#pragma mark - PSImageCacheDelegate
-//- (void)imageCacheDidLoad:(UIImage *)image forURLPath:(NSString *)urlPath {
-//  if (image && [_urlPathArray containsObject:urlPath]) {
-//    [_images addObject:image];
-//    [self prepareImageArray];
-//  }
-//}
-
 
 @end

@@ -50,6 +50,7 @@
 }
 
 - (void)reachabilityChanged:(NSNotification *)note {
+  // NOT IMPLEMENTED YET
 }
 
 - (BOOL)isNetworkReachable {

@@ -20,17 +20,11 @@
     
     UINavigationBar *bar = [[[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, 44)] autorelease];
     [bar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    if([bar respondsToSelector:@selector(setBackgroundImage:forBarMetrics:)] ) {
-      //iOS 5 new UINavigationBar custom background
-      [bar setBackgroundImage:[UIImage imageNamed:@"bg_navbar.png"] forBarMetrics:UIBarMetricsDefault];
-    } else {
-      UIImageView *bg = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"bg_navbar.png"]] autorelease];
-      [bar insertSubview:bg atIndex:0];
-    }
+    bar.barStyle = UIBarStyleBlackOpaque;
     
     UINavigationItem *navItem = [[[UINavigationItem alloc] init] autorelease];
     bar.items = [NSArray arrayWithObject:navItem];
-    navItem.title = @"How to use MealTime";
+    navItem.title = @"Tutorial Title";
     
     [self addSubview:bar];
     
@@ -53,8 +47,8 @@
     top += imageView.height;
     
     // Done Button
-    UIButton *doneButton = [UIButton buttonWithFrame:CGRectMake(20, top, _scrollView.width - 40, 44) andStyle:@"filterDoneButton" target:self action:@selector(finish)];
-    [doneButton setBackgroundImage:[UIImage stretchableImageNamed:@"button_round_blue.png" withLeftCapWidth:16 topCapWidth:22] forState:UIControlStateNormal];
+    UIButton *doneButton = [UIButton buttonWithFrame:CGRectMake(20, top, _scrollView.width - 40, 44) andStyle:@"text" target:self action:@selector(finish)];
+    [doneButton setBackgroundImage:[UIImage stretchableImageNamed:@"PSKit.bundle/BarBlueButton.png" withLeftCapWidth:16 topCapWidth:22] forState:UIControlStateNormal];
     [doneButton setTitle:@"Get Started" forState:UIControlStateNormal];
     [_scrollView addSubview:doneButton];
     
@@ -75,15 +69,6 @@
 
 - (void)layoutSubviews {
   [super layoutSubviews];
-  
-//  CGRect scrollFrame = self.bounds;
-//  if (!CGRectEqualToRect(scrollFrame, _scrollView.frame)) {
-//    _scrollView.frame = scrollFrame;
-//  } 
-
-  
-
-  
 
 }
 

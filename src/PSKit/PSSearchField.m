@@ -45,6 +45,7 @@
 
 // This overrides the default image for a clear button
 - (UIButton *)clearButton {
+  // This warning is annoying but its harmless
   UIButton *clearButton = [super clearButton];
   if (_searchFieldStyle == PSSearchFieldStyleBlack) {
     [clearButton setImage:[UIImage imageNamed:@"PSKit.bundle/IconClear.png"] forState:UIControlStateNormal];

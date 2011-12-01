@@ -7,9 +7,6 @@
 //
 
 #import "PSCoreDataTableViewController.h"
-#import "PSCoreDataStack.h"
-
-#define FETCH_COUNT 50
 
 @interface PSCoreDataTableViewController (Private)
 

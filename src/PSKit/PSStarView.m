@@ -20,9 +20,9 @@ static UIImage *_halfStar = nil;
 @synthesize rating = _rating;
 
 + (void)initialize {
-  _silverStar = [[UIImage imageNamed:@"icon_star_silver.png"] retain];
-  _goldStar = [[UIImage imageNamed:@"icon_star_gold.png"] retain];
-  _halfStar = [[UIImage imageNamed:@"icon_star_half.png"] retain];
+  _silverStar = [[UIImage imageNamed:@"PSKit.bundle/StarSilver.png"] retain];
+  _goldStar = [[UIImage imageNamed:@"PSKit.bundle/StarGold.png"] retain];
+  _halfStar = [[UIImage imageNamed:@"PSKit.bundle/StarHalf.png"] retain];
 }
 
 - (id)initWithFrame:(CGRect)frame rating:(CGFloat)rating {

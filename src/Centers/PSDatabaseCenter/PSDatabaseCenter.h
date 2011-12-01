@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "EGODatabase.h"
 
+// SQLite DB filename
+#define SQLITE_DB_SCHEMA_VERSION @"1"
+#define SQLITE_DB_NAME @"Rolodex_1"
+
 @interface PSDatabaseCenter : PSObject {
   EGODatabase *_database;
 }

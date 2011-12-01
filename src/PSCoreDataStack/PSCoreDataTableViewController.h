@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <CoreData/CoreData.h>
 #import "PSTableViewController.h"
 #import "PSCoreDataStack.h"
+
+#define PS_CORE_DATA_FETCH_COUNT 50
 
 typedef enum {
   FetchTypeCold = 0,

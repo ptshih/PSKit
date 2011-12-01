@@ -9,6 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
+#define CORE_DATA_MOM @"YourCoreDataMoM"
+#define CORE_DATA_SQL_FILE @"your_core_data_mom_file.sqlite"
+
 @interface PSCoreDataStack : NSObject {
 
 }

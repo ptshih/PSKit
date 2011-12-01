@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#define PS_SEARCH_CENTER_PLIST @"pssearchcenter.plist"
+
 @interface PSSearchCenter : PSObject {
   NSMutableDictionary *_terms;
 }

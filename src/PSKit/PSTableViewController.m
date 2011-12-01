@@ -7,7 +7,6 @@
 //
 
 #import "PSTableViewController.h"
-#import "PSImageCell.h"
 
 @interface PSTableViewController (Private)
 

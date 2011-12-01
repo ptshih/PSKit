@@ -17,7 +17,6 @@
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
-    VLog(@"Called by class: %@", [self class]);
     _shouldScale = NO;
     _shouldAnimate = NO;
     _placeholderImage = nil;
@@ -37,8 +36,6 @@
 - (void)dealloc {
   RELEASE_SAFELY(_loadingIndicator);
   RELEASE_SAFELY(_placeholderImage);
-  
-  VLog(@"Called by class: %@", [self class]);
   [super dealloc];
 }
 

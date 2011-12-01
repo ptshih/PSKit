@@ -7,7 +7,6 @@
 //
 
 #import "PSToastCenter.h"
-#import <QuartzCore/QuartzCore.h>
 
 @interface PSToastCenter (Private)
 

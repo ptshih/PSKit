@@ -9,8 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "PSDataCenterDelegate.h"
 
-#define SINCE_SAFETY_NET 300 // 5 minutes
-
 @interface PSDataCenter : PSObject <PSDataCenterDelegate> {
   id <PSDataCenterDelegate> _delegate;
 }

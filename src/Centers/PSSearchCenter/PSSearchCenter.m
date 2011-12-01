@@ -21,7 +21,7 @@ static NSString *_savedPath = nil;
 }
 
 + (void)initialize {
-  _savedPath = [[[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"pssearchcenter.plist"] retain];
+  _savedPath = [[[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:PS_SEARCH_CENTER_PLIST] retain];
 }
 
 - (id)init {
