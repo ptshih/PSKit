@@ -169,8 +169,11 @@
   AFHTTPRequestOperation *op = [[AFHTTPRequestOperation alloc] initWithRequest:request];
   [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
     [self cacheImageData:operation.responseData forURLPath:operation.request.URL.absoluteString];
-  } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
     
+    // fire notification
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:[NSDictionary dictionaryWithObjectsAndKeys:operation.responseData, @"imageData", urlPath, @"urlPath", nil]];
+  } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    // Something bad happened
   }];
 
   // Start the Request
