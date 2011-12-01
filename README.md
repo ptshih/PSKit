@@ -12,6 +12,7 @@ Required Frameworks
 * MessageUI
 * libsqlite3
 * libz (optional, unused)
+* CoreData (optional)
 
 External Modules
 ---
@@ -40,6 +41,7 @@ Shared Centers (Singletons)
 * PSStyleSheet
 * PSToastCenter
 * PSURLCache
+* PSCoreDataStack (requires CoreData.framework)
 
 Categories
 ---
