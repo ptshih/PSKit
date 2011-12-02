@@ -40,6 +40,7 @@ static NSMutableDictionary *_styles = nil;
   label.shadowOffset = [PSStyleSheet shadowOffsetForStyle:style];
   label.textAlignment = [PSStyleSheet textAlignmentForStyle:style];
   label.backgroundColor = [PSStyleSheet backgroundColorForStyle:style];
+  label.numberOfLines = [PSStyleSheet numberOfLinesForStyle:style];
 }
 
 + (void)applyStyle:(NSString *)style forButton:(UIButton *)button {
@@ -116,6 +117,15 @@ static NSMutableDictionary *_styles = nil;
   } else {
     return UITextAlignmentLeft;
   }
+}
+
+#pragma mark - Number of Lines
++ (NSInteger)numberOfLinesForStyle:(NSString *)style {
+  NSInteger numberOfLines = 0; // If left empty, default to 0
+  if ([[[_styles objectForKey:style] objectForKey:@"numberOfLines"] integerValue]) {
+    numberOfLines = [[[_styles objectForKey:style] objectForKey:@"numberOfLines"] integerValue];
+  }
+  return numberOfLines;
 }
 
 @end

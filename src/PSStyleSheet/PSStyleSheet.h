@@ -21,6 +21,7 @@
 + (UIColor *)backgroundColorForStyle:(NSString *)style;
 + (CGSize)shadowOffsetForStyle:(NSString *)style;
 + (UITextAlignment)textAlignmentForStyle:(NSString *)style;
++ (NSInteger)numberOfLinesForStyle:(NSString *)style;
 
 // TODO: Add UILineBreakMode
 
