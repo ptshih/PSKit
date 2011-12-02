@@ -78,9 +78,9 @@
 	<key>filmViewHeader</key>
 	<dict>
 		<key>fontName</key>
-		<string>HelveticaNeue</string>
+		<string>HelveticaNeue LT 67 MdCn</string>
 		<key>fontSize</key>
-		<integer>14</integer>
+		<integer>16</integer>
 		<key>textColor</key>
 		<string>0xefefef</string>
 		<key>highlightedTextColor</key>
@@ -95,9 +95,9 @@
 	<key>filmViewFooter</key>
 	<dict>
 		<key>fontName</key>
-		<string>HelveticaNeue</string>
+		<string>HelveticaNeue LT 67 MdCn</string>
 		<key>fontSize</key>
-		<integer>14</integer>
+		<integer>16</integer>
 		<key>textColor</key>
 		<string>0xefefef</string>
 		<key>highlightedTextColor</key>

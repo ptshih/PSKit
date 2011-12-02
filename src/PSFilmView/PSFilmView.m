@@ -46,16 +46,14 @@
 #pragma mark - View Setup
 - (void)setupHeaderAndFooter {
   _headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.width, HF_HEIGHT)];
-  UILabel *h = [[[UILabel alloc] initWithFrame:_headerView.frame] autorelease];
+  UILabel *h = [[[UILabel alloc] initWithFrame:CGRectMake(10, 10, self.width - 20, HF_HEIGHT - 20)] autorelease];
   h.autoresizingMask = ~UIViewAutoresizingNone;
-  h.text = @"Pull Down to Load Previous";
   [PSStyleSheet applyStyle:@"filmViewHeader" forLabel:h];
   [_headerView addSubview:h];
   
   _footerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.width, HF_HEIGHT)];
-  UILabel *f = [[[UILabel alloc] initWithFrame:_footerView.frame] autorelease];
+  UILabel *f = [[[UILabel alloc] initWithFrame:CGRectMake(10, 10, self.width - 20, HF_HEIGHT - 20)] autorelease];
   f.autoresizingMask = ~UIViewAutoresizingNone;
-  f.text = @"Pull Down to Load Next";
   [PSStyleSheet applyStyle:@"filmViewFooter" forLabel:f];
   [_footerView addSubview:f];
   
@@ -213,19 +211,19 @@
   BOOL footerShowing = (visibleBottom - HF_HEIGHT) > scrollView.contentSize.height;
   
   if (headerShowing) {
-    h.text = @"Release to Load Previous";
-    slideView.state = PSSlideViewStateUp;
+    slideView.state = PSSlideViewStateUp;    
+    h.text = [self.filmViewDataSource filmView:self titleForHeaderAtIndex:_slideIndex forState:slideView.state];
   } else if (!footerShowing) {
-    h.text = @"Pull Down to Load Previous";
     slideView.state = PSSlideViewStateNormal;
+    h.text = [self.filmViewDataSource filmView:self titleForHeaderAtIndex:_slideIndex forState:slideView.state];
   }
   
   if (footerShowing) {
-    f.text = @"Release to Load Next";
     slideView.state = PSSlideViewStateDown;
+    f.text = [self.filmViewDataSource filmView:self titleForFooterAtIndex:_slideIndex forState:slideView.state];
   } else if (!headerShowing) {
-    f.text = @"Pull Down to Load Next";
     slideView.state = PSSlideViewStateNormal;
+    f.text = [self.filmViewDataSource filmView:self titleForFooterAtIndex:_slideIndex forState:slideView.state];
   }
 }
 
