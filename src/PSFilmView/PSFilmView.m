@@ -91,7 +91,10 @@
   
   // Load the first slide (top)
   if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
-    _activeSlide = [self.filmViewDataSource filmView:self slideAtIndex:0];
+    _activeSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
+    // Calculate newSlide's height
+    CGFloat newSlideHeight = [self.filmViewDataSource filmView:self heightForSlideAtIndex:_slideIndex];
+    _activeSlide.slideContentView.height = fmaxf(newSlideHeight, self.height);
     [self addSubview:_activeSlide];
   }
 }
@@ -119,6 +122,9 @@
     if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
       newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
       newSlide.top = 0 - self.height;
+      // Calculate newSlide's height
+      CGFloat newSlideHeight = [self.filmViewDataSource filmView:self heightForSlideAtIndex:_slideIndex];
+      newSlide.slideContentView.height = fmaxf(newSlideHeight, self.height);
       [self addSubview:newSlide];
       slideToY = 0 + self.height + emptyHeight;
       
@@ -136,10 +142,15 @@
     if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
       newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
       newSlide.top = self.bottom;
+      // Calculate newSlide's height
+      CGFloat newSlideHeight = [self.filmViewDataSource filmView:self heightForSlideAtIndex:_slideIndex];
+      newSlide.slideContentView.height = fmaxf(newSlideHeight, self.height);
       [self addSubview:newSlide];
       slideToY = 0 - self.height - emptyHeight;
     }
   }
+  
+  
   
   // Animate the current slide off the screen and the new slide onto the screen
   _headerView.hidden = YES;

@@ -41,4 +41,8 @@
   self.contentOffset = CGPointMake(0, 0); // reset reused slide's contentOffset to top
 }
 
++ (CGFloat)heightForObject:(id)object {
+  return 0.0;
+}
+
 @end

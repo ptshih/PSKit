@@ -53,6 +53,7 @@ typedef enum {
 @protocol PSFilmViewDataSource <NSObject>
 
 @required
+- (CGFloat)filmView:(PSFilmView *)filmView heightForSlideAtIndex:(NSInteger)index;
 - (NSInteger)numberOfSlidesInFilmView:(PSFilmView *)filmView;
 - (PSSlideView *)filmView:(PSFilmView *)filmView slideAtIndex:(NSInteger)index;
 

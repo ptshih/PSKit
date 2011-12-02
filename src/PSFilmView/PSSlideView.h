@@ -26,4 +26,6 @@ typedef enum {
 
 - (void)prepareForReuse;
 
++ (CGFloat)heightForObject:(id)object;
+
 @end
