@@ -123,6 +123,7 @@
     _opened = YES;
     animationOptions = UIViewAnimationOptionCurveEaseOut;
     left = self.view.width - DRAWER_GAP;
+    _bottomViewController.view.hidden = NO;
     [_bottomViewController viewWillAppear:YES];
   }
   
@@ -137,6 +138,7 @@
                        [_bottomViewController viewDidAppear:YES];
                      } else {
                        [_bottomViewController viewDidDisappear:YES];
+                       _bottomViewController.view.hidden = YES;
                      }
                    }];
 }
