@@ -81,14 +81,14 @@
   
   // Left - Bottom
   if (_leftViewController) {
-    _leftViewController.view.frame = CGRectMake(0, 0, self.view.width, self.view.height);
+    _leftViewController.view.frame = CGRectMake(0, 0, self.view.width - DRAWER_GAP, self.view.height);
     _leftViewController.view.hidden = YES;
     [self.view addSubview:_leftViewController.view];
   }
   
   // Right - Middle
   if (_rightViewController) {
-    _rightViewController.view.frame = CGRectMake(0, 0, self.view.width, self.view.height);
+    _rightViewController.view.frame = CGRectMake(DRAWER_GAP, 0, self.view.width - DRAWER_GAP, self.view.height);
     _rightViewController.view.hidden = YES;
     [self.view addSubview:_rightViewController.view];
   }
