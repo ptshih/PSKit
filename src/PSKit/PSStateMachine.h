@@ -27,6 +27,11 @@
 - (void)updateState;
 
 /**
+ Configure/layout any subviews used in the view controller
+ */
+- (void)setupSubviews;
+
+/**
  Initiates loading of the dataSource
  */
 - (void)setupDataSource;
@@ -51,6 +56,7 @@
  */
 - (UIView *)navigationTitleView;
 - (UIView *)baseBackgroundView;
+- (UIColor *)baseBackgroundColor;
 - (UIView *)rowBackgroundViewForIndexPath:(NSIndexPath *)indexPath selected:(BOOL)selected;
 
 /**

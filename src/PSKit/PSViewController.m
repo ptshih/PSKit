@@ -49,6 +49,8 @@
     if (bgView) {
       [self.view insertSubview:bgView atIndex:0];
     }
+  } else if ([self respondsToSelector:@selector(baseBackgroundColor)]) {
+    self.view.backgroundColor = [self baseBackgroundColor];
   }
 }
 
