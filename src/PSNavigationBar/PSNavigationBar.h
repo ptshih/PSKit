@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PSNavigationBar : UINavigationBar
+@interface PSNavigationBar : UINavigationBar {
+  UIImage *_backgroundImage;
+}
+
+/**
+ Setting this property to a custom UIImage will override the default NavigationBar background image
+ */
+@property (nonatomic, retain) UIImage *backgroundImage;
 
 @end
