@@ -80,17 +80,15 @@
 
 #pragma mark - View Config
 - (UIView *)navigationTitleView {
-  UIView *v = [[[UIView alloc] initWithFrame:self.navigationItem.titleView.bounds] autorelease];
-  v.autoresizingMask = self.navigationItem.titleView.autoresizingMask;
-  UILabel *l = [[[UILabel alloc] initWithFrame:v.bounds] autorelease];
-  l.text = [[self.title copy] autorelease];
   self.navigationItem.title = nil;
+  UILabel *l = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.navigationController.navigationBar.width - 160.0, self.navigationController.navigationBar.height)] autorelease];
+  l.autoresizingMask = ~UIViewAutoresizingNone;
+  l.text = [[self.title copy] autorelease];
   l.numberOfLines = 3;
   l.backgroundColor = [UIColor clearColor];
   [PSStyleSheet applyStyle:@"navigationTitleLabel" forLabel:l];
-  [v addSubview:l];
   
-  return v;
+  return l;
 }
 
 #pragma mark - Rotation
