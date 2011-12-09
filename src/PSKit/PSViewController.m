@@ -52,6 +52,11 @@
   } else if ([self respondsToSelector:@selector(baseBackgroundColor)]) {
     self.view.backgroundColor = [self baseBackgroundColor];
   }
+  
+  // Set navigation title view
+  if (self.title) {
+    self.navigationItem.titleView = [self navigationTitleView];
+  }
 }
 
 - (void)viewWillAppear:(BOOL)animated

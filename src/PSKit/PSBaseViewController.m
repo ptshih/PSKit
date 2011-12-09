@@ -42,11 +42,6 @@
   
   self.view.autoresizingMask = ~UIViewAutoresizingNone;
   
-  // Set navigation title view
-  if (self.title) {
-    self.navigationItem.titleView = [self navigationTitleView];
-  }
-  
   // NullView
   _nullView = [[PSNullView alloc] initWithFrame:self.view.bounds];
   _nullView.autoresizingMask = ~UIViewAutoresizingNone;
