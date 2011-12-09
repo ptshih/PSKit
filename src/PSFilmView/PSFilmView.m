@@ -284,7 +284,7 @@
         f.text = @"Loading...";
         
         [UIView animateWithDuration:0.4 animations:^{
-          [slideView setContentInset:UIEdgeInsetsMake(0 - HF_HEIGHT, 0, 0, 0)];
+          [slideView setContentInset:UIEdgeInsetsMake(0, 0, HF_HEIGHT, 0)];
         }];
         if (self.filmViewDelegate && [self.filmViewDelegate respondsToSelector:@selector(filmViewDidTriggerLoadMore:)]) {
           [self.filmViewDelegate filmViewDidTriggerLoadMore:self];
