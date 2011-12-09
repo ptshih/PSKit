@@ -24,9 +24,12 @@
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
+    _state = PSFilmViewStateIdle;
+    
     _reusableSlides = [[NSMutableSet alloc] initWithCapacity:2];
     
     _slideIndex = 0;
+    _slideCount = 0;
     
     // Setup Header and Footer
     [self setupHeaderAndFooter];
@@ -75,6 +78,7 @@
   NSInteger numSlides = 0;
   if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(numberOfSlidesInFilmView:)]) {
     numSlides = [self.filmViewDataSource numberOfSlidesInFilmView:self];
+    _slideCount = numSlides;
   }
   
   // Unload any previous slides
@@ -97,58 +101,73 @@
   }
 }
 
-#pragma mark - Transition Previous or Next
-- (void)slideView:(PSSlideView *)slideView shouldSlideInDirection:(PSFilmSlideDirection)direction {
-  PSSlideView *newSlide = nil;
-  CGFloat slideToY = 0.0;
-  CGFloat emptyHeight = 0.0;
+- (void)filmViewDidRefresh {
+  _slideIndex = 0;
   
-  // Find out how many slides are in the dataSource
   NSInteger numSlides = 0;
   if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(numberOfSlidesInFilmView:)]) {
     numSlides = [self.filmViewDataSource numberOfSlidesInFilmView:self];
   }
+  if (numSlides > _slideCount) {
+    _slideIndex = _slideCount;
+    _slideCount = numSlides;
+    [self filmViewShouldSlideToIndex:_slideIndex direction:PSFilmSlideDirectionUp];;
+  } else {
+    _state = PSFilmViewStateIdle;
+    [UIView animateWithDuration:0.4 animations:^{
+      [_activeSlide setContentInset:UIEdgeInsetsZero];
+    }];
+  }
+}
+
+- (void)filmViewDidLoadMore {
+  NSInteger numSlides = 0;
+  if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(numberOfSlidesInFilmView:)]) {
+    numSlides = [self.filmViewDataSource numberOfSlidesInFilmView:self];
+  }
+  if (numSlides > _slideCount) {
+    _slideIndex = _slideCount;
+    _slideCount = numSlides;
+    [self filmViewShouldSlideToIndex:_slideIndex direction:PSFilmSlideDirectionDown];
+  } else {
+    _state = PSFilmViewStateIdle;
+    [UIView animateWithDuration:0.4 animations:^{
+      [_activeSlide setContentInset:UIEdgeInsetsZero];
+    }];
+  }
+}
+
+- (void)filmViewShouldSlideToIndex:(NSInteger)index direction:(PSFilmSlideDirection)direction {
+  CGFloat slideToY = 0.0;
+  CGFloat emptyHeight = 0.0;
+  _slideIndex = index;
   
-  if (direction == PSFilmSlideDirectionUp) {
-    if (_slideIndex == 0) return;
-    _slideIndex--;
+  // Get the new slide
+  PSSlideView *newSlide = nil;
+  CGFloat newSlideHeight = 0.0;
+  if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
+    newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
+    newSlideHeight = [self.filmViewDataSource filmView:self heightForSlideAtIndex:_slideIndex];
     
-    // Calculate empty height
-    emptyHeight = 0 - slideView.contentOffset.y;
+    // Calculate newSlide's height
+    newSlide.slideContentView.height = fmaxf(newSlideHeight, self.height);
     
-    // Get the previous slide
-    if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
-      newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
-      newSlide.top = 0 - self.height;
-      // Calculate newSlide's height
-      CGFloat newSlideHeight = [self.filmViewDataSource filmView:self heightForSlideAtIndex:_slideIndex];
-      newSlide.slideContentView.height = fmaxf(newSlideHeight, self.height);
-      [self addSubview:newSlide];
+    if (direction == PSFilmSlideDirectionUp) {
+      // Calculate empty height
+      emptyHeight = 0 - _activeSlide.contentOffset.y;
       slideToY = 0 + self.height + emptyHeight;
       
-      // NOT IMPLEMENTED
-      // Because we are going upwards, we need to simulate sliding thru the entire content not just the frame
-    }
-  } else if (direction == PSFilmSlideDirectionDown) {
-    if (_slideIndex == (numSlides - 1)) return;
-    _slideIndex++;
-    
-    // Calculate empty height
-    emptyHeight = (slideView.contentOffset.y + slideView.height) - slideView.contentSize.height;
-    
-    // Get the next slide
-    if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(filmView:slideAtIndex:)]) {
-      newSlide = [self.filmViewDataSource filmView:self slideAtIndex:_slideIndex];
-      newSlide.top = self.bottom;
-      // Calculate newSlide's height
-      CGFloat newSlideHeight = [self.filmViewDataSource filmView:self heightForSlideAtIndex:_slideIndex];
-      newSlide.slideContentView.height = fmaxf(newSlideHeight, self.height);
-      [self addSubview:newSlide];
+      newSlide.top = 0 - self.height;
+    } else if (direction == PSFilmSlideDirectionDown) {
+      // Calculate empty height
+      emptyHeight = (_activeSlide.contentOffset.y + _activeSlide.height) - _activeSlide.contentSize.height;
       slideToY = 0 - self.height - emptyHeight;
+      
+      newSlide.top = self.bottom;
     }
+    
+    [self addSubview:newSlide];
   }
-  
-  
   
   // Animate the current slide off the screen and the new slide onto the screen
   _headerView.hidden = YES;
@@ -161,6 +180,10 @@
     _activeSlide.frame = CGRectMake(0, slideToY, _activeSlide.width, _activeSlide.height);
     newSlide.frame = CGRectMake(0, 0, newSlide.width, newSlide.height);
   } completion:^(BOOL finished){
+    _state = PSFilmViewStateIdle;
+    [UIView animateWithDuration:0.4 animations:^{
+      [_activeSlide setContentInset:UIEdgeInsetsZero];
+    }];
     [self enqueueReusableSlideView:_activeSlide];
     _activeSlide = newSlide;
     _activeSlide.showsVerticalScrollIndicator = shouldShowVerticalScrollIndicator;
@@ -168,7 +191,6 @@
     _headerView.hidden = NO;
     _footerView.hidden = NO;
   }];
-  
 }
 
 #pragma mark - Reusing Slide Views
@@ -195,10 +217,9 @@
 
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-  // Detect if either header or footer got triggered
-  // Perform a slide
-  PSSlideView *slideView = (PSSlideView *)scrollView;
+  if (_state == PSFilmViewStateRefreshing || _state == PSFilmViewStateLoadingMore) return;
   
+  // Detect if either header or footer got triggered 
   CGFloat visibleTop = scrollView.contentOffset.y;
   CGFloat visibleBottom = scrollView.contentOffset.y + scrollView.height;
   
@@ -211,30 +232,67 @@
   BOOL footerShowing = (visibleBottom - HF_HEIGHT) > scrollView.contentSize.height;
   
   if (headerShowing) {
-    slideView.state = PSSlideViewStateUp;    
-    h.text = [self.filmViewDataSource filmView:self titleForHeaderAtIndex:_slideIndex forState:slideView.state];
+    _state = PSFilmViewStatePullingPrevious;
+    h.text = [self.filmViewDataSource filmView:self titleForHeaderAtIndex:_slideIndex forState:_state];
   } else if (!footerShowing) {
-    slideView.state = PSSlideViewStateNormal;
-    h.text = [self.filmViewDataSource filmView:self titleForHeaderAtIndex:_slideIndex forState:slideView.state];
+    _state = PSFilmViewStateIdle;
+    h.text = [self.filmViewDataSource filmView:self titleForHeaderAtIndex:_slideIndex forState:_state];
   }
   
   if (footerShowing) {
-    slideView.state = PSSlideViewStateDown;
-    f.text = [self.filmViewDataSource filmView:self titleForFooterAtIndex:_slideIndex forState:slideView.state];
+    _state = PSFilmViewStatePullingNext;
+    f.text = [self.filmViewDataSource filmView:self titleForFooterAtIndex:_slideIndex forState:_state];
   } else if (!headerShowing) {
-    slideView.state = PSSlideViewStateNormal;
-    f.text = [self.filmViewDataSource filmView:self titleForFooterAtIndex:_slideIndex forState:slideView.state];
+    _state = PSFilmViewStateIdle;
+    f.text = [self.filmViewDataSource filmView:self titleForFooterAtIndex:_slideIndex forState:_state];
   }
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
   if (decelerate) {
     PSSlideView *slideView = (PSSlideView *)scrollView;
-    NSLog(@"Slide View State: %d", slideView.state);
-    if (slideView.state == PSSlideViewStateDown) {
-      [self slideView:slideView shouldSlideInDirection:PSFilmSlideDirectionDown];
-    } else if (slideView.state == PSSlideViewStateUp) {
-      [self slideView:slideView shouldSlideInDirection:PSFilmSlideDirectionUp];
+    if (_state == PSFilmViewStatePullingPrevious) {
+      // Check if this is a refresh
+      if (_slideIndex == 0) {
+        // Refresh Triggered
+        UILabel *h = [_headerView.subviews firstObject];
+        _state = PSFilmViewStateRefreshing;
+        h.text = @"Loading...";
+        
+        [UIView animateWithDuration:0.4 animations:^{
+          [slideView setContentInset:UIEdgeInsetsMake(HF_HEIGHT, 0, 0, 0)];
+        }];
+        if (self.filmViewDelegate && [self.filmViewDelegate respondsToSelector:@selector(filmViewDidTriggerRefresh:)]) {
+          [self.filmViewDelegate filmViewDidTriggerRefresh:self];
+        }
+      } else {
+        _slideIndex--;
+        [self filmViewShouldSlideToIndex:_slideIndex direction:PSFilmSlideDirectionUp];
+      }
+    } else if (_state == PSFilmViewStatePullingNext) {
+      // Find out how many slides are in the dataSource
+      NSInteger numSlides = 0;
+      if (self.filmViewDataSource && [self.filmViewDataSource respondsToSelector:@selector(numberOfSlidesInFilmView:)]) {
+        numSlides = [self.filmViewDataSource numberOfSlidesInFilmView:self];
+        _slideCount = numSlides;
+      }
+      
+      if (_slideIndex == (numSlides - 1))  {
+        // Load more triggered
+        UILabel *f = [_footerView.subviews firstObject];
+        _state = PSFilmViewStateLoadingMore;
+        f.text = @"Loading...";
+        
+        [UIView animateWithDuration:0.4 animations:^{
+          [slideView setContentInset:UIEdgeInsetsMake(0 - HF_HEIGHT, 0, 0, 0)];
+        }];
+        if (self.filmViewDelegate && [self.filmViewDelegate respondsToSelector:@selector(filmViewDidTriggerLoadMore:)]) {
+          [self.filmViewDelegate filmViewDidTriggerLoadMore:self];
+        }
+      } else {
+        _slideIndex++;
+        [self filmViewShouldSlideToIndex:_slideIndex direction:PSFilmSlideDirectionDown];
+      }
     }
   }
 }

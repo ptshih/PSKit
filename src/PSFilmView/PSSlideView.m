@@ -11,12 +11,10 @@
 @implementation PSSlideView
 
 @synthesize slideContentView = _slideContentView;
-@synthesize state = _state;
 
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
-    _state = PSSlideViewStateNormal;
     self.alwaysBounceVertical = YES;
     self.autoresizingMask = ~UIViewAutoresizingNone;
     
