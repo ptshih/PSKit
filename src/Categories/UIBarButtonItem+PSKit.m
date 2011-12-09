@@ -44,9 +44,9 @@
       bg = [[UIImage imageNamed:@"PSKit.bundle/BarBorderedButton.png"] stretchableImageWithLeftCapWidth:14 topCapHeight:14];
       bgPressed = [[UIImage imageNamed:@"PSKit.bundle/BarBorderedButtonPressed.png"] stretchableImageWithLeftCapWidth:14 topCapHeight:14];
       break;
+    case BarButtonTypeNone:
+      break;
     default:
-      bg = [[UIImage imageNamed:@"PSKit.bundle/BarGrayButton.png"] stretchableImageWithLeftCapWidth:4 topCapHeight:0];
-      bgPressed = [[UIImage imageNamed:@"PSKit.bundle/BarGrayButtonPressed.png"] stretchableImageWithLeftCapWidth:4 topCapHeight:0];
       break;
   }
   
@@ -81,11 +81,11 @@
   return [[self class] barButtonWithTitle:title withTarget:target action:action width:width height:height buttonType:buttonType style:nil];
 }
 
-+ (UIBarButtonItem *)barButtonWithImage:(UIImage *)image withTarget:(id)target action:(SEL)action width:(CGFloat)width height:(CGFloat)height buttonType:(BarButtonType)buttonType {
++ (UIBarButtonItem *)barButtonWithImage:(UIImage *)image highlightedImage:(UIImage *)highlightedImage withTarget:(id)target action:(SEL)action width:(CGFloat)width height:(CGFloat)height buttonType:(BarButtonType)buttonType {
   UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
   button.frame = CGRectMake(0, 0, width, height);
   [button setImage:image forState:UIControlStateNormal];
-  [button setImage:image forState:UIControlStateHighlighted];
+  [button setImage:highlightedImage forState:UIControlStateHighlighted];
   
   [button setBackgroundImage:[[self class] bgForBarButtonType:buttonType pressed:NO] forState:UIControlStateNormal];
   [button setBackgroundImage:[[self class] bgForBarButtonType:buttonType pressed:YES] forState:UIControlStateHighlighted];

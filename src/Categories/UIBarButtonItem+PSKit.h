@@ -14,7 +14,8 @@ enum {
   BarButtonTypeRed = 2,
   BarButtonTypeGreen = 3,
   BarButtonTypeSilver = 4,
-  BarButtonTypeBordered = 5
+  BarButtonTypeBordered = 5,
+  BarButtonTypeNone = 6
 };
 typedef uint32_t BarButtonType;
 
@@ -22,7 +23,7 @@ typedef uint32_t BarButtonType;
 
 + (UIBarButtonItem *)barButtonWithTitle:(NSString *)title withTarget:(id)target action:(SEL)action width:(CGFloat)width height:(CGFloat)height buttonType:(BarButtonType)buttonType style:(NSString *)style;
 + (UIBarButtonItem *)barButtonWithTitle:(NSString *)title withTarget:(id)target action:(SEL)action width:(CGFloat)width height:(CGFloat)height buttonType:(BarButtonType)buttonType;
-+ (UIBarButtonItem *)barButtonWithImage:(UIImage *)image withTarget:(id)target action:(SEL)action width:(CGFloat)width height:(CGFloat)height buttonType:(BarButtonType)buttonType;
++ (UIBarButtonItem *)barButtonWithImage:(UIImage *)image highlightedImage:(UIImage *)highlightedImage withTarget:(id)target action:(SEL)action width:(CGFloat)width height:(CGFloat)height buttonType:(BarButtonType)buttonType;
 + (UIBarButtonItem *)navBackButtonWithTarget:(id)target action:(SEL)action;
 
 @end
