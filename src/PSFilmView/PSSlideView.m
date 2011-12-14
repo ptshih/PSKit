@@ -11,6 +11,7 @@
 @implementation PSSlideView
 
 @synthesize slideContentView = _slideContentView;
+@synthesize slideHeight = _slideHeight;
 
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
@@ -19,6 +20,8 @@
     self.autoresizingMask = ~UIViewAutoresizingNone;
     
     _slideContentView = [[UIView alloc] initWithFrame:frame];
+    _slideHeight = _slideContentView.height;
+    
     [self addSubview:_slideContentView];
   }
   return self;

@@ -10,9 +10,11 @@
 
 @interface PSSlideView : UIScrollView {
   UIView *_slideContentView;
+  CGFloat _slideHeight;
 }
 
 @property (nonatomic, retain) UIView *slideContentView;
+@property (nonatomic, assign) CGFloat slideHeight;
 
 - (void)prepareForReuse;
 

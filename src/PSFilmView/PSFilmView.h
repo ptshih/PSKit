@@ -70,8 +70,9 @@ typedef enum {
 - (NSString *)filmView:(PSFilmView *)filmView titleForHeaderAtIndex:(NSInteger)index forState:(PSFilmViewState)state;
 - (NSString *)filmView:(PSFilmView *)filmView titleForFooterAtIndex:(NSInteger)index forState:(PSFilmViewState)state;
 
-@required
 - (CGFloat)filmView:(PSFilmView *)filmView heightForSlideAtIndex:(NSInteger)index;
+
+@required
 - (NSInteger)numberOfSlidesInFilmView:(PSFilmView *)filmView;
 - (PSSlideView *)filmView:(PSFilmView *)filmView slideAtIndex:(NSInteger)index;
 
