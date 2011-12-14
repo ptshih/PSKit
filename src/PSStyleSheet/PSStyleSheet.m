@@ -41,6 +41,7 @@ static NSMutableDictionary *_styles = nil;
   label.textAlignment = [PSStyleSheet textAlignmentForStyle:style];
   label.backgroundColor = [PSStyleSheet backgroundColorForStyle:style];
   label.numberOfLines = [PSStyleSheet numberOfLinesForStyle:style];
+  label.lineBreakMode = [PSStyleSheet lineBreakModeForStyle:style];
 }
 
 + (void)applyStyle:(NSString *)style forButton:(UIButton *)button {
@@ -126,6 +127,29 @@ static NSMutableDictionary *_styles = nil;
     numberOfLines = [[[_styles objectForKey:style] objectForKey:@"numberOfLines"] integerValue];
   }
   return numberOfLines;
+}
+
++ (UILineBreakMode)lineBreakModeForStyle:(NSString *)style {
+//  typedef enum {		
+//    UILineBreakModeWordWrap = 0,            // Wrap at word boundaries
+//    UILineBreakModeCharacterWrap,           // Wrap at character boundaries
+//    UILineBreakModeClip,                    // Simply clip when it hits the end of the rect
+//    UILineBreakModeHeadTruncation,          // Truncate at head of line: "...wxyz". Will truncate multiline text on first line
+//    UILineBreakModeTailTruncation,          // Truncate at tail of line: "abcd...". Will truncate multiline text on last line
+//    UILineBreakModeMiddleTruncation,        // Truncate middle of line:  "ab...yz". Will truncate multiline text in the middle
+//  } UILineBreakMode;
+  UILineBreakMode lineBreakMode = UILineBreakModeTailTruncation;
+  if ([[_styles objectForKey:style] objectForKey:@"lineBreakMode"]) {
+    NSString *lineBreakModeString = [[_styles objectForKey:style] objectForKey:@"lineBreakMode"];
+    if ([lineBreakModeString isEqualToString:@"wordWrap"]) {
+      lineBreakMode = UILineBreakModeWordWrap;
+    } else if ([lineBreakModeString isEqualToString:@"characterWrap"]) {
+      lineBreakMode = UILineBreakModeCharacterWrap;
+    } else {
+      lineBreakMode = UILineBreakModeTailTruncation;
+    }
+  }
+  return lineBreakMode;
 }
 
 @end
