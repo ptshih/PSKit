@@ -8,6 +8,9 @@
 
 #import "PSImageCell.h"
 
+#define MARGIN_X 10.0
+#define MARGIN_Y 5.0
+
 @implementation PSImageCell
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {

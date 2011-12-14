@@ -9,9 +9,6 @@
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
 
-#define MARGIN_X 10.0
-#define MARGIN_Y 5.0
-
 enum {
   PSCellTypePlain = 0,
   PSCellTypeGrouped = 1
