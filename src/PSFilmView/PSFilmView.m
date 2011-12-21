@@ -186,12 +186,12 @@
   BOOL shouldShowHorizontalScrollIndicator = _activeSlide.showsHorizontalScrollIndicator;
   _activeSlide.showsVerticalScrollIndicator = NO;
   _activeSlide.showsHorizontalScrollIndicator = NO;
-  [UIView animateWithDuration:0.4 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+  [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
     _activeSlide.frame = CGRectMake(0, slideToY, _activeSlide.width, _activeSlide.height);
     newSlide.frame = CGRectMake(0, 0, newSlide.width, newSlide.height);
   } completion:^(BOOL finished){
     _state = PSFilmViewStateIdle;
-    [UIView animateWithDuration:0.4 animations:^{
+    [UIView animateWithDuration:0.3 animations:^{
       [_activeSlide setContentInset:UIEdgeInsetsZero];
     }];
     [self enqueueReusableSlideView:_activeSlide];
