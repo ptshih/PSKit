@@ -10,9 +10,17 @@
 #import <QuartzCore/QuartzCore.h>
 #import "PSStateMachine.h"
 
+#import "PSDrawerController.h"
+#import "PSNavigationController.h"
+
 @interface PSViewController : UIViewController <PSStateMachine> {
   UIScrollView *_activeScrollView; // subclasses should set this if they have a scrollView
+  PSDrawerController *_drawerController;
+  PSNavigationController *_navController;
 }
+
+@property (nonatomic, assign) PSDrawerController *drawerController;
+@property (nonatomic, assign) PSNavigationController *navController;
 
 /**
  Used to update the view when the orientation changes

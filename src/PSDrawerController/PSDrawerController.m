@@ -36,6 +36,7 @@
  */
 
 #import "PSDrawerController.h"
+#import "PSViewController.h"
 
 #define DRAWER_GAP 60.0
 
@@ -52,6 +53,16 @@
     _rootViewController = [rootViewController retain];
     _leftViewController = [leftViewController retain];
     _rightViewController = [rightViewController retain];
+    
+    if ([_rootViewController isMemberOfClass:[PSViewController class]]) {
+      [(PSViewController *)_rootViewController setDrawerController:self];
+    }
+    if ([_leftViewController isMemberOfClass:[PSViewController class]]) {
+      [(PSViewController *)_leftViewController setDrawerController:self];
+    }
+    if ([_rightViewController isMemberOfClass:[PSViewController class]]) {
+      [(PSViewController *)_rightViewController setDrawerController:self];
+    }
   }
   return self;
 }
@@ -76,6 +87,7 @@
   [super dealloc];
 }
 
+#pragma mark - View
 - (void)viewDidLoad {
   [super viewDidLoad];
   
@@ -98,7 +110,7 @@
   [self.view addSubview:_rootViewController.view];
 }
 
-#pragma mark - View Controller Seters
+#pragma mark - View Controller Setters
 - (void)setRootViewController:(UIViewController *)rootViewController {
   [_rootViewController autorelease];
   [_rootViewController.view removeFromSuperview];

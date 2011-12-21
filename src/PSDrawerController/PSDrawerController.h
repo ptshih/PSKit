@@ -36,7 +36,6 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "PSViewController.h"
 
 typedef enum {
   PSDrawerStateClosed = 1,
@@ -51,7 +50,9 @@ typedef enum{
   PSDrawerPositionRight = 2
 } PSDrawerPosition;
 
-@interface PSDrawerController : PSViewController {
+@class PSViewController;
+
+@interface PSDrawerController : UIViewController {
   PSDrawerState _state;
   
   UIViewController *_rootViewController;

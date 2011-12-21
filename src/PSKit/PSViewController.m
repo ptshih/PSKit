@@ -10,6 +10,9 @@
 
 @implementation PSViewController
 
+@synthesize drawerController = _drawerController;
+@synthesize navController = _navController;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -39,6 +42,13 @@
 }
 
 #pragma mark - View
+//- (void)loadView {
+//  UIView *view = [[UIView alloc] initWithFrame:APP_FRAME];
+//  view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+//  self.view = view;
+//  [view release];
+//}
+
 - (void)viewDidLoad {
   [super viewDidLoad];
   VLog(@"Called by class: %@", [self class]);
@@ -89,7 +99,7 @@
   UILabel *l = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.navigationController.navigationBar.width - 160.0, self.navigationController.navigationBar.height)] autorelease];
   l.autoresizingMask = ~UIViewAutoresizingNone;
   l.text = [[self.title copy] autorelease];
-  l.numberOfLines = 3;
+  l.numberOfLines = 2;
   l.backgroundColor = [UIColor clearColor];
   [PSStyleSheet applyStyle:@"navigationTitleLabel" forLabel:l];
   
