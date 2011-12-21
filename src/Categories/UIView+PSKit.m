@@ -9,9 +9,6 @@
 #import "UIView+PSKit.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define UIVIEW_RGBCOLOR(R,G,B) [UIColor colorWithRed:R/255.0 green:G/255.0 blue:B/255.0 alpha:1.0]
-#define UIVIEW_RGBACOLOR(R,G,B,A) [UIColor colorWithRed:R/255.0 green:G/255.0 blue:B/255.0 alpha:A]
-
 @implementation UIView (PSKit)
 
 #pragma mark - Additions
@@ -164,17 +161,19 @@
 }
 
 #pragma mark - Gradient Layer
-- (void)addGradientLayer {
-  [self addGradientLayerWithColors:[NSArray arrayWithObjects:(id)[[UIColor clearColor] CGColor], (id)[UIVIEW_RGBACOLOR(0, 0, 0, 0.1) CGColor], (id)[UIVIEW_RGBACOLOR(0, 0, 0, 0.8) CGColor], (id)[UIVIEW_RGBACOLOR(0, 0, 0, 1.0) CGColor], nil] andLocations:[NSArray arrayWithObjects:[NSNumber numberWithFloat:0.1], [NSNumber numberWithFloat:0.6], [NSNumber numberWithFloat:0.99], [NSNumber numberWithFloat:1.0], nil]];
-}
-
-- (void)addGradientLayerWithColors:(NSArray *)colors andLocations:(NSArray *)locations {
+- (void)addGradientLayerWithColors:(NSArray *)colors locations:(NSArray *)locations startPoint:(CGPoint)startPoint endPoint:(CGPoint)endPoint {
+// Horizontal
+//  [gradientLayer setStartPoint:CGPointMake(0.0, 0.5)];
+//  [gradientLayer setEndPoint:CGPointMake(1.0, 0.5)];
+  
   // Only add if a gradient layer hasn't already been added
   if (![[[self.layer sublayers] lastObject] isKindOfClass:[CAGradientLayer class]]) {
     CAGradientLayer *gradient = [CAGradientLayer layer];
     gradient.frame = self.bounds;
     gradient.colors = colors;
     gradient.locations = locations;
+    gradient.startPoint = startPoint;
+    gradient.endPoint = endPoint;
     [self.layer addSublayer:gradient];
   }
 }
