@@ -13,13 +13,13 @@
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
-    VLog(@"Called by class: %@", [self class]);
+//    VLog(@"#%@", [self class]);
   }
   return self;
 }
 
 - (void)dealloc {
-  VLog(@"Called by class: %@", [self class]);
+//  VLog(@"#%@", [self class]);
   [super dealloc];
 }
 

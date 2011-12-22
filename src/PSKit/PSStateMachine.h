@@ -29,6 +29,8 @@
 /**
  Configure/layout any subviews used in the view controller
  */
+- (void)setupHeader;
+- (void)setupFooter;
 - (void)setupSubviews;
 
 /**

@@ -11,47 +11,86 @@
 @implementation PSViewController
 
 @synthesize drawerController = _drawerController;
-@synthesize navController = _navController;
+@synthesize psNavigationController = _psNavigationController;
+@synthesize headerView = _headerView;
+@synthesize contentView = _contentView;
+@synthesize footerView = _footerView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     _activeScrollView = nil;
-    VLog(@"Called by class: %@", [self class]);
+//    VLog(@"#%@", [self class]);
   }
   return self;
 }
 
 - (void)dealloc
 {
-  VLog(@"Called by class: %@", [self class]);
+//  VLog(@"#%@", [self class]);
+  RELEASE_SAFELY(_headerView);
+  RELEASE_SAFELY(_contentView);
+  RELEASE_SAFELY(_footerView);
   [super dealloc];
 }
 
 - (void)viewDidUnload
 {
+  VLog(@"#%@", [self class]);
+  RELEASE_SAFELY(_headerView);
+  RELEASE_SAFELY(_contentView);
+  RELEASE_SAFELY(_footerView);
   [super viewDidUnload];
-  VLog(@"Called by class: %@", [self class]);
 }
 
 - (void)didReceiveMemoryWarning
 {
+  VLog(@"#%@", [self class]);
   [super didReceiveMemoryWarning];
-  VLog(@"Called by class: %@", [self class]);
+}
+
+#pragma mark - Setters/Getters
+- (void)setHeaderView:(UIView *)headerView {
+  [_headerView autorelease];
+  [_headerView removeFromSuperview];
+  _headerView = [headerView retain];
+  
+  // Add to view, adjust contentView
+  _headerView.left = 0.0;
+  _headerView.top = 0.0;
+  _contentView.top = _headerView.bottom;
+  _contentView.height -= _headerView.height;
+  [self.view addSubview:_headerView];
+}
+
+- (void)setFooterView:(UIView *)footerView {
+  [_footerView autorelease];
+  [_footerView removeFromSuperview];
+  _footerView = [footerView retain];
+  
+  // Add to view, adjust contentView
+  _footerView.left = 0.0;
+  _footerView.top = self.view.bottom - _footerView.height;
+  _contentView.height -= _footerView.height;
+  [self.view addSubview:_footerView];
 }
 
 #pragma mark - View
-//- (void)loadView {
-//  UIView *view = [[UIView alloc] initWithFrame:APP_FRAME];
-//  view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-//  self.view = view;
-//  [view release];
-//}
+- (void)loadView {
+  UIView *view = [[UIView alloc] initWithFrame:APP_FRAME];
+  view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+  self.view = view;
+  [view release];
+  
+  _contentView = [[UIView alloc] initWithFrame:self.view.bounds];
+  _contentView.autoresizingMask = self.view.autoresizingMask;
+  [self.view addSubview:_contentView];
+}
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  VLog(@"Called by class: %@", [self class]);
+  VLog(@"#%@", [self class]);
   
   // Background
   if ([self respondsToSelector:@selector(baseBackgroundView)]) {
@@ -72,25 +111,25 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  VLog(@"Called by class: %@", [self class]);
+  VLog(@"#%@", [self class]);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
   [super viewWillDisappear:animated];
-  VLog(@"Called by class: %@", [self class]);
+  VLog(@"#%@", [self class]);
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  VLog(@"Called by class: %@", [self class]);
+  VLog(@"#%@", [self class]);
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
-  VLog(@"Called by class: %@", [self class]);
+  VLog(@"#%@", [self class]);
 }
 
 #pragma mark - View Config
@@ -120,6 +159,20 @@
 - (void)updateScrollsToTop:(BOOL)isEnabled {
   if (_activeScrollView) {
     _activeScrollView.scrollsToTop = isEnabled;
+  }
+}
+
+- (PSDrawerController *)drawerController {
+  if (_psNavigationController) {
+    return _psNavigationController.drawerController;
+  } else {
+    return _drawerController;
+  }
+}
+
+- (void)animatedBack {
+  if (self.psNavigationController) {
+    [self.psNavigationController popViewControllerAnimated:YES];
   }
 }
 

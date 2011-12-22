@@ -49,10 +49,6 @@
   _viewHasLoadedOnce = YES;
 }
 
-- (void)back {
-  [self.navigationController popViewControllerAnimated:YES];
-}
-
 #pragma mark - PSNullViewDelegate
 - (void)nullViewTapped:(id)sender {
   // When a nullView is tapped, reload the dataSource

@@ -90,6 +90,7 @@
       if (image) {
         // First put it in the NSCache buffer
         [_buffer setObject:image forKey:md5Path cost:1];
+        [image release];
         
         // Also write it to file
         [imageData writeToFile:[_cachePath stringByAppendingPathComponent:md5Path] atomically:YES];
@@ -178,6 +179,7 @@
 
   // Start the Request
   [_requestQueue addOperation:op];
+  [op release];
   
   return YES;
 }

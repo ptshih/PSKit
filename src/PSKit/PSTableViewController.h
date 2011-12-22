@@ -27,7 +27,6 @@
   UISearchBar *_searchBar;
   EGORefreshTableHeaderView *_refreshHeaderView;
   UIView *_loadMoreView;
-  UIView *_footerView; // just a pointer
   
   // Paging
   NSInteger _pagingStart;
@@ -49,8 +48,6 @@
 - (void)setupPullRefresh;
 - (void)setupTableHeader;
 - (void)setupTableFooter;
-- (void)setupHeaderWithView:(UIView *)headerView;
-- (void)setupFooterWithView:(UIView *)footerView;
 - (void)setupLoadMoreView;
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles;
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles andPlaceholder:(NSString *)placeholder;

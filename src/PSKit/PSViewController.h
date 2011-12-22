@@ -15,12 +15,18 @@
 
 @interface PSViewController : UIViewController <PSStateMachine> {
   UIScrollView *_activeScrollView; // subclasses should set this if they have a scrollView
+  UIView *_headerView;
+  UIView *_contentView;
+  UIView *_footerView;
   PSDrawerController *_drawerController;
-  PSNavigationController *_navController;
+  PSNavigationController *_psNavigationController;
 }
 
+@property (nonatomic, retain) UIView *headerView;
+@property (nonatomic, retain) UIView *contentView;
+@property (nonatomic, retain) UIView *footerView;
 @property (nonatomic, assign) PSDrawerController *drawerController;
-@property (nonatomic, assign) PSNavigationController *navController;
+@property (nonatomic, assign) PSNavigationController *psNavigationController;
 
 /**
  Used to update the view when the orientation changes
@@ -31,5 +37,10 @@
  Used to update the currently active scrollview (for scrollsToTop fix)
  */
 - (void)updateScrollsToTop:(BOOL)isEnabled;
+
+/**
+ Convenience Back Animated
+ */
+- (void)animatedBack;
 
 @end

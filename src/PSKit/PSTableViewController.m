@@ -169,24 +169,6 @@
   // subclass should implement
 }
 
-// Optional Header View
-- (void)setupHeaderWithView:(UIView *)headerView {
-  _nullView.frame = CGRectMake(_nullView.left, _nullView.top + headerView.height, _nullView.width, _nullView.height - headerView.height);
-  _tableView.frame = CGRectMake(_tableView.left, _tableView.top + headerView.height, _tableView.width, _tableView.height - headerView.height);  
-  headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
-  [self.view addSubview:headerView];
-}
-
-// Optional footer view
-- (void)setupFooterWithView:(UIView *)footerView {
-  _footerView = footerView;
-  _nullView.frame = CGRectMake(_nullView.left, _nullView.top, _nullView.width, _nullView.height - footerView.height);
-  _tableView.frame = CGRectMake(_tableView.left, _tableView.top, _tableView.width, _tableView.height - footerView.height);
-  footerView.top = self.view.height - footerView.height; // 44 navbar
-  footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
-  [self.view addSubview:footerView];
-}
-
 // This is the automatic load more style
 - (void)setupLoadMoreView {
   _loadMoreView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)];
@@ -552,7 +534,6 @@
         CGFloat tableBottom = tableView.contentSize.height - tableView.rowHeight;
         
         if (tableOffset >= tableBottom) {
-          VLog(@"### loadMore");
           [self loadMore];
         }
       }
