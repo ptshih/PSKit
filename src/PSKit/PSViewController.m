@@ -71,7 +71,7 @@
   
   // Add to view, adjust contentView
   _footerView.left = 0.0;
-  _footerView.top = self.view.bottom - _footerView.height;
+  _footerView.top = self.view.height - _footerView.height;
   _contentView.height -= _footerView.height;
   [self.view addSubview:_footerView];
 }
