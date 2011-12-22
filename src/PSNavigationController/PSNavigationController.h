@@ -7,6 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "PSDrawerController.h"
+
+/**
+ This class does NOT manage a shared navigation bar.
+ It is the responsibility of the view controller to present a navigation bar.
+ PSViewController has an optional PSNavigationBar property that will add one.
+ */
 
 @protocol PSNavigationControllerDelegate;
 
@@ -17,9 +24,11 @@
   UIViewController *_disappearingViewController;
   UIView *_overlayView;
   
+  PSDrawerController *_drawerController;
   id <PSNavigationControllerDelegate> _delegate;
 }
 
+@property (nonatomic, assign) PSDrawerController *drawerController; // pointer
 @property (nonatomic, assign) id <PSNavigationControllerDelegate> delegate;
 @property (nonatomic, retain) NSArray *viewControllers; // expect non-mutable as param to setter
 
@@ -27,6 +36,9 @@
 @property (nonatomic, readonly) UIViewController *topViewController;
 @property (nonatomic, readonly) UIViewController *rootViewController;
 
+/**
+ Convenience initializer
+ */
 - (id)initWithRootViewController:(UIViewController *)rootViewController;
 
 /**
@@ -43,9 +55,9 @@
 @protocol PSNavigationControllerDelegate <NSObject>
 
 @optional
-- (void)navController:(PSNavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated;
-- (void)navController:(PSNavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated;
-- (void)navController:(PSNavigationController *)navigationController willHideViewController:(UIViewController *)viewController animated:(BOOL)animated;
-- (void)navController:(PSNavigationController *)navigationController didHideViewController:(UIViewController *)viewController animated:(BOOL)animated;
+- (void)psNavigationController:(PSNavigationController *)psNavigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated;
+- (void)psNavigationController:(PSNavigationController *)psNavigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated;
+- (void)psNavigationController:(PSNavigationController *)psNavigationController willHideViewController:(UIViewController *)viewController animated:(BOOL)animated;
+- (void)psNavigationController:(PSNavigationController *)psNavigationController didHideViewController:(UIViewController *)viewController animated:(BOOL)animated;
 
 @end

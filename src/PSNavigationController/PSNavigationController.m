@@ -9,8 +9,13 @@
 #import "PSNavigationController.h"
 #import "PSViewController.h"
 
+@interface PSNavigationController (Private)
+
+@end
+
 @implementation PSNavigationController
 
+@synthesize drawerController = _drawerController;
 @synthesize delegate = _delegate;
 @synthesize viewControllers = _viewControllers;
 
@@ -58,25 +63,33 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self.topViewController viewWillAppear:animated];
+  if (!self.childViewControllers) {
+    [self.topViewController viewWillAppear:animated];
+  }
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [self.topViewController viewDidAppear:animated];
+  if (!self.childViewControllers) {
+    [self.topViewController viewDidAppear:animated];
+  }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
   [super viewWillDisappear:animated];
-  [self.topViewController viewWillDisappear:animated];
+  if (!self.childViewControllers) {
+    [self.topViewController viewWillDisappear:animated];
+  }
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
-  [self.topViewController viewDidDisappear:animated];
+  if (!self.childViewControllers) {
+    [self.topViewController viewDidDisappear:animated];
+  }
 }
 
 #pragma mark - Getter/Setter
@@ -88,7 +101,7 @@
     
     for (UIViewController *viewController in _viewControllers) {
       if ([viewController isKindOfClass:[PSViewController class]]) {
-        [(PSViewController *)viewController setNavController:self];
+        [(PSViewController *)viewController setPsNavigationController:self];
       }
     }
     
@@ -109,31 +122,33 @@
 }
 
 #pragma mark - Push/Pop
-const CGFloat kPushTransitionScale = 0.95;
+const CGFloat kPushPopScale = 0.95;
 const CGFloat kOverlayViewAlpha = 0.75;
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
   _disappearingViewController = self.topViewController;
   [_viewControllers addObject:viewController];
   
+  // Set psNavigationController property for new controller
+  if ([self.topViewController isKindOfClass:[PSViewController class]]) {
+    [(PSViewController *)self.topViewController setPsNavigationController:self];
+  }
+  
   // topViewController is now the new viewController
   [self.view addSubview:self.topViewController.view];
   
-  // Set navController property for new controller
-  if ([self.topViewController isKindOfClass:[PSViewController class]]) {
-    [(PSViewController *)self.topViewController setNavController:self];
+  // Let the views know of this event (in iOS4)
+  if (!self.childViewControllers) {
+    [self.topViewController viewWillAppear:animated];
+    [_disappearingViewController viewWillDisappear:animated];
   }
-  
-  // Let the views know of this event
-  [self.topViewController viewWillAppear:animated];
-  [_disappearingViewController viewWillDisappear:animated];
   
   // Let the delegate know
-  if (self.delegate && [self.delegate respondsToSelector:@selector(navController:willShowViewController:animated:)]) {
-    [self.delegate navController:self willShowViewController:self.topViewController animated:YES];
+  if (self.delegate && [self.delegate respondsToSelector:@selector(psNavigationController:willShowViewController:animated:)]) {
+    [self.delegate psNavigationController:self willShowViewController:self.topViewController animated:YES];
   }
-  if (self.delegate && [self.delegate respondsToSelector:@selector(navController:willHideViewController:animated:)]) {
-    [self.delegate navController:self willHideViewController:_disappearingViewController animated:YES];
+  if (self.delegate && [self.delegate respondsToSelector:@selector(psNavigationController:willHideViewController:animated:)]) {
+    [self.delegate psNavigationController:self willHideViewController:_disappearingViewController animated:YES];
   }
   
   // Prepare view frames
@@ -159,22 +174,10 @@ const CGFloat kOverlayViewAlpha = 0.75;
   
   [UIView animateWithDuration:animationDuration delay:0.0 options:animationOptions animations:^{
     self.topViewController.view.frame = self.view.bounds;
-    _disappearingViewController.view.transform = CGAffineTransformMakeScale(kPushTransitionScale, kPushTransitionScale);
+    _disappearingViewController.view.transform = CGAffineTransformMakeScale(kPushPopScale, kPushPopScale);
     _overlayView.alpha = kOverlayViewAlpha;
     
-  } completion:^(BOOL finished) {
-    // Let the views know
-    [self.topViewController viewDidAppear:animated];
-    [_disappearingViewController viewDidDisappear:animated];
-    
-    // Let the delegate know
-    if (self.delegate && [self.delegate respondsToSelector:@selector(navController:didShowViewController:animated:)]) {
-      [self.delegate navController:self didShowViewController:self.topViewController animated:YES];
-    }
-    if (self.delegate && [self.delegate respondsToSelector:@selector(navController:didHideViewController:animated:)]) {
-      [self.delegate navController:self didHideViewController:_disappearingViewController animated:YES];
-    }
-    
+  } completion:^(BOOL finished) {        
     // Remove shadow
     self.topViewController.view.layer.shadowColor = nil;
     self.topViewController.view.layer.shadowOffset = CGSizeZero;
@@ -184,6 +187,20 @@ const CGFloat kOverlayViewAlpha = 0.75;
     
     // Remove gray layer
     [_overlayView removeFromSuperview];
+    
+    // Let the delegate know
+    if (self.delegate && [self.delegate respondsToSelector:@selector(psNavigationController:didShowViewController:animated:)]) {
+      [self.delegate psNavigationController:self didShowViewController:self.topViewController animated:YES];
+    }
+    if (self.delegate && [self.delegate respondsToSelector:@selector(psNavigationController:didHideViewController:animated:)]) {
+      [self.delegate psNavigationController:self didHideViewController:_disappearingViewController animated:YES];
+    }
+    
+    // Let the views know of this event (in iOS4)
+    if (!self.childViewControllers) {
+      [self.topViewController viewDidAppear:animated];
+      [_disappearingViewController viewDidDisappear:animated];
+    }
     
     // Remove old view
     [_disappearingViewController.view removeFromSuperview];
@@ -204,16 +221,18 @@ const CGFloat kOverlayViewAlpha = 0.75;
     // Add the new top view
     [self.view insertSubview:self.topViewController.view belowSubview:_disappearingViewController.view];
     
-    // Let views know
-    [self.topViewController viewWillAppear:animated];
-    [_disappearingViewController viewWillDisappear:animated];
+    // Let the views know of this event (in iOS4)
+    if (!self.childViewControllers) {
+      [self.topViewController viewWillAppear:animated];
+      [_disappearingViewController viewWillDisappear:animated];
+    }
     
     // Let the delegate know
-    if (self.delegate && [self.delegate respondsToSelector:@selector(navController:willShowViewController:animated:)]) {
-      [self.delegate navController:self willShowViewController:self.topViewController animated:YES];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(psNavigationController:willShowViewController:animated:)]) {
+      [self.delegate psNavigationController:self willShowViewController:self.topViewController animated:YES];
     }
-    if (self.delegate && [self.delegate respondsToSelector:@selector(navController:willHideViewController:animated:)]) {
-      [self.delegate navController:self willHideViewController:_disappearingViewController animated:YES];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(psNavigationController:willHideViewController:animated:)]) {
+      [self.delegate psNavigationController:self willHideViewController:_disappearingViewController animated:YES];
     }
     
     // Prepare view frames
@@ -230,7 +249,7 @@ const CGFloat kOverlayViewAlpha = 0.75;
     _overlayView.alpha = kOverlayViewAlpha;
     [self.topViewController.view addSubview:_overlayView];
     
-    self.topViewController.view.transform =  CGAffineTransformMakeScale(kPushTransitionScale, kPushTransitionScale);
+    self.topViewController.view.transform =  CGAffineTransformMakeScale(kPushPopScale, kPushPopScale);
     
     // Transition
     UIViewAnimationOptions animationOptions = UIViewAnimationCurveEaseInOut;
@@ -245,18 +264,6 @@ const CGFloat kOverlayViewAlpha = 0.75;
       
       _overlayView.alpha = 0.0;
     } completion:^(BOOL finished) {
-      // Let the views know
-      [self.topViewController viewDidAppear:animated];
-      [_disappearingViewController viewDidDisappear:animated];
-      
-      // Let the delegate know
-      if (self.delegate && [self.delegate respondsToSelector:@selector(navController:didShowViewController:animated:)]) {
-        [self.delegate navController:self didShowViewController:self.topViewController animated:YES];
-      }
-      if (self.delegate && [self.delegate respondsToSelector:@selector(navController:didHideViewController:animated:)]) {
-        [self.delegate navController:self didHideViewController:_disappearingViewController animated:YES];
-      }
-      
       // Remove shadow
       _disappearingViewController.view.layer.shadowColor = nil;
       _disappearingViewController.view.layer.shadowOffset = CGSizeZero;
@@ -266,6 +273,20 @@ const CGFloat kOverlayViewAlpha = 0.75;
       
       // Remove gray layer
       [_overlayView removeFromSuperview];
+      
+      // Let the delegate know
+      if (self.delegate && [self.delegate respondsToSelector:@selector(psNavigationController:didShowViewController:animated:)]) {
+        [self.delegate psNavigationController:self didShowViewController:self.topViewController animated:YES];
+      }
+      if (self.delegate && [self.delegate respondsToSelector:@selector(psNavigationController:didHideViewController:animated:)]) {
+        [self.delegate psNavigationController:self didHideViewController:_disappearingViewController animated:YES];
+      }
+      
+      // Let the views know of this event (in iOS4)
+      if (!self.childViewControllers) {
+        [self.topViewController viewDidAppear:animated];
+        [_disappearingViewController viewDidDisappear:animated];
+      }
       
       // Remove old view
       [_disappearingViewController.view removeFromSuperview];
