@@ -12,6 +12,19 @@
 
 @implementation UIImage (PSKit)
 
+#pragma mark - Orientation
+- (BOOL)isPortrait {
+  return self.size.width < self.size.height;
+}
+
+- (BOOL)isLandscape {
+  return self.size.width > self.size.height;
+}
+
+- (BOOL)isSquare {
+  return self.size.width == self.size.height;
+}
+
 #pragma mark - Strechable
 + (UIImage *)stretchableImageNamed:(NSString *)name withLeftCapWidth:(NSInteger)leftCapWidth topCapWidth:(NSInteger)topCapWidth; {
   return [[UIImage imageNamed:name] stretchableImageWithLeftCapWidth:leftCapWidth topCapHeight:topCapWidth];

@@ -11,6 +11,11 @@
 
 @interface UIImage (PSKit) <NSCoding>
 
+#pragma mark - Orientation
+- (BOOL)isPortrait;
+- (BOOL)isLandscape;
+- (BOOL)isSquare;
+
 #pragma mark - Strechable
 + (UIImage *)stretchableImageNamed:(NSString *)name withLeftCapWidth:(NSInteger)leftCapWidth topCapWidth:(NSInteger)topCapWidth;
 
