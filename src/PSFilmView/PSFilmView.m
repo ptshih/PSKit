@@ -102,7 +102,10 @@
       newSlideHeight = _activeSlide.slideHeight;
     }
 
-    _activeSlide.slideContentView.height = fmaxf(newSlideHeight, self.height);
+    newSlideHeight = fmaxf(newSlideHeight, self.height);
+    [_activeSlide setContentHeight:newSlideHeight];
+//    _activeSlide.slideContentView.height = fmaxf(newSlideHeight, self.height);
+    
     [self addSubview:_activeSlide];
   }
 }
@@ -160,7 +163,9 @@
     }
     
     // Calculate newSlide's height
-    newSlide.slideContentView.height = fmaxf(newSlideHeight, self.height);
+    newSlideHeight = fmaxf(newSlideHeight, self.height);
+    [newSlide setContentHeight:newSlideHeight];
+//    newSlide.slideContentView.height = fmaxf(newSlideHeight, self.height);
     
     if (direction == PSFilmSlideDirectionUp) {
       // Calculate empty height
