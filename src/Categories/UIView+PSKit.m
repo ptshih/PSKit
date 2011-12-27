@@ -161,21 +161,20 @@
 }
 
 #pragma mark - Gradient Layer
-- (void)addGradientLayerWithColors:(NSArray *)colors locations:(NSArray *)locations startPoint:(CGPoint)startPoint endPoint:(CGPoint)endPoint {
+- (CAGradientLayer *)addGradientLayerWithFrame:(CGRect)frame colors:(NSArray *)colors locations:(NSArray *)locations startPoint:(CGPoint)startPoint endPoint:(CGPoint)endPoint {
 // Horizontal
 //  [gradientLayer setStartPoint:CGPointMake(0.0, 0.5)];
 //  [gradientLayer setEndPoint:CGPointMake(1.0, 0.5)];
   
-  // Only add if a gradient layer hasn't already been added
-  if (![[[self.layer sublayers] lastObject] isKindOfClass:[CAGradientLayer class]]) {
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    gradient.frame = self.bounds;
-    gradient.colors = colors;
-    gradient.locations = locations;
-    gradient.startPoint = startPoint;
-    gradient.endPoint = endPoint;
-    [self.layer addSublayer:gradient];
-  }
+  CAGradientLayer *gradient = [CAGradientLayer layer];
+  gradient.frame = frame;
+  gradient.colors = colors;
+  gradient.locations = locations;
+  gradient.startPoint = startPoint;
+  gradient.endPoint = endPoint;
+  [self.layer addSublayer:gradient];
+  
+  return gradient;
 }
 
 @end
