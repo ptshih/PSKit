@@ -212,7 +212,7 @@ const CGFloat kOverlayViewAlpha = 0.75;
   UIViewController *poppedViewController = nil;
   
   if ([_viewControllers count] > 1) {
-    poppedViewController = [[self.topViewController retain] autorelease];
+    poppedViewController = [self.topViewController retain];
     _disappearingViewController = poppedViewController;
     
     // Remove from stack
@@ -290,6 +290,7 @@ const CGFloat kOverlayViewAlpha = 0.75;
       
       // Remove old view
       [_disappearingViewController.view removeFromSuperview];
+      [_disappearingViewController release];
       _disappearingViewController = nil;
     }];
   }
