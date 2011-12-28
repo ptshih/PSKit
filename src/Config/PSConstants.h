@@ -66,6 +66,7 @@
 #define APP_SCREEN [UIScreen mainScreen]
 #define APP_FRAME (CGRect)[APP_SCREEN applicationFrame]
 #define APP_BOUNDS (CGRect)[[[UIApplication sharedApplication] keyWindow] bounds]
+#define APP_SCREEN_BOUNDS (CGRect)[APP_SCREEN bounds]
 
 
 // Directory Macros
