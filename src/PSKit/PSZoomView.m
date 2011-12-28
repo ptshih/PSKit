@@ -13,6 +13,7 @@
 - (id)initWithImage:(UIImage *)image frame:(CGRect)frame {
   self = [super initWithFrame:APP_BOUNDS];
   if (self) {
+    // TODO: Get rid of status bar when zooming
     _originalRect = frame;
     _shouldRotate = [image isLandscape];
     
