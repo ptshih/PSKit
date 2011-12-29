@@ -78,7 +78,7 @@
 
 #pragma mark - View
 - (void)loadView {
-  UIView *view = [[UIView alloc] initWithFrame:APP_FRAME];
+  UIView *view = [[UIView alloc] initWithFrame:APP_BOUNDS];
   view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
   self.view = view;
   [view release];
