@@ -10,7 +10,7 @@
 
 @implementation PSZoomView
 
-- (id)initWithImage:(UIImage *)image frame:(CGRect)frame {
+- (id)initWithImage:(UIImage *)image frame:(CGRect)frame contentMode:(UIViewContentMode)contentMode {
   self = [super initWithFrame:APP_BOUNDS];
   if (self) {
     // TODO: Get rid of status bar when zooming
@@ -24,7 +24,8 @@
     
     _zoomedView = [[UIImageView alloc] initWithImage:image];
     _zoomedView.frame = frame;
-    _zoomedView.contentMode = UIViewContentModeScaleAspectFit;
+    _zoomedView.contentMode = contentMode;
+    _zoomedView.clipsToBounds = YES;
     _zoomedView.userInteractionEnabled = YES;
     [self addSubview:_zoomedView];
     

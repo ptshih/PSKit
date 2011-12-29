@@ -15,7 +15,7 @@
   BOOL _shouldRotate;
 }
 
-- (id)initWithImage:(UIImage *)image frame:(CGRect)frame;
+- (id)initWithImage:(UIImage *)image frame:(CGRect)frame contentMode:(UIViewContentMode)contentMode;
 - (void)show;
 
 @end

@@ -21,11 +21,7 @@
 
 + (UILabel *)labelWithText:(NSString *)text style:(NSString *)style {
   UILabel *l = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
-  l.backgroundColor = [UIColor clearColor];
-  l.font = [PSStyleSheet fontForStyle:style];
-  l.textColor = [PSStyleSheet textColorForStyle:style];
-  l.shadowColor = [PSStyleSheet shadowColorForStyle:style];
-  l.shadowOffset = [PSStyleSheet shadowOffsetForStyle:style];
+  [PSStyleSheet applyStyle:style forLabel:l];
   l.text = text;
   return l;
 }
