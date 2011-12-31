@@ -50,7 +50,7 @@ static NSData * AFJSONEncode(id object, NSError **error) {
         invocation.selector = _SBJSONSelector;
         
         [invocation invoke];
-        [invocation getReturnValue:&data];
+        [invocation getReturnValue:&JSONString];
         
         data = [JSONString dataUsingEncoding:NSUTF8StringEncoding];
     } else if (_YAJLSelector && [object respondsToSelector:_YAJLSelector]) {
@@ -82,7 +82,7 @@ static NSData * AFJSONEncode(id object, NSError **error) {
         [invocation getReturnValue:&data];
     } else {
         NSDictionary *userInfo = [NSDictionary dictionaryWithObject:NSLocalizedString(@"Please either target a platform that supports NSJSONSerialization or add one of the following libraries to your project: JSONKit, SBJSON, or YAJL", nil) forKey:NSLocalizedRecoverySuggestionErrorKey];
-        [NSException exceptionWithName:NSInternalInconsistencyException reason:NSLocalizedString(@"No JSON generation functionality available", nil) userInfo:userInfo];
+        [[NSException exceptionWithName:NSInternalInconsistencyException reason:NSLocalizedString(@"No JSON generation functionality available", nil) userInfo:userInfo] raise];
     }
 
     return data;
@@ -109,9 +109,11 @@ static id AFJSONDecode(NSData *data, NSError **error) {
         
         [invocation invoke];
         [invocation getReturnValue:&JSON];
-    } else if (_SBJSONSelector && [data respondsToSelector:_SBJSONSelector]) {
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[data methodSignatureForSelector:_SBJSONSelector]];
-        invocation.target = data;
+    } else if (_SBJSONSelector && [NSString instancesRespondToSelector:_SBJSONSelector]) {
+        // Create a string representation of JSON, to use SBJSON -`JSONValue` category method
+        NSString *string = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[string methodSignatureForSelector:_SBJSONSelector]];
+        invocation.target = string;
         invocation.selector = _SBJSONSelector;
         
         [invocation invoke];
