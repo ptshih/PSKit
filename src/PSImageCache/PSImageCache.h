@@ -15,7 +15,7 @@
   NSCache *_buffer;
   NSString *_cachePath;
   NSSearchPathDirectory _cacheDirectory;
-  NSOperationQueue *_requestQueue;
+  NSOperationQueue *_opQueue;
 }
 
 @property (nonatomic, retain) NSString *cachePath;

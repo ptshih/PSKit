@@ -28,8 +28,8 @@
     [_buffer setDelegate:self];
 //    [_buffer setTotalCostLimit:100];
     
-    _requestQueue = [[NSOperationQueue alloc] init];
-    _requestQueue.maxConcurrentOperationCount = 8;
+    _opQueue = [[NSOperationQueue alloc] init];
+    _opQueue.maxConcurrentOperationCount = 8;
     
     // Set to NSDocumentDirectory by default
     [self setupCachePathWithCacheDirectory:NSCachesDirectory];
@@ -62,7 +62,7 @@
 - (void)dealloc {
   RELEASE_SAFELY(_buffer);
   RELEASE_SAFELY(_cachePath);
-  RELEASE_SAFELY(_requestQueue);
+  RELEASE_SAFELY(_opQueue);
   [super dealloc];
 }
 
@@ -160,8 +160,8 @@
 #pragma mark Remote Image Load Request
 - (BOOL)downloadImageForURLPath:(NSString *)urlPath {
   // Check to make sure urlPath is not already pending
-  for (NSURLRequest *request in [_requestQueue operations]) {
-    if ([request.URL.absoluteString isEqualToString:urlPath]) {
+  for (AFHTTPRequestOperation *op in [_opQueue operations]) {
+    if ([op.request.URL.absoluteString isEqualToString:urlPath]) {
       VLog(@"urlpath: %@ already enqueued to download", urlPath);
       return NO;
     }
@@ -178,14 +178,14 @@
   }];
 
   // Start the Request
-  [_requestQueue addOperation:op];
+  [_opQueue addOperation:op];
   [op release];
   
   return YES;
 }
 
 - (void)cancelDownloadForURLPath:(NSString *)urlPath {
-  for (AFHTTPRequestOperation *op in [_requestQueue operations]) {
+  for (AFHTTPRequestOperation *op in [_opQueue operations]) {
     if ([op.request.URL.absoluteString isEqualToString:urlPath]) {
       [op cancel];
     }
