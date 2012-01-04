@@ -32,6 +32,8 @@
 + (UIImage *)imageWithImage:(UIImage*)image scaledToSize:(CGSize)newSize;
 
 #pragma mark - Scaling and Cropping
+- (UIImage *)scaledImageWithinSize:(CGSize)withinSize;
+
 - (CGSize)scaledSizeProportionalToSize:(CGSize)desiredSize;
 - (CGSize)scaledSizeBoundedByWidth:(CGFloat)desiredWidth;
 - (UIImage *)scaleToSize:(CGSize)size;

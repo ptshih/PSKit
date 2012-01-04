@@ -97,6 +97,18 @@
 }
 
 #pragma mark - Scaling and Cropping
+- (UIImage *)scaledImageWithinSize:(CGSize)withinSize {
+  UIImage *image = self;
+  
+  CGImageRef scaledImageRef = CreateCGImageWithinSize(self.CGImage, withinSize, self.imageOrientation);
+  if (scaledImageRef) {
+    image = [UIImage imageWithCGImage:scaledImageRef];
+    CFRelease(scaledImageRef);
+  }
+  
+  return image;
+}
+
 - (CGSize)scaledSizeProportionalToSize:(CGSize)desiredSize {
   if(self.size.width > self.size.height) {
     // Landscape
@@ -230,7 +242,10 @@
 - (UIImage *)scaledBoundedByWidth:(CGFloat)desiredWidth {
   CGSize desiredSize = [self scaledSizeBoundedByWidth:desiredWidth];
   
-  CGRect desiredRect = CGRectMake(0, 0, desiredSize.width, desiredSize.height);
+  CGFloat leftMargin = ceil((self.size.width - desiredSize.width) / 2);
+  CGFloat topMargin = ceil((self.size.height - desiredSize.height) / 2);
+  
+  CGRect desiredRect = CGRectMake(leftMargin, topMargin, desiredSize.width, desiredSize.height);
   
   CGImageRef imageRef = CGImageCreateWithImageInRect([self CGImage], desiredRect);
   UIImage *scaledImage = [UIImage imageWithCGImage:imageRef];
