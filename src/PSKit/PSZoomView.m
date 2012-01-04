@@ -10,20 +10,21 @@
 
 @implementation PSZoomView
 
-- (id)initWithImage:(UIImage *)image frame:(CGRect)frame contentMode:(UIViewContentMode)contentMode {
-  self = [super initWithFrame:APP_BOUNDS];
+- (id)initWithImage:(UIImage *)image contentMode:(UIViewContentMode)contentMode {
+  
+  self = [super initWithFrame:[[UIScreen mainScreen] bounds]];
   if (self) {
     // TODO: Get rid of status bar when zooming
-    _originalRect = frame;
     _shouldRotate = [image isLandscape];
     
     _backgroundView = [[UIView alloc] initWithFrame:self.bounds];
+    _backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _backgroundView.backgroundColor = [UIColor blackColor];
     _backgroundView.alpha = 0.0;
     [self addSubview:_backgroundView];
     
     _zoomedView = [[UIImageView alloc] initWithImage:image];
-    _zoomedView.frame = frame;
+    _zoomedView.frame = self.bounds;
     _zoomedView.contentMode = contentMode;
     _zoomedView.clipsToBounds = YES;
     _zoomedView.userInteractionEnabled = YES;
@@ -41,7 +42,15 @@
   [super dealloc];
 }
 
-- (void)show {
+- (void)showInRect:(CGRect)rect {
+  self.frame = [[UIScreen mainScreen] bounds];
+  _backgroundView.frame = self.bounds;
+  
+  _originalRect = rect;
+  _zoomedView.frame = _originalRect;
+  
+  [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+  
   [[APP_DELEGATE window] addSubview:self];
   _zoomedView.userInteractionEnabled = NO;
   [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
@@ -58,6 +67,8 @@
 }
 
 - (void)dismiss {
+  [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+  
   _zoomedView.userInteractionEnabled = NO;
   [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
     if (_shouldRotate) _zoomedView.transform = CGAffineTransformIdentity;
