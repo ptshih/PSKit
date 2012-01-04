@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+#import <ImageIO/ImageIO.h>
 
 #define kLocationAcquired @"LocationAcquired"
 #define kLocationUnchanged @"LocationUnchanged"
@@ -43,6 +44,7 @@
 - (CLLocationAccuracy)accuracy;
 
 - (NSString *)locationString;
+- (NSMutableDictionary *)exifLocation;
 
 // Private Methods
 - (void)startUpdates;

@@ -185,6 +185,36 @@ static NSInteger _ageFilter = 60; // seconds
   }
 }
 
+- (NSMutableDictionary *)exifLocation {
+  NSMutableDictionary *locDict = [[NSMutableDictionary alloc] init];
+  CLLocation *location = [self location];
+  
+  if (location) {
+    CLLocationDegrees exifLatitude = location.coordinate.latitude;
+    CLLocationDegrees exifLongitude = location.coordinate.longitude;
+    
+    [locDict setObject:location.timestamp forKey:(NSString*)kCGImagePropertyGPSTimeStamp];
+    
+    if (exifLatitude < 0.0) {
+      exifLatitude = exifLatitude*(-1);
+      [locDict setObject:@"S" forKey:(NSString*)kCGImagePropertyGPSLatitudeRef];
+    } else {
+      [locDict setObject:@"N" forKey:(NSString*)kCGImagePropertyGPSLatitudeRef];
+    }
+    [locDict setObject:[NSNumber numberWithFloat:exifLatitude] forKey:(NSString*)kCGImagePropertyGPSLatitude];
+    
+    if (exifLongitude < 0.0) {
+      exifLongitude=exifLongitude*(-1);
+      [locDict setObject:@"W" forKey:(NSString*)kCGImagePropertyGPSLongitudeRef];
+    } else {
+      [locDict setObject:@"E" forKey:(NSString*)kCGImagePropertyGPSLongitudeRef];
+    }
+    [locDict setObject:[NSNumber numberWithFloat:exifLongitude] forKey:(NSString*) kCGImagePropertyGPSLongitude];
+  }
+  
+  return [locDict autorelease];
+}
+
 #pragma mark CLLocationManagerDelegate
 // Delegate method from the CLLocationManagerDelegate protocol.
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
