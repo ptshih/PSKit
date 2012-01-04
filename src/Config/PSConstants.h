@@ -18,6 +18,7 @@
 #import "PSTextField.h"
 #import "PSTextView.h"
 #import "PSSearchField.h"
+#import "CoreGraphics-PSKit.h"
 
 // Import PSKit Categories
 #import "PSCategories.h"
@@ -63,10 +64,13 @@
 #define APP_DEFAULTS [NSUserDefaults standardUserDefaults]
 #define APP_BUNDLE [NSBundle mainBundle]
 #define APP_FILEMANAGER [NSFileManager defaultManager]
-#define APP_SCREEN [UIScreen mainScreen]
-#define APP_FRAME (CGRect)[APP_SCREEN applicationFrame]
 #define APP_BOUNDS (CGRect)[[[UIApplication sharedApplication] keyWindow] bounds]
-#define APP_SCREEN_BOUNDS (CGRect)[APP_SCREEN bounds]
+
+// This is always 320x480
+#define APP_SCREEN_BOUNDS (CGRect)[[UIScreen mainScreen] bounds]
+
+// This changes based on statusBar hidden
+#define APP_FRAME (CGRect)[APP_SCREEN applicationFrame]
 
 
 // Directory Macros

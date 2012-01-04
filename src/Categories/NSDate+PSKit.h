@@ -16,6 +16,8 @@
 #pragma mark - Facebook
 + (NSDate *)dateFromFacebookTimestamp:(NSString *)timestamp;
 
+#pragma mark - Formatters
+
 #pragma mark - AWS
 - (NSString *)stringWithAWSRequestFormat;
 
