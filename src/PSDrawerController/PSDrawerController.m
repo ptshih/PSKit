@@ -88,6 +88,12 @@
 }
 
 #pragma mark - View
+//- (void)loadView {
+//  UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
+//  self.view = view;
+//  [view release];
+//}
+
 - (void)viewDidLoad {
   [super viewDidLoad];
   

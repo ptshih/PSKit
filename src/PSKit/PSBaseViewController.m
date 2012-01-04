@@ -41,10 +41,10 @@
   [super viewDidLoad];
   
   // NullView
-  _nullView = [[PSNullView alloc] initWithFrame:self.view.bounds];
+  _nullView = [[PSNullView alloc] initWithFrame:_contentView.bounds];
   _nullView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
   [_nullView setState:PSNullViewStateDisabled];
-  [self.view addSubview:_nullView];
+  [_contentView addSubview:_nullView];
   
   _viewHasLoadedOnce = YES;
 }

@@ -23,6 +23,7 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
+    self.wantsFullScreenLayout = YES;
     _viewControllers = [[NSMutableArray alloc] initWithCapacity:1];
   }
   return self;
@@ -48,9 +49,11 @@
 }
 
 #pragma mark - View
-- (void)loadView
-{
-  UIView *view = [[UIView alloc] initWithFrame:APP_BOUNDS];
+- (void)loadView {
+  // Setup the main container view
+  CGRect frame = [[UIScreen mainScreen] applicationFrame];
+  UIView *view = [[UIView alloc] initWithFrame:frame];
+  view.backgroundColor = [UIColor blackColor];
   self.view = view;
   [view release];
   
@@ -106,7 +109,12 @@
     }
     
     // Show the top view controller without animation
-    self.topViewController.view.frame = self.view.bounds;
+    if (self.topViewController.wantsFullScreenLayout) {
+      self.topViewController.view.frame = self.view.bounds;
+    } else {
+      CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+      self.topViewController.view.frame = CGRectMake(0.0, statusBarHeight, self.view.width, self.view.height - statusBarHeight);
+    }
     [self.view addSubview:self.topViewController.view];
   }
 }
@@ -152,8 +160,14 @@ const CGFloat kOverlayViewAlpha = 0.75;
   }
   
   // Prepare view frames
-  CGRect offscreenFrame = self.view.bounds;
-  offscreenFrame.origin.x = CGRectGetMaxX(self.view.bounds);
+  CGRect offscreenFrame = CGRectZero;
+  if (self.topViewController.wantsFullScreenLayout) {
+    offscreenFrame = self.view.bounds;
+  } else {
+    CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+    offscreenFrame = CGRectMake(0.0, statusBarHeight, self.view.width, self.view.height - statusBarHeight);
+  }
+  offscreenFrame.origin.x = CGRectGetMaxX(offscreenFrame);
   self.topViewController.view.frame = offscreenFrame;
   
   // Add Shadow
@@ -173,7 +187,12 @@ const CGFloat kOverlayViewAlpha = 0.75;
   NSTimeInterval animationDuration = animated ? 0.3 : 0.0;
   
   [UIView animateWithDuration:animationDuration delay:0.0 options:animationOptions animations:^{
-    self.topViewController.view.frame = self.view.bounds;
+    if (self.topViewController.wantsFullScreenLayout) {
+      self.topViewController.view.frame = self.view.bounds;
+    } else {
+      CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+      self.topViewController.view.frame = CGRectMake(0.0, statusBarHeight, self.view.width, self.view.height - statusBarHeight);
+    }
     _disappearingViewController.view.transform = CGAffineTransformMakeScale(kPushPopScale, kPushPopScale);
     _overlayView.alpha = kOverlayViewAlpha;
     
@@ -256,8 +275,14 @@ const CGFloat kOverlayViewAlpha = 0.75;
     NSTimeInterval animationDuration = animated ? 0.3 : 0.0;
     
     [UIView animateWithDuration:animationDuration delay:0.0 options:animationOptions animations:^{
-      CGRect offscreenFrame = self.view.bounds;
-      offscreenFrame.origin.x = CGRectGetMaxX(self.view.bounds);
+      CGRect offscreenFrame = CGRectZero;
+      if (_disappearingViewController.wantsFullScreenLayout) {
+        offscreenFrame = self.view.bounds;
+      } else {
+        CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+        offscreenFrame = CGRectMake(0.0, statusBarHeight, self.view.width, self.view.height - statusBarHeight);
+      }
+      offscreenFrame.origin.x = CGRectGetMaxX(offscreenFrame);
       _disappearingViewController.view.frame = offscreenFrame;
 
       self.topViewController.view.transform = CGAffineTransformIdentity;

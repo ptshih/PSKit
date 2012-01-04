@@ -78,7 +78,9 @@
 
 #pragma mark - View
 - (void)loadView {
-  UIView *view = [[UIView alloc] initWithFrame:APP_BOUNDS];
+  CGRect frame = [[UIScreen mainScreen] applicationFrame];
+  UIView *view = [[UIView alloc] initWithFrame:frame];
+  view.backgroundColor = [UIColor blackColor];
   view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
   self.view = view;
   [view release];
