@@ -10,15 +10,12 @@
 #import "PSImageCache.h"
 
 @interface PSCachedImageView : PSImageView {
-  NSString *_urlPath;
+  NSURL *_url;
 }
 
-@property (nonatomic, copy) NSString *urlPath;
-
-- (void)loadImageAndDownload:(BOOL)download;
+- (void)loadImageWithURL:(NSURL *)url shouldDownload:(BOOL)shouldDownload thumbnailWithSize:(CGSize)thumbnailSize;
+- (void)loadImageWithURL:(NSURL *)url shouldDownload:(BOOL)shouldDownload;
+- (void)loadImageWithURL:(NSURL *)url;
 - (void)unloadImage;
-
-// Image cache loaded from notification
-- (void)imageCacheDidLoad:(NSNotification *)notification;
 
 @end

@@ -134,8 +134,7 @@
   int i = 0;
   for (NSString *pictureURLPath in _pictureURLArray) {
     profileImage = [[[PSCachedImageView alloc] initWithFrame:CGRectMake(0, 0, PICTURE_SIZE, PICTURE_SIZE)] autorelease];
-    profileImage.urlPath = pictureURLPath;
-    [profileImage loadImageAndDownload:YES];
+    [profileImage loadImageWithURL:[NSURL URLWithString:pictureURLPath]];
     
     profileImage.left = (i * profileImage.width) + (i * MARGIN);
     [_pictureScrollView addSubview:profileImage];

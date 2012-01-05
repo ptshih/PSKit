@@ -21,13 +21,13 @@
     _shouldAnimate = NO;
     _placeholderImage = nil;
     
-    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    _loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     _loadingIndicator.hidesWhenStopped = YES;
     _loadingIndicator.frame = self.bounds;
     _loadingIndicator.contentMode = UIViewContentModeCenter;
     [_loadingIndicator startAnimating];
     [self addSubview:_loadingIndicator];
-    self.backgroundColor = [UIColor blackColor];
+    self.backgroundColor = [UIColor clearColor];
     self.contentMode = UIViewContentModeScaleAspectFill;
   }
   return self;

@@ -12,6 +12,10 @@
 
 @synthesize cachePath = _cachePath;
 
+static inline NSString *PSImageCacheKeyWithURL(NSURL *url) {
+  return [[NSString stringWithFormat:@"PSImageCache#%@", [url absoluteString]] stringWithPercentEscape];
+}
+
 + (id)sharedCache {
   static id sharedCache;
   if (!sharedCache) {
@@ -37,6 +41,14 @@
   return self;
 }
 
+- (void)dealloc {
+  RELEASE_SAFELY(_buffer);
+  RELEASE_SAFELY(_cachePath);
+  RELEASE_SAFELY(_opQueue);
+  [super dealloc];
+}
+
+#pragma mark - Cache Setup and Directory
 - (void)setupCachePathWithCacheDirectory:(NSSearchPathDirectory)cacheDirectory {
   self.cachePath = [[NSSearchPathForDirectoriesInDomains(cacheDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"PSImageCache"];
   
@@ -47,7 +59,6 @@
   }
 }
 
-#pragma mark Setter/Getter for cacheDirectory
 - (void)setCacheDirectory:(NSSearchPathDirectory)cacheDirectory {
   _cacheDirectory = cacheDirectory;
   
@@ -59,134 +70,103 @@
   return _cacheDirectory;
 }
 
-- (void)dealloc {
-  RELEASE_SAFELY(_buffer);
-  RELEASE_SAFELY(_cachePath);
-  RELEASE_SAFELY(_opQueue);
-  [super dealloc];
+#pragma mark - Set Cache
+- (void)cacheImage:(UIImage *)image forURL:(NSURL *)url {
+  if (!image || !url) return;
+  
+  // Convert UIImage -> NSData
+  NSData *imageData = UIImagePNGRepresentation(image);
+  
+  [self cacheImageData:imageData forURL:url];
 }
 
-// Cache UIImage
-- (void)cacheImage:(UIImage *)image forURLPath:(NSString *)urlPath {
-  NSString *md5Path = [urlPath stringFromMD5Hash];
-  if (image) {
-    // Memcache
-    [_buffer setObject:image forKey:md5Path cost:1];
+- (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url {
+  if (!imageData || !url) return;
+  
+  [imageData retain];
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    NSString *cacheKey = PSImageCacheKeyWithURL(url);
     
-    // Diskcache
-    [UIImageJPEGRepresentation(image, 1.0) writeToFile:[_cachePath stringByAppendingPathComponent:md5Path] atomically:YES];
+    // In memory cache
+    [_buffer setObject:imageData forKey:cacheKey cost:1];
     
-    VLog(@"PSImageCache CACHE: %@", urlPath);
-  }
-}
-
-// Cache Image Data
-- (void)cacheImageData:(NSData *)imageData forURLPath:(NSString *)urlPath {
-  NSString *md5Path = [urlPath stringFromMD5Hash];
-  if (imageData) {
-    [imageData retain];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-      UIImage *image = [[UIImage alloc] initWithData:imageData];
-      if (image) {
-        // First put it in the NSCache buffer
-        [_buffer setObject:image forKey:md5Path cost:1];
-        [image release];
-        
-        // Also write it to file
-        [imageData writeToFile:[_cachePath stringByAppendingPathComponent:md5Path] atomically:YES];
-      }
-      [imageData release];
+    // Disk cache
+    [imageData writeToFile:[_cachePath stringByAppendingPathComponent:cacheKey] atomically:YES];
+    [imageData release];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+      VLog(@"Cached image with URL: %@", url);
       
-      dispatch_async(dispatch_get_main_queue(), ^{
-        VLog(@"PSImageCache CACHE: %@", urlPath);
-        // fire notification
-        [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:[NSDictionary dictionaryWithObjectsAndKeys:urlPath, @"urlPath", nil]];
-        
-      });
+      // Fire notification to inform image is cached and ready
+      [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:[NSDictionary dictionaryWithObject:url forKey:@"url"]];
     });
-  }
+  });
 }
 
-// Read Cached Image
-- (UIImage *)imageForURLPath:(NSString *)urlPath shouldDownload:(BOOL)shouldDownload {
-  if (!urlPath) return nil;
+#pragma mark - Read Cache
+- (UIImage *)cachedImageForURL:(NSURL *)url {
+  if (!url) return nil;
   
-  // First check NSCache buffer
-  //  NSData *imageData = [_buffer objectForKey:[urlPath stringByURLEncoding]];
-  UIImage *image = [_buffer objectForKey:[urlPath stringFromMD5Hash]];
-  if (image) {
-    // Image exists in buffer
-    VLog(@"PSImageCache CACHE HIT: %@", urlPath);
-    return image;
-  } else {
-    // Image not in buffer, read from disk instead
-    VLog(@"PSImageCache CACHE MISS: %@", urlPath);
-    image = [UIImage imageWithContentsOfFile:[_cachePath stringByAppendingPathComponent:[urlPath stringFromMD5Hash]]];
-    
-    // If Image is in disk, read it
-    if (image) {
-      VLog(@"PSImageCache DISK HIT: %@", urlPath);
-      // Put this image into the buffer also
-      [_buffer setObject:image forKey:[urlPath stringFromMD5Hash] cost:1];
-      return image;
+  NSData *cachedImageData = [self cachedImageDataForURL:url];
+  
+  UIImage *cachedImage = nil;
+  if (cachedImageData) {
+    cachedImage = [UIImage imageWithData:cachedImageData];
+  }
+  
+  return cachedImage;
+}
+
+- (NSData *)cachedImageDataForURL:(NSURL *)url {
+  NSString *cacheKey = PSImageCacheKeyWithURL(url);
+  
+  NSData *imageData = [_buffer objectForKey:cacheKey];
+  if (!imageData) {
+    imageData = [NSData dataWithContentsOfFile:[_cachePath stringByAppendingPathComponent:cacheKey]];
+    if (!imageData) {
+      [self downloadImageForURL:url];
     } else {
-      VLog(@"PSImageCache DISK MISS: %@", urlPath);
-      if (shouldDownload) {
-        // Download the image data from the source URL
-        [self downloadImageForURLPath:urlPath];
-      }
-      return nil;
+      [cacheKey retain];
+      [imageData retain];
+      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        [_buffer setObject:imageData forKey:cacheKey cost:1];
+        [imageData release];
+        [cacheKey release];
+      });
     }
   }
+  
+  return imageData;
 }
 
-- (BOOL)hasImageForURLPath:(NSString *)urlPath {
-  NSString *md5Path = [urlPath stringFromMD5Hash];
-  if ([_buffer objectForKey:md5Path]) {
-    // Image exists in memcache
-    return YES;
-  } else {
-    // Check disk for image
-    return [[NSFileManager defaultManager] fileExistsAtPath:[_cachePath stringByAppendingPathComponent:md5Path]];
-  }
-}
-
-- (void)cacheImageForURLPath:(NSString *)urlPath {
-  if (![self hasImageForURLPath:urlPath]) {
-    [self downloadImageForURLPath:urlPath];
-  }
-}
-
-#pragma mark Remote Image Load Request
-- (BOOL)downloadImageForURLPath:(NSString *)urlPath {
-  // Check to make sure urlPath is not already pending
+- (void)downloadImageForURL:(NSURL *)url {
+  // Check to make sure url is not already pending
   for (AFHTTPRequestOperation *op in [_opQueue operations]) {
-    if ([op.request.URL.absoluteString isEqualToString:urlPath]) {
-      VLog(@"urlpath: %@ already enqueued to download", urlPath);
-      return NO;
+    if ([op.request.URL isEqual:url]) {
+      return;
     }
   }
   
-  VLog(@"Downloading image at url: %@", urlPath)
-  NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlPath]];
-  
+  // Download the image from url
+  NSURLRequest *request = [NSURLRequest requestWithURL:url];
   AFHTTPRequestOperation *op = [[AFHTTPRequestOperation alloc] initWithRequest:request];
   [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-    [self cacheImageData:operation.responseData forURLPath:operation.request.URL.absoluteString];
+    NSInteger statusCode = [operation.response statusCode];
+    if (statusCode == 200) {
+      [self cacheImageData:operation.responseData forURL:operation.request.URL];
+    }
   } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
     // Something bad happened
   }];
-
+  
   // Start the Request
   [_opQueue addOperation:op];
   [op release];
-  
-  return YES;
 }
 
-- (void)cancelDownloadForURLPath:(NSString *)urlPath {
+- (void)cancelDownloadForURL:(NSURL *)url {
   for (AFHTTPRequestOperation *op in [_opQueue operations]) {
-    if ([op.request.URL.absoluteString isEqualToString:urlPath]) {
+    if ([op.request.URL isEqual:url]) {
       [op cancel];
     }
   }

@@ -42,10 +42,6 @@
   self.textLabel.width = self.contentView.width - _psImageView.width - MARGIN_X * 2;
 }
 
-- (void)loadImage {
-  [_psImageView loadImageAndDownload:YES];
-}
-
 - (void)dealloc {
   RELEASE_SAFELY(_psImageView);
   [super dealloc];

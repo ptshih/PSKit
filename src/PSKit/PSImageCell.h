@@ -13,6 +13,4 @@
   PSCachedImageView *_psImageView;
 }
 
-- (void)loadImage;
-
 @end

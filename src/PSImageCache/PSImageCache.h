@@ -24,17 +24,23 @@
 + (id)sharedCache;
 - (void)setupCachePathWithCacheDirectory:(NSSearchPathDirectory)cacheDirectory;
 
-// Image Cache
-- (void)cacheImage:(UIImage *)image forURLPath:(NSString *)urlPath;
-- (void)cacheImageData:(NSData *)imageData forURLPath:(NSString *)urlPath;
-- (UIImage *)imageForURLPath:(NSString *)urlPath shouldDownload:(BOOL)shouldDownload;
-- (BOOL)hasImageForURLPath:(NSString *)urlPath;
-- (void)cacheImageForURLPath:(NSString *)urlPath;
+/**
+ This tries to retrieve the image with a given URL from the cache
+ */
+- (UIImage *)cachedImageForURL:(NSURL *)url;
+- (NSData *)cachedImageDataForURL:(NSURL *)url;
+
+/**
+ This caches a UIImage keyed to a URL
+ */
+- (void)cacheImage:(UIImage *)image forURL:(NSURL *)url;
+- (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url;
+
 
 // Remote Request
-- (BOOL)downloadImageForURLPath:(NSString *)urlPath;
+- (void)downloadImageForURL:(NSURL *)url;
+- (void)cancelDownloadForURL:(NSURL *)url;
 
-- (void)cancelDownloadForURLPath:(NSString *)urlPath;
 
 // Helpers
 + (NSString *)documentDirectory;
