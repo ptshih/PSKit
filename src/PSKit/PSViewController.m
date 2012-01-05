@@ -175,6 +175,8 @@
 - (void)animatedBack {
   if (self.psNavigationController) {
     [self.psNavigationController popViewControllerAnimated:YES];
+  } else if (self.navigationController) {
+    [self.navigationController popViewControllerAnimated:YES];
   }
 }
 

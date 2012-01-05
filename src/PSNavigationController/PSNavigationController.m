@@ -255,6 +255,13 @@ const CGFloat kOverlayViewAlpha = 0.75;
     }
     
     // Prepare view frames
+//    self.topViewController.view.transform = CGAffineTransformIdentity;
+//    if (self.topViewController.wantsFullScreenLayout) {
+//      self.topViewController.view.frame = self.view.bounds;
+//    } else {
+//      CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+//      self.topViewController.view.frame = CGRectMake(0.0, statusBarHeight, self.view.width, self.view.height - statusBarHeight);
+//    }
     
     // Add Shadow
     _disappearingViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
@@ -268,7 +275,7 @@ const CGFloat kOverlayViewAlpha = 0.75;
     _overlayView.alpha = kOverlayViewAlpha;
     [self.topViewController.view addSubview:_overlayView];
     
-    self.topViewController.view.transform =  CGAffineTransformMakeScale(kPushPopScale, kPushPopScale);
+//    self.topViewController.view.transform =  CGAffineTransformMakeScale(kPushPopScale, kPushPopScale);
     
     // Transition
     UIViewAnimationOptions animationOptions = UIViewAnimationCurveEaseInOut;
