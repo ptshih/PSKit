@@ -83,16 +83,19 @@ static inline NSString *PSImageCacheKeyWithURL(NSURL *url) {
 - (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url {
   if (!imageData || !url) return;
   
-  [imageData retain];
+  NSString *cacheKey = PSImageCacheKeyWithURL(url);
+  __block NSString *blockCacheKey = [cacheKey copy];
+  __block NSData *blockImageData = [imageData copy];
+  
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-    NSString *cacheKey = PSImageCacheKeyWithURL(url);
     
     // In memory cache
-    [_buffer setObject:imageData forKey:cacheKey cost:1];
+    [_buffer setObject:blockImageData forKey:blockCacheKey cost:1];
     
     // Disk cache
-    [imageData writeToFile:[_cachePath stringByAppendingPathComponent:cacheKey] atomically:YES];
-    [imageData release];
+    [blockImageData writeToFile:[_cachePath stringByAppendingPathComponent:blockCacheKey] atomically:YES];
+    [blockImageData release];
+    [blockCacheKey release];
     
     dispatch_async(dispatch_get_main_queue(), ^{
       VLog(@"Cached image with URL: %@", url);
@@ -119,19 +122,20 @@ static inline NSString *PSImageCacheKeyWithURL(NSURL *url) {
 
 - (NSData *)cachedImageDataForURL:(NSURL *)url {
   NSString *cacheKey = PSImageCacheKeyWithURL(url);
-  
   NSData *imageData = [_buffer objectForKey:cacheKey];
+  
   if (!imageData) {
     imageData = [NSData dataWithContentsOfFile:[_cachePath stringByAppendingPathComponent:cacheKey]];
     if (!imageData) {
       [self downloadImageForURL:url];
     } else {
-      [cacheKey retain];
-      [imageData retain];
+      __block NSData *blockImageData = [imageData copy];
+      __block NSString *blockCacheKey = [cacheKey copy];
+      
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        [_buffer setObject:imageData forKey:cacheKey cost:1];
-        [imageData release];
-        [cacheKey release];
+        [_buffer setObject:blockImageData forKey:blockCacheKey cost:1];
+        [blockImageData release];
+        [blockCacheKey release];
       });
     }
   }

@@ -27,8 +27,14 @@
 - (void)dealloc {
   [[NSNotificationCenter defaultCenter] removeObserver:self name:kPSImageCacheDidCacheImage object:nil];
   
+  RELEASE_SAFELY(_originalImage);
+  RELEASE_SAFELY(_thumbnailImage);
   RELEASE_SAFELY(_url);
   [super dealloc];
+}
+
+- (UIImage *)originalImage {
+  return _originalImage;
 }
 
 - (void)loadImageWithURL:(NSURL *)url {
@@ -45,6 +51,8 @@
   RELEASE_SAFELY(_url);
   _url = [url copy];
   
+  _thumbnailSize = thumbnailSize;
+  
   NSData *imageData = [[PSImageCache sharedCache] cachedImageDataForURL:url];
   [self setImageWithCachedImageData:imageData];
 }
@@ -52,21 +60,33 @@
 - (void)unloadImage {
   [[PSImageCache sharedCache] cancelDownloadForURL:_url];
   self.image = _placeholderImage;
+  RELEASE_SAFELY(_originalImage);
+  RELEASE_SAFELY(_thumbnailImage);
   RELEASE_SAFELY(_url);
 }
 
 - (void)setImageWithCachedImageData:(NSData *)imageData {
   if (!imageData) return;
-  
+  __block BOOL showThumbnail = !CGSizeEqualToSize(_thumbnailSize, CGSizeZero);
+  __block NSData *blockImageData = [imageData copy];
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-    UIImage *cachedImage = [[UIImage alloc] initWithData:imageData];
+    _originalImage = [[UIImage alloc] initWithData:blockImageData];
+    [blockImageData release];
+
+    if (showThumbnail) {
+      _thumbnailImage = [[_originalImage scaledImageWithinSize:_thumbnailSize] retain];
+    }
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-      if (cachedImage) {
-        self.image = cachedImage;
+      if (_originalImage) {
+        if (showThumbnail) {
+          self.image = _thumbnailImage;
+        } else {
+          self.image = _originalImage;
+        }
       } else {
         self.image = _placeholderImage;
       }
-      [cachedImage release];
     });
   });
 }

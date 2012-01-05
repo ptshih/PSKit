@@ -11,7 +11,12 @@
 
 @interface PSCachedImageView : PSImageView {
   NSURL *_url;
+  CGSize _thumbnailSize;
+  UIImage *_originalImage;
+  UIImage *_thumbnailImage;
 }
+
+- (UIImage *)originalImage;
 
 - (void)loadImageWithURL:(NSURL *)url shouldDownload:(BOOL)shouldDownload thumbnailWithSize:(CGSize)thumbnailSize;
 - (void)loadImageWithURL:(NSURL *)url shouldDownload:(BOOL)shouldDownload;
