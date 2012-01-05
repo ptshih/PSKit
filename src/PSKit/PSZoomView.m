@@ -8,6 +8,8 @@
 
 #import "PSZoomView.h"
 
+#define ZOOM_DURATION 0.2
+
 @implementation PSZoomView
 
 - (id)initWithImage:(UIImage *)image contentMode:(UIViewContentMode)contentMode {
@@ -53,11 +55,11 @@
   
   [[APP_DELEGATE window] addSubview:self];
   _zoomedView.userInteractionEnabled = NO;
-  [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+  [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
     _backgroundView.alpha = 1.0;
   } completion:^(BOOL finished) {
     // Rotate/Zoom image if necessary
-    [UIView animateWithDuration:1.0 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+    [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
     if (_shouldRotate) _zoomedView.transform = CGAffineTransformMakeRotation(0.5 * M_PI);
       _zoomedView.frame = self.bounds;
     } completion:^(BOOL finished){
@@ -70,11 +72,11 @@
   [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
   
   _zoomedView.userInteractionEnabled = NO;
-  [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+  [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
     if (_shouldRotate) _zoomedView.transform = CGAffineTransformIdentity;
     _zoomedView.frame = _originalRect;
   } completion:^(BOOL finished){
-    [UIView animateWithDuration:1.0 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+    [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
       _backgroundView.alpha = 0.0;
     } completion:^(BOOL finished){
       [self removeFromSuperview];
