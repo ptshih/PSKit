@@ -48,7 +48,7 @@
 }
 
 - (UIImage *)originalImage {
-  return [[PSImageCache sharedCache] cachedImageForURL:_url];
+  return [[PSImageCache sharedCache] cachedImageForURL:_url showThumbnail:NO];
 }
 
 - (void)setImageWithCachedImageData:(NSData *)imageData {
@@ -74,8 +74,14 @@
   NSURL *url = [userInfo objectForKey:@"url"];
   
   if ([_url isEqual:url]) {
-  NSData *imageData = [[PSImageCache sharedCache] cachedImageDataForURL:url showThumbnail:YES];
-    [self setImageWithCachedImageData:imageData];
+    NSString *scheme = [url scheme];
+    if ([scheme isEqualToString:@"assets-library"]) {
+      UIImage *image = [[PSImageCache sharedCache] cachedImageForURL:url showThumbnail:YES];
+      self.image = image;
+    } else {
+      NSData *imageData = [[PSImageCache sharedCache] cachedImageDataForURL:url showThumbnail:YES];
+      [self setImageWithCachedImageData:imageData];
+    }
   }
 }
 

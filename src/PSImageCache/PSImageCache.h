@@ -12,6 +12,7 @@
 #define kPSImageCacheDidCacheImage @"PSImageCacheDidCacheImage"
 
 @interface PSImageCache : PSObject <NSCacheDelegate> {
+  NSCache *_assetCache;
   NSCache *_buffer;
   NSString *_cachePath;
   NSSearchPathDirectory _cacheDirectory;
@@ -28,6 +29,7 @@
  This tries to retrieve the image with a given URL from the cache
  */
 - (UIImage *)cachedImageForURL:(NSURL *)url;
+- (UIImage *)cachedImageForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
 - (NSData *)cachedImageDataForURL:(NSURL *)url;
 - (NSData *)cachedImageDataForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
 
