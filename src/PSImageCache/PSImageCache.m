@@ -7,6 +7,8 @@
 //
 
 #import "PSImageCache.h"
+#import <AssetsLibrary/AssetsLibrary.h>
+#import <ImageIO/ImageIO.h>
 
 @implementation PSImageCache
 
@@ -14,6 +16,10 @@
 
 static inline NSString *PSImageCacheKeyWithURL(NSURL *url) {
   return [[NSString stringWithFormat:@"PSImageCache#%@", [url absoluteString]] stringWithPercentEscape];
+}
+
+static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
+  return [[NSString stringWithFormat:@"PSImageCacheThumb#%@", [url absoluteString]] stringWithPercentEscape];
 }
 
 + (id)sharedCache {
@@ -83,19 +89,29 @@ static inline NSString *PSImageCacheKeyWithURL(NSURL *url) {
 - (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url {
   if (!imageData || !url) return;
   
-  NSString *cacheKey = PSImageCacheKeyWithURL(url);
-  __block NSString *blockCacheKey = [cacheKey copy];
-  __block NSData *blockImageData = [imageData copy];
   
+  NSString *cacheKey = PSImageCacheKeyWithURL(url);
+  NSString *thumbKey = PSImageCacheThumbKeyWithURL(url);
+  
+  [imageData retain];
+  [cacheKey retain];
+  [thumbKey retain];
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    NSData *thumbData = UIImageJPEGRepresentation([UIImage imageWithData:imageData], 0.5);
+    
+    if (!thumbData) return ;
     
     // In memory cache
-    [_buffer setObject:blockImageData forKey:blockCacheKey cost:1];
+    [_buffer setObject:imageData forKey:cacheKey cost:1];
+    [_buffer setObject:thumbData forKey:thumbKey cost:0];
     
     // Disk cache
-    [blockImageData writeToFile:[_cachePath stringByAppendingPathComponent:blockCacheKey] atomically:YES];
-    [blockImageData release];
-    [blockCacheKey release];
+    [imageData writeToFile:[_cachePath stringByAppendingPathComponent:cacheKey] atomically:YES];
+    [thumbData writeToFile:[_cachePath stringByAppendingPathComponent:thumbKey] atomically:YES];
+    
+    [imageData release];
+    [cacheKey release];
+    [thumbKey release];
     
     dispatch_async(dispatch_get_main_queue(), ^{
       VLog(@"Cached image with URL: %@", url);
@@ -121,26 +137,68 @@ static inline NSString *PSImageCacheKeyWithURL(NSURL *url) {
 }
 
 - (NSData *)cachedImageDataForURL:(NSURL *)url {
+  return [self cachedImageDataForURL:url showThumbnail:YES];
+}
+
+- (NSData *)cachedImageDataForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail {
   NSString *cacheKey = PSImageCacheKeyWithURL(url);
+  NSString *thumbKey = PSImageCacheThumbKeyWithURL(url);
   NSData *imageData = [_buffer objectForKey:cacheKey];
+  NSData *thumbData = [_buffer objectForKey:thumbKey];
   
-  if (!imageData) {
+  if (!imageData || !thumbData) {
     imageData = [NSData dataWithContentsOfFile:[_cachePath stringByAppendingPathComponent:cacheKey]];
-    if (!imageData) {
-      [self downloadImageForURL:url];
+    thumbData = [NSData dataWithContentsOfFile:[_cachePath stringByAppendingPathComponent:thumbKey]];
+    if (!imageData || !thumbData) {
+      // No imageData found in either memory or disk
+      // Check URL Scheme
+      NSString *scheme = [url scheme];
+      if ([scheme isEqualToString:@"assets-library"]) {
+        [self loadImageForAssetURL:url];
+      } else {
+        [self downloadImageForURL:url];
+      }
     } else {
-      __block NSData *blockImageData = [imageData copy];
-      __block NSString *blockCacheKey = [cacheKey copy];
-      
+      [imageData retain];
+      [thumbData retain];
+      [cacheKey retain];
+      [thumbKey retain];
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        [_buffer setObject:blockImageData forKey:blockCacheKey cost:1];
-        [blockImageData release];
-        [blockCacheKey release];
+        [_buffer setObject:imageData forKey:cacheKey cost:1];
+        [_buffer setObject:thumbData forKey:thumbKey cost:0];
+        [imageData release];
+        [cacheKey release];
+        [thumbKey release];
       });
     }
   }
   
-  return imageData;
+  return showThumbnail ? thumbData : imageData;
+}
+
+- (void)loadImageForAssetURL:(NSURL *)url {
+  ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+  
+  [library assetForURL:url resultBlock:^(ALAsset *asset){
+    ALAssetRepresentation *rep = [asset defaultRepresentation];
+    
+    // Read out asset DATA
+    long long assetSize = rep.size;
+    uint8_t *buffer = (uint8_t *)malloc(sizeof(uint8_t)*assetSize);
+    NSError *error = nil;
+    [rep getBytes:buffer fromOffset:0 length:assetSize error:&error];
+    if (error) {
+      NSLog(@"Default Representation getBytes with error: %@", error);
+    }
+    NSData *assetData = [NSData dataWithBytesNoCopy:buffer length:assetSize freeWhenDone:YES];
+    
+    [self cacheImageData:assetData forURL:url];
+    
+  } failureBlock:^(NSError *error){
+    
+  }];
+  
+  [library release];
 }
 
 - (void)downloadImageForURL:(NSURL *)url {

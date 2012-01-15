@@ -29,6 +29,7 @@
  */
 - (UIImage *)cachedImageForURL:(NSURL *)url;
 - (NSData *)cachedImageDataForURL:(NSURL *)url;
+- (NSData *)cachedImageDataForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
 
 /**
  This caches a UIImage keyed to a URL
@@ -41,6 +42,8 @@
 - (void)downloadImageForURL:(NSURL *)url;
 - (void)cancelDownloadForURL:(NSURL *)url;
 
+// Asset Library
+- (void)loadImageForAssetURL:(NSURL *)url;
 
 // Helpers
 + (NSString *)documentDirectory;
