@@ -12,6 +12,7 @@
 #import "UILabel+PSKit.h"
 #import "UIScreen+PSKit.h"
 #import "UIView+PSKit.h"
+#import "NSMutableURLRequest+PSKit.h"
 
 // Vendor Categories
 #import "NSDate+Helper.h"

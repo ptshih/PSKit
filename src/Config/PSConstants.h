@@ -28,6 +28,15 @@
 #endif
 
 /**
+ Macros
+ */
+// declare a temporary block version of a variable; use to prevent retain cycles
+#define BLOCK_VAR(block_var, original_var) __block __typeof__(original_var) block_var = original_var
+
+// declare a temporary block version of self called blockSelf; use to prevent retain cycles
+#define BLOCK_SELF BLOCK_VAR(blockSelf, self)
+
+/**
  Device
  */
 #define IS_DEVICE_PHONE ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
