@@ -37,7 +37,17 @@
   RELEASE_SAFELY(_url);
   _url = [url copy];
   
-  NSData *imageData = [[PSImageCache sharedCache] cachedImageDataForURL:url showThumbnail:YES];
+  NSData *imageData = [[PSImageCache sharedCache] cachedImageDataForURL:url];
+  [self setImageWithCachedImageData:imageData];
+}
+
+- (void)loadThumbnailWithURL:(NSURL *)url {
+  if (!url) return;
+  
+  RELEASE_SAFELY(_url);
+  _url = [url copy];
+  
+  NSData *imageData = [[PSImageCache sharedCache] cachedThumbnailDataForURL:url];
   [self setImageWithCachedImageData:imageData];
 }
 
@@ -48,7 +58,11 @@
 }
 
 - (UIImage *)originalImage {
-  return [[PSImageCache sharedCache] cachedImageForURL:_url showThumbnail:NO];
+  return [[PSImageCache sharedCache] cachedImageForURL:_url];
+}
+
+- (NSURL *)url {
+  return _url;
 }
 
 - (void)setImageWithCachedImageData:(NSData *)imageData {
@@ -72,16 +86,16 @@
 - (void)imageCacheDidCache:(NSNotification *)notification {
   NSDictionary *userInfo = [notification userInfo];
   NSURL *url = [userInfo objectForKey:@"url"];
+  BOOL showThumbnail = [[userInfo objectForKey:@"showThumbnail"] boolValue];
   
   if ([_url isEqual:url]) {
-    NSString *scheme = [url scheme];
-    if ([scheme isEqualToString:@"assets-library"]) {
-      UIImage *image = [[PSImageCache sharedCache] cachedImageForURL:url showThumbnail:YES];
-      self.image = image;
+    NSData *imageData = nil;
+    if (showThumbnail) {
+      imageData = [[PSImageCache sharedCache] cachedThumbnailDataForURL:url];
     } else {
-      NSData *imageData = [[PSImageCache sharedCache] cachedImageDataForURL:url showThumbnail:YES];
-      [self setImageWithCachedImageData:imageData];
+      imageData = [[PSImageCache sharedCache] cachedImageDataForURL:url];
     }
+    [self setImageWithCachedImageData:imageData];
   }
 }
 

@@ -14,7 +14,7 @@
 
 @synthesize cachePath = _cachePath;
 
-static inline NSString *PSImageCacheKeyWithURL(NSURL *url) {
+static inline NSString *PSImageCacheImageKeyWithURL(NSURL *url) {
   return [[NSString stringWithFormat:@"PSImageCache#%@", [url absoluteString]] stringWithPercentEscape];
 }
 
@@ -33,12 +33,9 @@ static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
 - (id)init {
   self = [super init];
   if (self) {
-    _assetCache = [[NSCache alloc] init];
-    [_assetCache setName:@"PSAssetCache"];
-    
-    _buffer = [[NSCache alloc] init];
-    [_buffer setName:@"PSImageCache"];
-    [_buffer setDelegate:self];
+    _memCache = [[NSCache alloc] init];
+    [_memCache setName:@"PSImageCache"];
+//    [_buffer setDelegate:self];
 //    [_buffer setTotalCostLimit:100];
     
     _opQueue = [[NSOperationQueue alloc] init];
@@ -51,8 +48,7 @@ static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
 }
 
 - (void)dealloc {
-  RELEASE_SAFELY(_assetCache);
-  RELEASE_SAFELY(_buffer);
+  RELEASE_SAFELY(_memCache);
   RELEASE_SAFELY(_cachePath);
   RELEASE_SAFELY(_opQueue);
   [super dealloc];
@@ -91,121 +87,131 @@ static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
 }
 
 - (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url {
+  [self cacheImageData:imageData forURL:url showThumbnail:NO];
+}
+
+- (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail {
   if (!imageData || !url) return;
     
-  NSString *cacheKey = PSImageCacheKeyWithURL(url);
+  NSString *imageKey = PSImageCacheImageKeyWithURL(url);
   NSString *thumbKey = PSImageCacheThumbKeyWithURL(url);
   
   [imageData retain];
-  [cacheKey retain];
+  [imageKey retain];
   [thumbKey retain];
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-    NSData *thumbData = UIImageJPEGRepresentation([UIImage imageWithData:imageData], 0.5);
+    NSData *thumbData = nil;
     
-    if (!thumbData) return ;
+    NSString *scheme = [url scheme];
+    if ([scheme isEqualToString:@"assets-library"] && showThumbnail) {
+      thumbData = imageData;
+    } else {
+      // Generate a thumbnail
+      thumbData = UIImageJPEGRepresentation([UIImage imageWithData:imageData], 0.25);
+      
+      [imageData writeToFile:[_cachePath stringByAppendingPathComponent:imageKey] atomically:YES];
+    }
+    
+    if (!thumbData) return;
     
     // In memory cache
-    [_buffer setObject:imageData forKey:cacheKey cost:1];
-    [_buffer setObject:thumbData forKey:thumbKey cost:0];
+    [_memCache setObject:thumbData forKey:thumbKey cost:0];
     
     // Disk cache
-    [imageData writeToFile:[_cachePath stringByAppendingPathComponent:cacheKey] atomically:YES];
     [thumbData writeToFile:[_cachePath stringByAppendingPathComponent:thumbKey] atomically:YES];
     
     [imageData release];
-    [cacheKey release];
+    [imageKey release];
     [thumbKey release];
     
     dispatch_async(dispatch_get_main_queue(), ^{
       VLog(@"Cached image with URL: %@", url);
       
       // Fire notification to inform image is cached and ready
-      [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:[NSDictionary dictionaryWithObject:url forKey:@"url"]];
+      NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:url, @"url", [NSNumber numberWithBool:showThumbnail], @"showThumbnail", nil];
+      [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:userInfo];
     });
   });
 }
 
 #pragma mark - Read Cache
 - (UIImage *)cachedImageForURL:(NSURL *)url {
-  return [self cachedImageForURL:url showThumbnail:YES];
-}
-
-- (UIImage *)cachedImageForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail {
   if (!url) return nil;
   
-  NSString *cacheKey = PSImageCacheKeyWithURL(url);
-  NSString *thumbKey = PSImageCacheThumbKeyWithURL(url);
+  NSData *cachedImageData = [self cachedImageDataForURL:url];
   
-  NSString *scheme = [url scheme];
-  if ([scheme isEqualToString:@"assets-library"]) {
-    if (showThumbnail) {
-      return [_assetCache objectForKey:thumbKey];
+  UIImage *cachedImage = nil;
+  if (cachedImageData) {
+    cachedImage = [UIImage imageWithData:cachedImageData];
+  }
+  
+  return cachedImage;
+}
+
+- (NSData *)cachedImageDataForURL:(NSURL *)url {  
+  NSString *imageKey = PSImageCacheImageKeyWithURL(url);
+  
+  // Read image from disk
+  NSData *imageData = [NSData dataWithContentsOfFile:[_cachePath stringByAppendingPathComponent:imageKey]];
+  
+  if (!imageData) {
+    NSString *scheme = [url scheme];
+    if ([scheme isEqualToString:@"assets-library"]) {
+      [self loadImageForAssetURL:url showThumbnail:NO];
     } else {
-      return [_assetCache objectForKey:cacheKey];
+      [self downloadImageForURL:url showThumbnail:NO];
     }
-  } else {
-    NSData *cachedImageData = [self cachedImageDataForURL:url showThumbnail:showThumbnail];
-    
-    UIImage *cachedImage = nil;
-    if (cachedImageData) {
-      cachedImage = [UIImage imageWithData:cachedImageData];
-    }
-    
-    return cachedImage;
   }
-}
-
-- (NSData *)cachedImageDataForURL:(NSURL *)url {
-  return [self cachedImageDataForURL:url showThumbnail:YES];
-}
-
-- (NSData *)cachedImageDataForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail {
-  NSString *cacheKey = PSImageCacheKeyWithURL(url);
-  NSString *thumbKey = PSImageCacheThumbKeyWithURL(url);
   
-  // If this is from the assets library, read directly from disk
-  NSString *scheme = [url scheme];
-  if ([scheme isEqualToString:@"assets-library"]) {
-    [self loadImageForAssetURL:url];
-    return nil;
-  } else {
-    NSData *imageData = [_buffer objectForKey:cacheKey];
-    NSData *thumbData = [_buffer objectForKey:thumbKey];
-    
-    if (!imageData || !thumbData) {
-      imageData = [NSData dataWithContentsOfFile:[_cachePath stringByAppendingPathComponent:cacheKey]];
-      thumbData = [NSData dataWithContentsOfFile:[_cachePath stringByAppendingPathComponent:thumbKey]];
-      if (!imageData || !thumbData) {
-        // No imageData found in either memory or disk
-        [self downloadImageForURL:url];
-      } else {
-        [imageData retain];
-        [thumbData retain];
-        [cacheKey retain];
-        [thumbKey retain];
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-          [_buffer setObject:imageData forKey:cacheKey cost:1];
-          [_buffer setObject:thumbData forKey:thumbKey cost:0];
-          [imageData release];
-          [cacheKey release];
-          [thumbKey release];
-        });
-      }
-    }
-    
-    return showThumbnail ? thumbData : imageData;
+  return imageData;
+}
+
+- (UIImage *)cachedThumbnailForURL:(NSURL *)url {
+  if (!url) return nil;
+  
+  NSData *cachedThumbnailData = [self cachedThumbnailDataForURL:url];
+  
+  UIImage *cachedThumbnail = nil;
+  if (cachedThumbnailData) {
+    cachedThumbnail = [UIImage imageWithData:cachedThumbnailData];
   }
+  
+  return cachedThumbnail;
+}
+
+- (NSData *)cachedThumbnailDataForURL:(NSURL *)url {
+  // read thumbnail from memory
+  NSString *thumbKey = PSImageCacheThumbKeyWithURL(url);
+  NSData *thumbData = [_memCache objectForKey:thumbKey];
+  
+  if (!thumbData) {
+    thumbData = [NSData dataWithContentsOfFile:[_cachePath stringByAppendingPathComponent:thumbKey]];
+    
+    if (!thumbData) {
+      NSString *scheme = [url scheme];
+      if ([scheme isEqualToString:@"assets-library"]) {
+        [self loadImageForAssetURL:url showThumbnail:YES];
+      } else {
+        [self downloadImageForURL:url showThumbnail:YES];
+      }
+    } else {
+      [_memCache setObject:thumbData forKey:thumbKey];
+    }
+  }
+  
+  return thumbData;
 }
 
 - (void)loadImageForAssetURL:(NSURL *)url {
+  [self loadImageForAssetURL:url showThumbnail:NO];
+}
+
+- (void)loadImageForAssetURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail {
   NSLog(@"loading asset url: %@", url);
-  NSString *cacheKey = PSImageCacheKeyWithURL(url);
-  NSString *thumbKey = PSImageCacheThumbKeyWithURL(url);
-  
+
   ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
   
   [library assetForURL:url resultBlock:^(ALAsset *asset){
-    ALAssetRepresentation *rep = [asset defaultRepresentation];
     
     // Read out asset DATA
 //    long long assetSize = rep.size;
@@ -219,15 +225,14 @@ static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
     
 //    [self cacheImageData:assetData forURL:url];
     
-    if (![_assetCache objectForKey:thumbKey]) {
-      [_assetCache setObject:[UIImage imageWithCGImage:asset.thumbnail] forKey:thumbKey];
+    UIImage *image = nil;
+    if (showThumbnail) {
+      image = [UIImage imageWithCGImage:asset.thumbnail];
+    } else {
+      ALAssetRepresentation *rep = [asset defaultRepresentation];
+      image = [UIImage imageWithCGImage:rep.fullScreenImage];
     }
-    if (![_assetCache objectForKey:cacheKey]) {
-      [_assetCache setObject:[UIImage imageWithCGImage:rep.fullScreenImage] forKey:cacheKey];
-    }
-    
-    // Fire notification to inform image is cached and ready
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:[NSDictionary dictionaryWithObject:url forKey:@"url"]];
+    [self cacheImageData:UIImageJPEGRepresentation(image, 1.0) forURL:url showThumbnail:showThumbnail];
     
   } failureBlock:^(NSError *error){
     
@@ -237,6 +242,10 @@ static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
 }
 
 - (void)downloadImageForURL:(NSURL *)url {
+  [self downloadImageForURL:url showThumbnail:NO];
+}
+
+- (void)downloadImageForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail {
   // Check to make sure url is not already pending
   for (AFHTTPRequestOperation *op in [_opQueue operations]) {
     if ([op.request.URL isEqual:url]) {
@@ -250,7 +259,7 @@ static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
   [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
     NSInteger statusCode = [operation.response statusCode];
     if (statusCode == 200) {
-      [self cacheImageData:operation.responseData forURL:operation.request.URL];
+      [self cacheImageData:operation.responseData forURL:operation.request.URL showThumbnail:showThumbnail];
     }
   } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
     // Something bad happened

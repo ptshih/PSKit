@@ -12,8 +12,7 @@
 #define kPSImageCacheDidCacheImage @"PSImageCacheDidCacheImage"
 
 @interface PSImageCache : PSObject <NSCacheDelegate> {
-  NSCache *_assetCache;
-  NSCache *_buffer;
+  NSCache *_memCache;
   NSString *_cachePath;
   NSSearchPathDirectory _cacheDirectory;
   NSOperationQueue *_opQueue;
@@ -29,23 +28,26 @@
  This tries to retrieve the image with a given URL from the cache
  */
 - (UIImage *)cachedImageForURL:(NSURL *)url;
-- (UIImage *)cachedImageForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
 - (NSData *)cachedImageDataForURL:(NSURL *)url;
-- (NSData *)cachedImageDataForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
+- (UIImage *)cachedThumbnailForURL:(NSURL *)url;
+- (NSData *)cachedThumbnailDataForURL:(NSURL *)url;
 
 /**
  This caches a UIImage keyed to a URL
  */
 - (void)cacheImage:(UIImage *)image forURL:(NSURL *)url;
 - (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url;
+- (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
 
 
 // Remote Request
 - (void)downloadImageForURL:(NSURL *)url;
+- (void)downloadImageForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
 - (void)cancelDownloadForURL:(NSURL *)url;
 
 // Asset Library
 - (void)loadImageForAssetURL:(NSURL *)url;
+- (void)loadImageForAssetURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
 
 // Helpers
 + (NSString *)documentDirectory;

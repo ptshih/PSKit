@@ -14,8 +14,10 @@
 }
 
 - (void)loadImageWithURL:(NSURL *)url;
+- (void)loadThumbnailWithURL:(NSURL *)url;
 - (void)unloadImage;
 
 - (UIImage *)originalImage;
+- (NSURL *)url;
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import "PSZoomView.h"
+#import "PSImageCache.h"
 
 #define ZOOM_DURATION 0.2
 
@@ -34,14 +35,25 @@
     
     UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss)] autorelease];
     [_zoomedView addGestureRecognizer:gr];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageCacheDidCache:) name:kPSImageCacheDidCacheImage object:nil];
   }
   return self;
 }
 
 - (void)dealloc {
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:kPSImageCacheDidCacheImage object:nil];
+  
   RELEASE_SAFELY(_backgroundView);
   RELEASE_SAFELY(_zoomedView);
   [super dealloc];
+}
+
+- (void)loadFullResolutionWithURL:(NSURL *)url {
+  UIImage *image = [[PSImageCache sharedCache] cachedImageForURL:url];
+  if (image) {
+    [_zoomedView setImage:image];
+  }
 }
 
 - (void)showInRect:(CGRect)rect {
@@ -82,6 +94,17 @@
       [self removeFromSuperview];
     }];
   }];
+}
+
+#pragma mark - PSImageCacheNotification
+- (void)imageCacheDidCache:(NSNotification *)notification {
+  NSDictionary *userInfo = [notification userInfo];
+  NSURL *url = [userInfo objectForKey:@"url"];
+  
+  UIImage *image = [[PSImageCache sharedCache] cachedImageForURL:url];
+  if (image) {
+    [_zoomedView setImage:image];
+  }
 }
 
 @end
