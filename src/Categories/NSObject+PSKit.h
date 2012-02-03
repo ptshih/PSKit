@@ -11,6 +11,6 @@
 
 @interface NSObject (PSKit)
 
-- (BOOL)notNil;
+- (BOOL)notNull;
 
 @end

@@ -11,7 +11,7 @@
 
 @implementation NSObject (PSKit)
 
-- (BOOL)notNil {
+- (BOOL)notNull {
 	return self != [NSNull null];
 }
 
