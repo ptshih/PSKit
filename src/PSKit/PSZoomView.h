@@ -15,6 +15,8 @@
   BOOL _shouldRotate;
 }
 
+@property (nonatomic, assign) CGRect newFrame;
+
 - (id)initWithImage:(UIImage *)image contentMode:(UIViewContentMode)contentMode;
 - (void)showInRect:(CGRect)rect;
 
