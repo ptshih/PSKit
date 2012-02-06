@@ -10,6 +10,7 @@
 
 @interface PSManagedObject : NSManagedObject
 
++ (BOOL)updateOrInsertInManagedObjectContext:(NSManagedObjectContext *)moc entity:(NSDictionary *)entity uniqueKey:(NSString *)uniqueKey;
 + (BOOL)updateOrInsertInManagedObjectContext:(NSManagedObjectContext *)moc entities:(NSArray *)entities uniqueKey:(NSString *)uniqueKey;
 - (void)updateAttributesWithDictionary:(NSDictionary *)dictionary;
 
