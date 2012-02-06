@@ -34,7 +34,7 @@ NSString *FSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
     for (id key in [parameters allKeys]) {
         id value = [parameters valueForKey:key];
         // NOTE: Ignore any value that isn't a String for now
-        if ([value isKindOfClass:[NSString class]]) {
+        if ([value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]]) {
             NSString *pair = [NSString stringWithFormat:@"%@=%@", FSURLEncodedStringFromStringWithEncoding([key description], encoding), FSURLEncodedStringFromStringWithEncoding([value description], encoding)];
             [parameterPairs addObject:pair];
         }
