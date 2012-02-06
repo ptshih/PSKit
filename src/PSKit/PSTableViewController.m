@@ -266,7 +266,7 @@
 }
 
 - (void)dataSourceShouldLoadObjects:(id)objects shouldAnimate:(BOOL)shouldAnimate {
-  [self dataSourceShouldLoadObjects:objects sortBy:nil ascending:YES shouldAnimate:shouldAnimate];
+  [self dataSourceShouldLoadObjects:objects sortBy:nil ascending:NO shouldAnimate:shouldAnimate];
 }
 
 - (void)dataSourceShouldLoadObjects:(id)objects sortBy:(NSString *)sortBy ascending:(BOOL)ascending shouldAnimate:(BOOL)shouldAnimate {
