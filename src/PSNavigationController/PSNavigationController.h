@@ -13,6 +13,8 @@
  This class does NOT manage a shared navigation bar.
  It is the responsibility of the view controller to present a navigation bar.
  PSViewController has an optional PSNavigationBar property that will add one.
+ 
+ iOS5 only, uses view containment
  */
 
 @protocol PSNavigationControllerDelegate;
@@ -20,21 +22,13 @@
 @class PSViewController;
 
 @interface PSNavigationController : UIViewController <UIGestureRecognizerDelegate> {
-  NSMutableArray *_viewControllers;
-  UIViewController *_disappearingViewController;
-  UIView *_overlayView;
-  
-  PSDrawerController *_drawerController;
-  id <PSNavigationControllerDelegate> _delegate;
 }
 
-@property (nonatomic, assign) PSDrawerController *drawerController; // pointer
+@property (nonatomic, assign) UIView *overlayView;
 @property (nonatomic, assign) id <PSNavigationControllerDelegate> delegate;
-@property (nonatomic, retain) NSArray *viewControllers; // expect non-mutable as param to setter
-
-// Getter
-@property (nonatomic, readonly) UIViewController *topViewController;
-@property (nonatomic, readonly) UIViewController *rootViewController;
+@property (nonatomic, retain) UIViewController *disappearingViewController;
+@property (nonatomic, retain) UIViewController *topViewController;
+@property (nonatomic, retain) UIViewController *rootViewController;
 
 /**
  Convenience initializer
