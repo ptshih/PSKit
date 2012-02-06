@@ -36,6 +36,19 @@
 // declare a temporary block version of self called blockSelf; use to prevent retain cycles
 #define BLOCK_SELF BLOCK_VAR(blockSelf, self)
 
+// check if an object is not nil and not NSNull
+#define NOT_NULL(obj) \
+({ id _obj = (obj); _obj && !IS_KIND(_obj, NSNull); })
+
+
+// return the object if it is non-nil, or else return NSNull
+#define OBJ_OR_NULL(obj) \
+({ id _obj = (obj); _obj ? _obj : [NSNull null]; })
+
+// return the object if it is non-nil, or else return nil
+#define OBJ_OR_NIL(obj) \
+({ id _obj = (obj); _obj ? _obj : nil; })
+
 /**
  Device
  */

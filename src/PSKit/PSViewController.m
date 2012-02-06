@@ -10,8 +10,6 @@
 
 @implementation PSViewController
 
-@synthesize drawerController = _drawerController;
-@synthesize psNavigationController = _psNavigationController;
 @synthesize headerView = _headerView;
 @synthesize contentView = _contentView;
 @synthesize footerView = _footerView;
@@ -161,18 +159,6 @@
 - (void)updateScrollsToTop:(BOOL)isEnabled {
   if (_activeScrollView) {
     _activeScrollView.scrollsToTop = isEnabled;
-  }
-}
-
-- (PSDrawerController *)drawerController {
-    return _drawerController;
-}
-
-- (void)animatedBack {
-  if (self.psNavigationController) {
-    [self.psNavigationController popViewControllerAnimated:YES];
-  } else if (self.navigationController) {
-    [self.navigationController popViewControllerAnimated:YES];
   }
 }
 

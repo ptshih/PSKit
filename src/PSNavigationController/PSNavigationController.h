@@ -26,9 +26,10 @@
 
 @property (nonatomic, assign) UIView *overlayView;
 @property (nonatomic, assign) id <PSNavigationControllerDelegate> delegate;
-@property (nonatomic, retain) UIViewController *disappearingViewController;
-@property (nonatomic, retain) UIViewController *topViewController;
-@property (nonatomic, retain) UIViewController *rootViewController;
+@property (nonatomic, assign) UIViewController *disappearingViewController;
+@property (nonatomic, assign) UIViewController *topViewController;
+@property (nonatomic, assign) UIViewController *rootViewController;
+@property (nonatomic, retain) NSMutableArray *viewControllers;
 
 /**
  Convenience initializer
@@ -42,7 +43,6 @@
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated;
 - (NSArray *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated;
 - (NSArray *)popToRootViewControllerAnimated:(BOOL)animated;
-- (void)removeViewController:(UIViewController *)viewController; // Remove a VC from the stack without popping
 
 @end
 

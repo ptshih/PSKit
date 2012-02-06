@@ -53,16 +53,12 @@ typedef enum{
 @class PSViewController;
 
 @interface PSDrawerController : UIViewController {
-  PSDrawerState _state;
-  
-  UIViewController *_rootViewController;
-  UIViewController *_leftViewController;
-  UIViewController *_rightViewController;
 }
 
+@property (nonatomic, assign) PSDrawerState state;
 @property (nonatomic, retain) UIViewController *rootViewController;
-@property (nonatomic, retain, readonly) UIViewController *leftViewController;
-@property (nonatomic, retain, readonly) UIViewController *rightViewController;
+@property (nonatomic, retain) UIViewController *leftViewController;
+@property (nonatomic, retain) UIViewController *rightViewController;
 
 /**
  Initializes and returns a newly created drawer controller
@@ -74,6 +70,8 @@ typedef enum{
  @return The initialized drawer controller object or nil if there was a problem initializing the object.
  */
 - (id)initWithRootViewController:(UIViewController *)rootViewController leftViewController:(UIViewController *)leftViewController rightViewController:(UIViewController *)rightViewController;
+
+- (void)replaceRootViewControllerWithViewController:(UIViewController *)viewController animated:(BOOL)animated;
 
 #pragma mark - Slide Drawer
 /**
