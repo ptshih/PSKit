@@ -20,6 +20,7 @@ newFrame = _newFrame;
     
     self = [super initWithFrame:[[UIScreen mainScreen] bounds]];
     if (self) {
+        
         // TODO: Get rid of status bar when zooming
         _shouldRotate = [image isLandscape];
         
@@ -34,13 +35,10 @@ newFrame = _newFrame;
 //        CGFloat iWidth = image.size.width;
 //        CGFloat iHeight = image.size.height;
         CGSize withinSize = self.bounds.size;
-        self.newFrame = CGRectMake(0, 0, image.size.width, image.size.height);
         CGFloat widthScale = withinSize.width / image.size.width;
         CGFloat heightScale = withinSize.height / image.size.height;
         CGFloat scale = MIN(widthScale, heightScale);
-        if (scale < 1.0) {
-            self.newFrame = CGRectMake(0, 0, image.size.width * scale, image.size.height * scale);
-        }
+        self.newFrame = CGRectMake(0, 0, floorf(image.size.width * scale), floorf(image.size.height * scale));
         
         _zoomedView.frame = self.newFrame;
         _zoomedView.center = self.center;
@@ -54,6 +52,8 @@ newFrame = _newFrame;
         [_zoomedView addGestureRecognizer:gr];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageCacheDidCache:) name:kPSImageCacheDidCacheImage object:nil];
+        
+        _zoomedView.alpha = 0.0;
     }
     return self;
 }
@@ -85,6 +85,7 @@ newFrame = _newFrame;
     [[APP_DELEGATE window] addSubview:self];
     _zoomedView.userInteractionEnabled = NO;
     [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+        _zoomedView.alpha = 1.0;
         _backgroundView.alpha = 1.0;
     } completion:^(BOOL finished) {
         // Rotate/Zoom image if necessary
@@ -115,6 +116,7 @@ newFrame = _newFrame;
         _zoomedView.frame = _originalRect;
     } completion:^(BOOL finished){
         [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+            _zoomedView.alpha = 0.0;
             _backgroundView.alpha = 0.0;
         } completion:^(BOOL finished){
             [self removeFromSuperview];
