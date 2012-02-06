@@ -15,7 +15,6 @@
  */
 
 #import "FBRequest.h"
-#import "JSONKit.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // global
@@ -28,6 +27,10 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+@interface FBRequest ()
+@property (nonatomic,readwrite) FBRequestState state;
+@end
+
 @implementation FBRequest
 
 @synthesize delegate = _delegate,
@@ -35,8 +38,9 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
             httpMethod = _httpMethod,
             params = _params,
             connection = _connection,
-            responseText = _responseText;
-
+            responseText = _responseText,
+            state = _state,
+            error = _error;
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // class public
 
@@ -180,7 +184,6 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
   NSString* responseString = [[[NSString alloc] initWithData:data
                                                     encoding:NSUTF8StringEncoding]
                               autorelease];
-
   if ([responseString isEqualToString:@"true"]) {
     return [NSDictionary dictionaryWithObject:@"true" forKey:@"result"];
   } else if ([responseString isEqualToString:@"false"]) {
@@ -193,8 +196,7 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
     return nil;
   }
 
-
-  id result = [responseString objectFromJSONString];
+    id result = [responseString objectFromJSONString];
 
   if (![result isKindOfClass:[NSArray class]]) {
     if ([result objectForKey:@"error"] != nil) {
@@ -237,6 +239,7 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
   if ([_delegate respondsToSelector:@selector(request:didFailWithError:)]) {
     [_delegate request:self didFailWithError:error];
   }
+  self.state = kFBRequestStateError;
 }
 
 /*
@@ -247,12 +250,14 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
       @selector(request:didLoadRawResponse:)]) {
     [_delegate request:self didLoadRawResponse:data];
   }
+    
+  NSError* error = nil;
+  id result = [self parseJsonResponse:data error:&error];
+  self.error = error;  
 
   if ([_delegate respondsToSelector:@selector(request:didLoad:)] ||
       [_delegate respondsToSelector:
           @selector(request:didFailWithError:)]) {
-    NSError* error = nil;
-    id result = [self parseJsonResponse:data error:&error];
 
     if (error) {
       [self failWithError:error];
@@ -304,7 +309,7 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
   }
 
   _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-
+  self.state = kFBRequestStateLoading;
 }
 
 /**
@@ -345,19 +350,21 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
   [self handleResponseData:_responseText];
 
-  [_responseText release];
-  _responseText = nil;
-  [_connection release];
-  _connection = nil;
+  self.responseText = nil;
+  self.connection = nil;
+
+  if (self.state != kFBRequestStateError) {
+    self.state = kFBRequestStateComplete;
+  }
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
   [self failWithError:error];
 
-  [_responseText release];
-  _responseText = nil;
-  [_connection release];
-  _connection = nil;
+  self.responseText = nil;
+  self.connection = nil;
+
+  self.state = kFBRequestStateError;
 }
 
 @end

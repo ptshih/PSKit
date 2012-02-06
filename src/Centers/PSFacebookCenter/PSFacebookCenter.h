@@ -10,9 +10,9 @@
 #import "Facebook.h"
 
 // Facebook
-#define FB_APP_ID @"APP_ID_HERE"
+#define FB_APP_ID @"145264018857264"
 #define FB_PERMISSIONS_PUBLISH @"publish_stream"
-#define FB_BASIC_PERMISISONS [NSArray arrayWithObjects:@"offline_access", nil]
+#define FB_BASIC_PERMISISONS [NSArray arrayWithObjects:@"offline_access", @"user_photos", nil]
 
 #define kPSFacebookCenterDialogDidSucceed @"PSFacebookCenterDialogDidSucceed"
 #define kPSFacebookCenterDialogDidFail @"PSFacebookCenterDialogDidFail"
@@ -38,5 +38,11 @@
 
 // Dialog
 - (void)showDialog:(NSString *)dialog andParams:(NSMutableDictionary *)params;
+
+// Convenience
+- (NSString *)accessToken;
+- (NSDate *)expirationDate;
+
+- (NSDictionary *)me;
 
 @end
