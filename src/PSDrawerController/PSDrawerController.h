@@ -60,6 +60,8 @@ typedef enum{
 @property (nonatomic, retain) UIViewController *leftViewController;
 @property (nonatomic, retain) UIViewController *rightViewController;
 
++ (id)sharedDrawer;
+
 /**
  Initializes and returns a newly created drawer controller
  

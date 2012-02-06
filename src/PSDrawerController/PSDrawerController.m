@@ -49,6 +49,14 @@ leftViewController = _leftViewController,
 rightViewController = _rightViewController;
 
 #pragma mark - Init
++ (id)sharedDrawer {
+    static id sharedDrawer;
+    if (!sharedDrawer) {
+        sharedDrawer = [[self alloc] initWithNibName:nil bundle:nil];
+    }
+    return sharedDrawer;
+}
+
 - (id)initWithRootViewController:(UIViewController *)rootViewController leftViewController:(UIViewController *)leftViewController rightViewController:(UIViewController *)rightViewController {
     self = [self initWithNibName:nil bundle:nil];
     if (self) {
@@ -88,6 +96,7 @@ rightViewController = _rightViewController;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.rootViewController.view.frame = self.view.bounds;
     [self.view addSubview:self.rootViewController.view];
 }
 
