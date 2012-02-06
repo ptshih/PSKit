@@ -10,7 +10,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import "PSStateMachine.h"
 
-#import "PSDrawerController.h"
 #import "PSNavigationController.h"
 
 @interface PSViewController : UIViewController <PSStateMachine> {

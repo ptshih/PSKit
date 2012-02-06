@@ -13,7 +13,7 @@
 #import "PSCell.h"
 #import "PSImageView.h"
 #import "PSRandomSortDescriptor.h"
-#import "PSNavigationBar.h"
+//#import "PSNavigationBar.h"
 #import "PSNullView.h"
 #import "PSTextField.h"
 #import "PSTextView.h"

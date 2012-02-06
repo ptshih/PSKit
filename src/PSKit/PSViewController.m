@@ -165,11 +165,7 @@
 }
 
 - (PSDrawerController *)drawerController {
-  if (_psNavigationController) {
-    return _psNavigationController.drawerController;
-  } else {
     return _drawerController;
-  }
 }
 
 - (void)animatedBack {
