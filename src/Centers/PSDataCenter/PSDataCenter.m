@@ -66,7 +66,7 @@
   for (NSString *key in keys) {
     value = [dictionary valueForKey:key];
     
-    if ([value notNil]) {
+    if ([value notNull]) {
       if ([value isKindOfClass:[NSArray class]]) {
         [sanitizedDictionary setValue:[self sanitizeArray:(NSArray *)value] forKey:key];
       } else if ([value isKindOfClass:[NSDictionary class]]) {

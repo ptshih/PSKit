@@ -39,7 +39,7 @@
 - (void)loadImageArray {
   // Download all images
   for (NSString *urlPath in _urlPathArray) {
-    UIImage *image = [[PSImageCache sharedCache] imageForURLPath:urlPath shouldDownload:YES];
+      UIImage *image = [[PSImageCache sharedCache] cachedImageForURL:[NSURL URLWithString:urlPath]];
     if (image && ![_images containsObject:image]) {
       [_images addObject:image];
       [self prepareImageArray];
@@ -111,7 +111,7 @@
 - (void)imageCacheDidLoad:(NSNotification *)notification {
   NSDictionary *userInfo = [notification userInfo];
   NSString *urlPath = [userInfo objectForKey:@"urlPath"];
-  UIImage *image = [[PSImageCache sharedCache] imageForURLPath:urlPath shouldDownload:NO];
+  UIImage *image = [[PSImageCache sharedCache] cachedImageForURL:[NSURL URLWithString:urlPath]];
   
   if (image && [_urlPathArray containsObject:urlPath] && ![_images containsObject:image]) {
     [_images addObject:image];
