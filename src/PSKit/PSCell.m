@@ -19,7 +19,7 @@
     
     _isExpanded = NO;
     self.opaque = YES;
-    self.contentMode = UIViewContentModeRedraw;
+//    self.contentMode = UIViewContentModeRedraw;
   }
   return self;
 }
