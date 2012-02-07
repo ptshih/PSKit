@@ -96,13 +96,26 @@ rightViewController = _rightViewController;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if (self.leftViewController) {
+        self.leftViewController.view.frame = self.view.bounds;
+        [self.view addSubview:self.leftViewController.view];
+    }
+    
+    if (self.rightViewController) {
+        self.rightViewController.view.frame = self.view.bounds;
+        [self.view addSubview:self.rightViewController.view];
+    }
+    
     self.rootViewController.view.frame = self.view.bounds;
     [self.view addSubview:self.rootViewController.view];
 }
 
 - (void)replaceRootViewControllerWithViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    viewController.view.frame = self.rootViewController.view.frame;
+    CGRect frame = self.rootViewController.view.frame;
+    [self.rootViewController.view removeFromSuperview];
     self.rootViewController = viewController;
+    self.rootViewController.view.frame = frame;
+    [self.view addSubview:self.rootViewController.view];
     
     switch (self.state) {
         case PSDrawerStateClosed:
