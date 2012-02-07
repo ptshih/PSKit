@@ -23,9 +23,9 @@
     if (self) {
         _facebook = [[Facebook alloc] initWithAppId:FB_APP_ID andDelegate:self];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        if ([defaults objectForKey:@"facebookAccessToken"] && [defaults objectForKey:@"facebookExpirationDate"]) {
-            _facebook.accessToken = [[NSUserDefaults standardUserDefaults] valueForKey:@"facebookAccessToken"];
-            _facebook.expirationDate = [[NSUserDefaults standardUserDefaults] valueForKey:@"facebookExpirationDate"];
+        if ([defaults objectForKey:@"fbAccessToken"] && [defaults objectForKey:@"fbExpirationDate"]) {
+            _facebook.accessToken = [[NSUserDefaults standardUserDefaults] valueForKey:@"fbAccessToken"];
+            _facebook.expirationDate = [[NSUserDefaults standardUserDefaults] valueForKey:@"fbExpirationDate"];
             NSLog(@"FB Token: %@", _facebook.accessToken);
         }
     }
@@ -66,11 +66,11 @@
 }
 
 - (BOOL)hasPublishStreamPermission {
-    return [[[NSUserDefaults standardUserDefaults] objectForKey:@"facebookExtendedPermissions"] containsObject:FB_PERMISSIONS_PUBLISH];
+    return [[[NSUserDefaults standardUserDefaults] objectForKey:@"fbExtendedPermissions"] containsObject:FB_PERMISSIONS_PUBLISH];
 }
 
 - (NSArray *)availableExtendedPermissions {
-    return [[NSUserDefaults standardUserDefaults] objectForKey:@"facebookExtendedPermissions"];
+    return [[NSUserDefaults standardUserDefaults] objectForKey:@"fbExtendedPermissions"];
 }
 
 - (void)addExtendedPermission:(NSString *)permission {
@@ -118,11 +118,11 @@
 #pragma mark - FBSessionDelegate
 - (void)fbDidLogin {
     if (_newPermissions) {
-        [[NSUserDefaults standardUserDefaults] setObject:_newPermissions forKey:@"facebookExtendedPermissions"];
+        [[NSUserDefaults standardUserDefaults] setObject:_newPermissions forKey:@"fbExtendedPermissions"];
         [_newPermissions release], _newPermissions = nil;
     }
-    [[NSUserDefaults standardUserDefaults] setObject:_facebook.accessToken forKey:@"facebookAccessToken"];
-    [[NSUserDefaults standardUserDefaults] setObject:_facebook.expirationDate forKey:@"facebookExpirationDate"];
+    [[NSUserDefaults standardUserDefaults] setObject:_facebook.accessToken forKey:@"fbAccessToken"];
+    [[NSUserDefaults standardUserDefaults] setObject:_facebook.expirationDate forKey:@"fbExpirationDate"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     NSLog(@"Got FB Token: %@", _facebook.accessToken);
