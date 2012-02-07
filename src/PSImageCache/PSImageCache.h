@@ -37,7 +37,7 @@
  */
 - (void)cacheImage:(UIImage *)image forURL:(NSURL *)url;
 - (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url;
-- (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
+- (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)imageURL showThumbnail:(BOOL)showThumbnail;
 
 
 // Remote Request

@@ -13,11 +13,12 @@
   NSURL *_url;
 }
 
-- (void)loadImageWithURL:(NSURL *)url;
-- (void)loadThumbnailWithURL:(NSURL *)url;
+@property (nonatomic, copy) NSURL *url;
+
+- (void)loadImageWithURL:(NSURL *)URL;
+- (void)loadThumbnailWithURL:(NSURL *)URL;
 - (void)unloadImage;
 
 - (UIImage *)originalImage;
-- (NSURL *)url;
 
 @end

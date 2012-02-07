@@ -90,8 +90,9 @@ static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
   [self cacheImageData:imageData forURL:url showThumbnail:NO];
 }
 
-- (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail {
-  if (!imageData || !url) return;
+- (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)imageURL showThumbnail:(BOOL)showThumbnail {
+  if (!imageData || !imageURL) return;
+    NSURL *url = [[imageURL copy] autorelease];
     
   NSString *imageKey = PSImageCacheImageKeyWithURL(url);
   NSString *thumbKey = PSImageCacheThumbKeyWithURL(url);
@@ -129,7 +130,7 @@ static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
       
       // Fire notification to inform image is cached and ready
       NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:url, @"url", [NSNumber numberWithBool:showThumbnail], @"showThumbnail", nil];
-      [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:userInfo];
+      [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:url userInfo:userInfo];
     });
   });
 }
