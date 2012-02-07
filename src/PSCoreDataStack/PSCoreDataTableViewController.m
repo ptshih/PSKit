@@ -34,6 +34,8 @@ sectionNameKeyPath = _sectionNameKeyPath;
 }
 
 - (void)dealloc {
+    RELEASE_SAFELY(_moc);
+    RELEASE_SAFELY(_frc);
 //  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:nil];
     [super dealloc];
 }
@@ -63,7 +65,7 @@ sectionNameKeyPath = _sectionNameKeyPath;
 - (NSManagedObjectContext *)moc {
     if (!_moc) {
         // Each controller should have its own MOC
-        _moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+        _moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
         // The MOC should use the global persistent store
         [_moc setPersistentStoreCoordinator:[PSCoreDataStack persistentStoreCoordinator]];
     }

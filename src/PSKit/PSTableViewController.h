@@ -13,7 +13,6 @@
 
 @interface PSTableViewController : PSBaseViewController <UITableViewDelegate, UITableViewDataSource, UISearchDisplayDelegate, UISearchBarDelegate, EGORefreshTableHeaderDelegate> {
   UITableView *_tableView;
-  NSMutableArray *_sectionTitles;
   NSMutableArray *_items;
   NSMutableArray *_searchItems;
   NSMutableDictionary *_selectedIndexes;
@@ -42,6 +41,7 @@
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) NSMutableArray *items;
 @property (nonatomic, retain) NSMutableArray *searchItems;
+@property (nonatomic, retain) NSMutableArray *sectionTitles;
 
 // View Setup
 - (void)setupTableViewWithFrame:(CGRect)frame style:(UITableViewStyle)style separatorStyle:(UITableViewCellSeparatorStyle)separatorStyle separatorColor:(UIColor *)separatorColor;

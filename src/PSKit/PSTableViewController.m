@@ -17,13 +17,14 @@
 @synthesize tableView = _tableView;
 @synthesize items = _items;
 @synthesize searchItems = _searchItems;
+@synthesize sectionTitles = _sectionTitles;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     _items = [[NSMutableArray alloc] initWithCapacity:1];
-    _sectionTitles = [[NSMutableArray alloc] initWithCapacity:1];
+      self.sectionTitles = [NSMutableArray arrayWithCapacity:1];
     _selectedIndexes = [[NSMutableDictionary alloc] initWithCapacity:1];
     _cellCache = [[NSMutableArray alloc] initWithCapacity:1];
 //    _adShowing = NO;
