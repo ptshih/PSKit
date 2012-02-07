@@ -146,7 +146,9 @@
                     NSLog(@"# NSURLConnection succeeded with statusCode: %d", statusCode);
                     // We got an HTTP OK code, start reading the response
                     NSDictionary *me = [data objectFromJSONData];
+                    NSString *fbId = [me objectForKey:@"id"];
                     if (me) {
+                        [[NSUserDefaults standardUserDefaults] setObject:fbId forKey:@"fbId"];
                         [[NSUserDefaults standardUserDefaults] setObject:me forKey:@"fbMe"];
                         [[NSUserDefaults standardUserDefaults] synchronize];
                         
