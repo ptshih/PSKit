@@ -20,6 +20,4 @@
 - (id)initWithImage:(UIImage *)image contentMode:(UIViewContentMode)contentMode;
 - (void)showInRect:(CGRect)rect;
 
-- (void)loadFullResolutionWithURL:(NSURL *)url;
-
 @end
