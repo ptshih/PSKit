@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PSDrawerController.h"
 
 /**
  This class does NOT manage a shared navigation bar.
@@ -16,6 +15,13 @@
  
  iOS5 only, uses view containment
  */
+
+typedef enum {
+    PSNavigationControllerDirectionLeft = 1,
+    PSNavigationControllerDirectionRight = 2,
+    PSNavigationControllerDirectionUp = 3,
+    PSNavigationControllerDirectionDown = 4
+} PSNavigationControllerDirection;
 
 @protocol PSNavigationControllerDelegate;
 
@@ -40,7 +46,10 @@
  Push and Pop
  */
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated;
+- (void)pushViewController:(UIViewController *)viewController direction:(PSNavigationControllerDirection)direction animated:(BOOL)animated;
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated;
+- (UIViewController *)popViewControllerWithDirection:(PSNavigationControllerDirection)direction animated:(BOOL)animated;
+
 - (NSArray *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated;
 - (NSArray *)popToRootViewControllerAnimated:(BOOL)animated;
 

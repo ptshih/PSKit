@@ -83,21 +83,42 @@ const CGFloat kPushPopScale = 0.95;
 const CGFloat kOverlayViewAlpha = 0.75;
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
+    [self pushViewController:viewController direction:PSNavigationControllerDirectionRight animated:animated];
+}
+
+- (void)pushViewController:(UIViewController *)viewController direction:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
     UIViewController *disappearingViewController = nil;
     
     disappearingViewController = self.topViewController;
     [self addChildViewController:viewController];
     [self.viewControllers addObject:viewController];
     
-    // Prepare view frames
-    CGRect offscreenFrame = CGRectZero;
-    offscreenFrame = self.view.bounds;
-    offscreenFrame.origin.x = CGRectGetMaxX(offscreenFrame);
+    // Prepare view frames and add shadows
+    CGRect offscreenFrame = self.view.bounds;
+    CGSize shadowSize = CGSizeZero;
+    switch (direction) {
+        case PSNavigationControllerDirectionLeft:
+            offscreenFrame.origin.x = CGRectGetMaxX(offscreenFrame);
+            shadowSize = CGSizeMake(-5.0, 0.0);
+            break;
+        case PSNavigationControllerDirectionRight:
+            offscreenFrame.origin.x = -CGRectGetMaxX(offscreenFrame);
+            shadowSize = CGSizeMake(5.0, 0.0);
+            break;
+        case PSNavigationControllerDirectionUp:
+            offscreenFrame.origin.y = CGRectGetMaxY(offscreenFrame);
+            shadowSize = CGSizeMake(0.0, -5.0);
+            break;
+        case PSNavigationControllerDirectionDown:
+            offscreenFrame.origin.y = -CGRectGetMaxY(offscreenFrame);
+            shadowSize = CGSizeMake(0.0, 5.0);
+            break;
+        default:
+            break;
+    }
     self.topViewController.view.frame = offscreenFrame;
-    
-    // Add Shadow
     self.topViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
-    self.topViewController.view.layer.shadowOffset = CGSizeMake(-5, 0);
+    self.topViewController.view.layer.shadowOffset = shadowSize;
     self.topViewController.view.layer.shadowOpacity = 0.75;
     self.topViewController.view.layer.shadowRadius = 5.0;
     self.topViewController.view.layer.shouldRasterize = YES;
@@ -129,6 +150,10 @@ const CGFloat kOverlayViewAlpha = 0.75;
 }
 
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated {
+    return [self popViewControllerWithDirection:PSNavigationControllerDirectionLeft animated:YES];
+}
+
+- (UIViewController *)popViewControllerWithDirection:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
     UIViewController *poppedViewController = nil;
     
     // Don't pop if at root
@@ -140,8 +165,26 @@ const CGFloat kOverlayViewAlpha = 0.75;
     [poppedViewController willMoveToParentViewController:nil];
     
     // Add Shadow
+    CGSize shadowSize = CGSizeZero;
+    switch (direction) {
+        case PSNavigationControllerDirectionLeft:
+            shadowSize = CGSizeMake(5.0, 0.0);
+            break;
+        case PSNavigationControllerDirectionRight:
+            shadowSize = CGSizeMake(-5.0, 0.0);
+            break;
+        case PSNavigationControllerDirectionUp:
+            shadowSize = CGSizeMake(0.0, 5.0);
+            break;
+        case PSNavigationControllerDirectionDown:
+            shadowSize = CGSizeMake(0.0, -5.0);
+            break;
+        default:
+            break;
+    }
+
     poppedViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
-    poppedViewController.view.layer.shadowOffset = CGSizeMake(-5, 0);
+    poppedViewController.view.layer.shadowOffset = shadowSize;
     poppedViewController.view.layer.shadowOpacity = 0.8;
     poppedViewController.view.layer.shadowRadius = 5.0;
     poppedViewController.view.layer.shouldRasterize = YES;
@@ -157,9 +200,25 @@ const CGFloat kOverlayViewAlpha = 0.75;
     [self transitionFromViewController:poppedViewController toViewController:self.topViewController duration:animationDuration options:animationOptions animations:^{
         [self.view exchangeSubviewAtIndex:[[self.view subviews] count] - 1 withSubviewAtIndex:[[self.view subviews] count] - 2];
         
-        CGRect offscreenFrame = CGRectZero;
-        offscreenFrame = self.view.bounds;
-        offscreenFrame.origin.x = CGRectGetMaxX(offscreenFrame);
+        // Prepare view frames and add shadows
+        CGRect offscreenFrame = self.view.bounds;
+        switch (direction) {
+            case PSNavigationControllerDirectionLeft:
+                offscreenFrame.origin.x = -CGRectGetMaxX(offscreenFrame);
+                break;
+            case PSNavigationControllerDirectionRight:
+                offscreenFrame.origin.x = CGRectGetMaxX(offscreenFrame);
+                break;
+            case PSNavigationControllerDirectionUp:
+                offscreenFrame.origin.y = -CGRectGetMaxY(offscreenFrame);
+                break;
+            case PSNavigationControllerDirectionDown:
+                offscreenFrame.origin.y = CGRectGetMaxY(offscreenFrame);
+                break;
+            default:
+                break;
+        }
+        
         poppedViewController.view.frame = offscreenFrame;
         
         self.topViewController.view.transform = CGAffineTransformIdentity;
