@@ -45,14 +45,6 @@ sectionNameKeyPath = _sectionNameKeyPath;
   return (self.frc && self.frc.fetchedObjects.count > 0);
 }
 
-- (BOOL)dataIsLoading {
-  return _reloading;
-}
-
-- (void)updateState {
-  [super updateState];
-}
-
 #pragma mark Data Source
 - (void)dataSourceDidFetch {
   // subclass may optionally implement
@@ -80,42 +72,20 @@ sectionNameKeyPath = _sectionNameKeyPath;
     return _frc;
 }
 
-// Subclass MUST implement
-- (NSFetchRequest *)fetchRequest {
-    return nil;
-}
-
-// Subclass MAY OPTIONALLY implement
-- (NSString *)frcCacheName {
-    return nil;
-}
-
-- (NSPredicate *)fetchPredicate {
-    return nil;
-}
-
-- (NSArray *)fetchSortDescriptors {
-    return nil;
-}
-
-- (NSString *)sectionNameKeyPath {
-    return nil;
-}
-
 #pragma mark NSFetchedresultsControllerDelegate
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
-  [_tableView beginUpdates];
+  [self.tableView beginUpdates];
 }
 
 - (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
   
   switch(type) {
     case NSFetchedResultsChangeInsert:
-      [_tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+      [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
       break;
       
     case NSFetchedResultsChangeDelete:
-      [_tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+      [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
       break;
   }
 }
@@ -124,7 +94,7 @@ sectionNameKeyPath = _sectionNameKeyPath;
        atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
       newIndexPath:(NSIndexPath *)newIndexPath {
   
-  UITableView *tableView = _tableView;
+  UITableView *tableView = self.tableView;
   
   DLog(@"type: %d, old indexPath: %@, new indexPath: %@, class: %@", type, indexPath, newIndexPath, NSStringFromClass([self class]));
   
@@ -149,7 +119,7 @@ sectionNameKeyPath = _sectionNameKeyPath;
 }
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
-  [_tableView endUpdates];
+  [self.tableView endUpdates];
   [self updateState];
 }
 

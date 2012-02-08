@@ -189,6 +189,11 @@ const CGFloat kOverlayViewAlpha = 0.75;
     poppedViewController.view.layer.shadowRadius = 5.0;
     poppedViewController.view.layer.shouldRasterize = YES;
     
+    // In case the previous view controller was reloaded due to memory, restore transform
+    if (CGAffineTransformIsIdentity(self.topViewController.view.transform)) {
+        self.topViewController.view.transform = CGAffineTransformMakeScale(kPushPopScale, kPushPopScale);
+    }
+    
     // Add Gray Layer
     _overlayView.frame = self.topViewController.view.bounds;
     _overlayView.alpha = kOverlayViewAlpha;

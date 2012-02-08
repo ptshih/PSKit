@@ -14,28 +14,35 @@
 
 @implementation PSTableViewController
 
-@synthesize tableView = _tableView;
-@synthesize items = _items;
-@synthesize searchItems = _searchItems;
-@synthesize sectionTitles = _sectionTitles;
+@synthesize
+items = _items,
+searchItems = _searchItems,
+sectionTitles = _sectionTitles,
+selectedIndexes = _selectedIndexes,
+cellCache = _cellCache,
+contentOffset = _contentOffset,
+
+tableView = _tableView,
+pullRefreshView = _pullRefreshView,
+searchBar = _searchBar,
+loadMoreView = _loadMoreView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        _items = [[NSMutableArray alloc] initWithCapacity:1];
-        self.sectionTitles = [NSMutableArray arrayWithCapacity:1];
-        _selectedIndexes = [[NSMutableDictionary alloc] initWithCapacity:1];
-        _cellCache = [[NSMutableArray alloc] initWithCapacity:1];
-        //    _adShowing = NO;
+        self.items = [NSMutableArray array];
+        self.searchItems = [NSMutableArray array];
+        self.sectionTitles = [NSMutableArray array];
+        self.selectedIndexes = [NSMutableDictionary dictionary];
+        self.cellCache = [NSMutableArray array];;
+        
+        // View State
+        self.contentOffset = CGPointZero;
+        
         _pagingStart = 0;
         _pagingCount = 0;
         _pagingTotal = 0;
-        
-        // View State
-        _contentOffset = CGPointZero;
-        
-        _hasMore = YES;
     }
     return self;
 }
@@ -44,18 +51,15 @@
     [super viewDidUnload];
     
     // Save view state
-    _contentOffset = _tableView.contentOffset;
+    self.contentOffset = self.tableView.contentOffset;
     
-    if (_searchBar) _searchBar.delegate = nil;
-    if (_tableView) _tableView.delegate = nil, _tableView.dataSource = nil;
-    if (_refreshHeaderView) _refreshHeaderView.delegate = nil;
+    if (self.searchBar) self.searchBar.delegate = nil;
+    if (self.tableView) self.tableView.delegate = nil, self.tableView.dataSource = nil;
+    if (self.pullRefreshView) self.pullRefreshView.delegate = nil;
     
-    //  _adShowing = NO;
-    //  _adView.delegate = nil;
-    //  RELEASE_SAFELY(_adView);
     RELEASE_SAFELY(_tableView);
     RELEASE_SAFELY(_searchBar);
-    RELEASE_SAFELY(_refreshHeaderView);
+    RELEASE_SAFELY(_pullRefreshView);
     RELEASE_SAFELY(_loadMoreView);
 }
 
@@ -63,21 +67,16 @@
     [super didReceiveMemoryWarning];
 }
 
-- (void)dealloc {
-    // Remove scrolling observer
-    //  [_tableView removeObserver:self forKeyPath:@"contentOffset"];
-    
+- (void)dealloc {    
     // Delegates
-    //  _adView.delegate = nil;
-    if (_searchBar) _searchBar.delegate = nil;
-    if (_tableView) _tableView.delegate = nil, _tableView.dataSource = nil;
-    if (_refreshHeaderView) _refreshHeaderView.delegate = nil;
+    if (self.searchBar) self.searchBar.delegate = nil;
+    if (self.tableView) self.tableView.delegate = nil, self.tableView.dataSource = nil;
+    if (self.pullRefreshView) self.pullRefreshView.delegate = nil;
     
     // Views
-    //  RELEASE_SAFELY(_adView);
     RELEASE_SAFELY(_tableView);
     RELEASE_SAFELY(_searchBar);
-    RELEASE_SAFELY(_refreshHeaderView);
+    RELEASE_SAFELY(_pullRefreshView);
     RELEASE_SAFELY(_loadMoreView);
     
     // Non-Views
@@ -85,8 +84,6 @@
     RELEASE_SAFELY(_selectedIndexes);
     RELEASE_SAFELY(_items);
     RELEASE_SAFELY(_searchItems);
-    RELEASE_SAFELY(_visibleCells);
-    RELEASE_SAFELY(_visibleIndexPaths);
     RELEASE_SAFELY(_cellCache);
     
     [super dealloc];
@@ -99,103 +96,90 @@
 }
 
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles andPlaceholder:(NSString *)placeholder {
-    _searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)];
-    _searchBar.delegate = self;
-    //  _searchBar.tintColor = [UIColor darkGrayColor];
-    _searchBar.placeholder = placeholder;
-    _searchBar.barStyle = UIBarStyleBlackOpaque;
-    //  _searchBar.backgroundColor = [UIColor clearColor];
+    self.searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)] autorelease];
+    self.searchBar.delegate = self;
+    //  self.searchBar.tintColor = [UIColor darkGrayColor];
+    self.searchBar.placeholder = placeholder;
+    self.searchBar.barStyle = UIBarStyleBlackOpaque;
+    //  self.searchBar.backgroundColor = [UIColor clearColor];
     
     if (scopeButtonTitles) {
-        _searchBar.scopeButtonTitles = scopeButtonTitles;
+        self.searchBar.scopeButtonTitles = scopeButtonTitles;
     }
     
-    _tableView.tableHeaderView = _searchBar;
+    self.tableView.tableHeaderView = self.searchBar;
     
-    UISearchDisplayController *searchController = [[UISearchDisplayController alloc] initWithSearchBar:_searchBar contentsController:self];
+    UISearchDisplayController *searchController = [[UISearchDisplayController alloc] initWithSearchBar:self.searchBar contentsController:self];
     [searchController setDelegate:self];
     [searchController setSearchResultsDelegate:self];
     [searchController setSearchResultsDataSource:self];
-    
-    // SUBCLASSES MUST IMPLEMENT THE DELEGATE METHODS
-    _searchItems = [[NSMutableArray alloc] initWithCapacity:1];
 }
 
 // SUBCLASS SHOULD CALL THIS
 - (void)setupTableViewWithFrame:(CGRect)frame style:(UITableViewStyle)style separatorStyle:(UITableViewCellSeparatorStyle)separatorStyle separatorColor:(UIColor *)separatorColor {
-    _tableView = [[UITableView alloc] initWithFrame:frame style:style];
-    _tableView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    _tableView.delegate = self;
-    _tableView.dataSource = self;
-    _tableView.separatorStyle = separatorStyle;
-    _tableView.separatorColor = separatorColor;
-    _tableView.backgroundColor = [UIColor clearColor];
-    _tableView.backgroundView = nil;
-    _tableView.opaque = NO;
+    self.tableView = [[[UITableView alloc] initWithFrame:frame style:style] autorelease];
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
+    self.tableView.separatorStyle = separatorStyle;
+    self.tableView.separatorColor = separatorColor;
+    self.tableView.backgroundColor = [UIColor clearColor];
+    self.tableView.backgroundView = nil;
     
-    //  [self.view insertSubview:_tableView atIndex:0];
-    [self.view addSubview:_tableView];
+    [self.view addSubview:self.tableView];
     
     // Setup optional header/footer
-    [self setupTableHeader];
-    [self setupTableFooter];
-    
-    if ([self shouldLoadMore]) [self setupLoadMoreView];
+    if ([self respondsToSelector:@selector(setupTableHeader)]) {
+        [self setupTableHeader];
+    }
+    if ([self respondsToSelector:@selector(setupTableFooter)]) {
+        [self setupTableFooter];
+    }
+    if ([self respondsToSelector:@selector(setupLoadMoreView)]) {
+        [self setupLoadMoreView];
+    }
     
     // Set the active scrollView
-    _activeScrollView = _tableView;
-    
-    //  [_tableView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:NULL];
+    self.activeScrollView = self.tableView;
 }
 
 // SUBCLASS CAN OPTIONALLY CALL
 - (void)setupPullRefresh {
-    if (_refreshHeaderView == nil) {
-        _refreshHeaderView = [[EGORefreshTableHeaderView alloc] initWithFrame:CGRectMake(0.0f, 0.0f - _tableView.bounds.size.height, self.view.frame.size.width, _tableView.bounds.size.height)];
-        _refreshHeaderView.delegate = self;
-        [_tableView addSubview:_refreshHeaderView];		
+    if (self.pullRefreshView == nil) {
+        self.pullRefreshView = [[[EGORefreshTableHeaderView alloc] initWithFrame:CGRectMake(0.0f, 0.0f - self.tableView.bounds.size.height, self.view.frame.size.width, self.tableView.bounds.size.height)] autorelease];
+        self.pullRefreshView.delegate = self;
+        [self.tableView addSubview:self.pullRefreshView];		
     }
     
     //  update the last update date
-    [_refreshHeaderView refreshLastUpdatedDate];
-}
-
-// Optional table header
-- (void)setupTableHeader {
-    // subclass should implement
-}
-
-// Optional table footer
-- (void)setupTableFooter {
-    // subclass should implement
+    [self.pullRefreshView refreshLastUpdatedDate];
 }
 
 // This is the automatic load more style
-- (void)setupLoadMoreView {
-    _loadMoreView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)];
-    _loadMoreView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    _loadMoreView.backgroundColor = [UIColor clearColor];
-    
-    UIImageView *bg = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"shadow_lastcell.png"]] autorelease];
-    bg.autoresizingMask = ~UIViewAutoresizingNone;
-    
-    UILabel *l = [[[UILabel alloc] initWithFrame:_loadMoreView.bounds] autorelease];
-    l.backgroundColor = [UIColor clearColor];
-    l.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    l.text = @"Loading More...";
-    [PSStyleSheet applyStyle:@"loadMoreLabel" forLabel:l];
-    
-    // Activity
-    UIActivityIndicatorView *av = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite] autorelease];
-    av.frame = CGRectMake(12, 12, 20, 20);
-    av.hidesWhenStopped = YES;
-    [av startAnimating];
-    
-    // Add to subview
-    [_loadMoreView addSubview:bg];
-    [_loadMoreView addSubview:l];
-    [_loadMoreView addSubview:av];
-}
+//- (void)setupLoadMoreView {
+//    _loadMoreView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)];
+//    _loadMoreView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+//    _loadMoreView.backgroundColor = [UIColor clearColor];
+//    
+//    UIImageView *bg = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"shadow_lastcell.png"]] autorelease];
+//    bg.autoresizingMask = ~UIViewAutoresizingNone;
+//    
+//    UILabel *l = [[[UILabel alloc] initWithFrame:_loadMoreView.bounds] autorelease];
+//    l.backgroundColor = [UIColor clearColor];
+//    l.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+//    l.text = @"Loading More...";
+//    [PSStyleSheet applyStyle:@"loadMoreLabel" forLabel:l];
+//    
+//    // Activity
+//    UIActivityIndicatorView *av = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite] autorelease];
+//    av.frame = CGRectMake(12, 12, 20, 20);
+//    av.hidesWhenStopped = YES;
+//    [av startAnimating];
+//    
+//    // Add to subview
+//    [_loadMoreView addSubview:bg];
+//    [_loadMoreView addSubview:l];
+//    [_loadMoreView addSubview:av];
+//}
 
 #pragma mark - Utility Methods
 - (void)resetPaging {
@@ -203,16 +187,16 @@
     _pagingTotal = _pagingCount;
 }
 
-- (void)reloadDataSafely {
-    [_cellCache makeObjectsPerformSelector:@selector(setShouldAnimate:) withObject:[NSNumber numberWithBool:NO]];
-    [_tableView reloadData];
-    [_cellCache makeObjectsPerformSelector:@selector(setShouldAnimate:) withObject:[NSNumber numberWithBool:YES]];
-}
+//- (void)reloadDataSafely {
+//    [_cellCache makeObjectsPerformSelector:@selector(setShouldAnimate:) withObject:[NSNumber numberWithBool:NO]];
+//    [self.tableView reloadData];
+//    [_cellCache makeObjectsPerformSelector:@selector(setShouldAnimate:) withObject:[NSNumber numberWithBool:YES]];
+//}
 
 #pragma mark - PSStateMachine
 - (BOOL)dataIsAvailable {
     // Is this a searchResultsTable or just Table?
-    NSArray *items = (_tableView == self.searchDisplayController.searchResultsTableView) ? _searchItems : _items;
+    NSArray *items = (self.tableView == self.searchDisplayController.searchResultsTableView) ? self.searchItems : self.items;
     
     // Check numSections
     if ([items count] > 0) {
@@ -230,75 +214,44 @@
         return NO;
     }
 }
+//
+//- (void)loadDataSource {
+//    [super loadDataSource];
+//    if (self.pullRefreshView) {
+//        [self.pullRefreshView setState:EGOOPullRefreshLoading];
+//    }
+//}
+//
+//- (void)dataSourceDidLoad {
+//    [super dataSourceDidLoad];
+//    if (self.pullRefreshView) {
+//        [self.pullRefreshView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
+//    }
+//}
+//
+//- (void)dataSourceDidLoadMore {
+//    [super dataSourceDidLoadMore];
+//}
 
-- (BOOL)shouldLoadMore {
-    return NO;
-}
+//- (void)dataSourceDidError {
+//    [super dataSourceDidError];
+//    if (self.pullRefreshView) {
+//        [self.pullRefreshView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
+//    }
+//}
 
-- (void)restoreDataSource {
-    [super restoreDataSource];
-    [self reloadDataSafely];
-    _tableView.contentOffset = _contentOffset;
-}
-
-- (void)loadDataSource {
-    [super loadDataSource];
-    if (_refreshHeaderView) {
-        [_refreshHeaderView setState:EGOOPullRefreshLoading];
-    }
-}
-
-- (void)dataSourceDidLoad {
-    [super dataSourceDidLoad];
-    if (_refreshHeaderView) {
-        [_refreshHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:_tableView];
-    }
-}
-
-- (void)dataSourceDidLoadMore {
-    [super dataSourceDidLoadMore];
-}
-
-- (void)dataSourceDidError {
-    [super dataSourceDidError];
-    if (_refreshHeaderView) {
-        [_refreshHeaderView egoRefreshScrollViewDataSourceDidFinishedLoading:_tableView];
-    }
-}
-
-- (void)dataSourceShouldLoadObjects:(id)objects shouldAnimate:(BOOL)shouldAnimate {
-    [self dataSourceShouldLoadObjects:objects sortBy:nil ascending:NO shouldAnimate:shouldAnimate];
-}
-
-- (void)dataSourceShouldLoadObjects:(id)objects sortBy:(NSString *)sortBy ascending:(BOOL)ascending shouldAnimate:(BOOL)shouldAnimate {
-    // If we have no items, just return now
+- (void)dataSourceShouldLoadObjects:(id)objects animated:(BOOL)animated {
+    self.items = objects;
+    
     BOOL hasData = NO;
-    for (NSArray *rows in objects) {
+    for (NSArray *rows in self.items) {
         if ([rows count] > 0) {
             hasData = YES;
+            break;
         }
     }
     
-    // Optionally sort each section
-//    if (sortBy) {
-//        [objects enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-//            if ([obj count] > 0) {
-//                NSArray *sortedObj = [obj sortedArrayUsingDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:sortBy ascending:ascending]]];
-//                [objects replaceObjectAtIndex:idx withObject:sortedObj];
-//            }
-//        }];
-//    }
-    
-    if (!hasData) {
-        [self.items removeAllObjects];
-        [self.tableView reloadData];
-        [self dataSourceDidLoad];
-        return;
-    } else {
-        //    [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:NO];
-    }
-    
-    if (shouldAnimate) {
+    if (hasData && animated) {
         // Delete all existing data
         NSIndexSet *newSectionIndexSet = nil;
         NSIndexSet *deleteSectionIndexSet = nil;
@@ -335,39 +288,35 @@
         // BEGIN TABLEVIEW ANIMATION BLOCK
         //
         [_cellCache makeObjectsPerformSelector:@selector(setShouldAnimate:) withObject:[NSNumber numberWithBool:NO]];
-        [_tableView beginUpdates];
+        [self.tableView beginUpdates];
         
         // These are the sections that need to be inserted
         if (deleteSectionIndexSet) {
-            [_tableView deleteSections:deleteSectionIndexSet withRowAnimation:UITableViewRowAnimationNone];
+            [self.tableView deleteSections:deleteSectionIndexSet withRowAnimation:UITableViewRowAnimationNone];
         }
         
         if (newSectionIndexSet) {
-            [_tableView insertSections:newSectionIndexSet withRowAnimation:UITableViewRowAnimationNone];
+            [self.tableView insertSections:newSectionIndexSet withRowAnimation:UITableViewRowAnimationNone];
         }
         
         // These are the rows that need to be deleted
         if ([deleteRowIndexPaths count] > 0) {
-            [_tableView deleteRowsAtIndexPaths:deleteRowIndexPaths withRowAnimation:UITableViewRowAnimationNone];
+            [self.tableView deleteRowsAtIndexPaths:deleteRowIndexPaths withRowAnimation:UITableViewRowAnimationNone];
         }
         
         // These are the new rows that need to be inserted
         if ([newRowIndexPaths count] > 0) {
-            [_tableView insertRowsAtIndexPaths:newRowIndexPaths withRowAnimation:UITableViewRowAnimationNone];
+            [self.tableView insertRowsAtIndexPaths:newRowIndexPaths withRowAnimation:UITableViewRowAnimationNone];
         }
         
-        [_tableView endUpdates];
+        [self.tableView endUpdates];
         [_cellCache makeObjectsPerformSelector:@selector(setShouldAnimate:) withObject:[NSNumber numberWithBool:YES]];
         //
         // END TABLEVIEW ANIMATION BLOCK
         //
     } else {
-        self.items = objects;
-        [self reloadDataSafely];
+        [self.tableView reloadData];
     }
-    
-    [self dataSourceDidLoad];
-    
 }
 
 - (void)dataSourceShouldLoadMoreObjects:(id)objects forSection:(NSInteger)section shouldAnimate:(BOOL)shouldAnimate {
@@ -385,38 +334,25 @@
         //
         // BEGIN TABLEVIEW ANIMATION BLOCK
         //
-        [_tableView beginUpdates];
+        [self.tableView beginUpdates];
         
         // These are the new rows that need to be inserted
         if ([newRowIndexPaths count] > 0) {
-            [_tableView insertRowsAtIndexPaths:newRowIndexPaths withRowAnimation:UITableViewRowAnimationNone];
+            [self.tableView insertRowsAtIndexPaths:newRowIndexPaths withRowAnimation:UITableViewRowAnimationNone];
         }
         
-        [_tableView endUpdates];
+        [self.tableView endUpdates];
         //
         // END TABLEVIEW ANIMATION BLOCK
         //
     } else {
-        [self reloadDataSafely];
+        [self.tableView reloadData];
     }
-    
-    [self dataSourceDidLoadMore];
 }
 
 - (void)loadMore {
-    _reloading = YES;
+    self.reloading = YES;
     [self updateState];
-}
-
-- (void)updateState {
-    [super updateState];
-    
-    // Show/hide loadMore footer
-    if (_hasMore && [self shouldLoadMore] && [self dataIsAvailable]) {
-        self.tableView.tableFooterView = _loadMoreView;
-    } else if (!_hasMore && [self shouldLoadMore]) {
-        self.tableView.tableFooterView = nil;
-    }
 }
 
 #pragma mark - Custom TableView Methods
@@ -501,10 +437,10 @@
 
 - (void)searchDisplayController:(UISearchDisplayController *)controller didLoadSearchResultsTableView:(UITableView *)tableView {
     //  [tableView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:NULL];
-    tableView.rowHeight = _tableView.rowHeight;
+    tableView.rowHeight = self.tableView.rowHeight;
     tableView.backgroundColor = [UIColor whiteColor];
-    tableView.separatorColor = _tableView.separatorColor;
-    tableView.separatorStyle = _tableView.separatorStyle;
+    tableView.separatorColor = self.tableView.separatorColor;
+    tableView.separatorStyle = self.tableView.separatorStyle;
 }
 
 - (void)searchDisplayController:(UISearchDisplayController *)controller willUnloadSearchResultsTableView:(UITableView *)tableView {
@@ -525,8 +461,8 @@
         //    [self scrollEndedTrigger];
     }
     if (!self.searchDisplayController.active) {
-        if (_refreshHeaderView) {
-            [_refreshHeaderView egoRefreshScrollViewDidEndDragging:scrollView];
+        if (self.pullRefreshView) {
+            [self.pullRefreshView egoRefreshScrollViewDidEndDragging:scrollView];
         }
     }
 }
@@ -536,23 +472,23 @@
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if (_refreshHeaderView) {
-        [_refreshHeaderView egoRefreshScrollViewDidScroll:scrollView];
+    if (self.pullRefreshView) {
+        [self.pullRefreshView egoRefreshScrollViewDidScroll:scrollView];
     }
     
-    if ([self shouldLoadMore]) {
-        if ([scrollView isKindOfClass:[UITableView class]]) {
-            UITableView *tableView = (UITableView *)scrollView;
-            if (!_reloading && _hasMore && [[tableView visibleCells] count] > 0) {
-                CGFloat tableOffset = tableView.contentOffset.y + tableView.height;
-                CGFloat tableBottom = tableView.contentSize.height - tableView.rowHeight;
-                
-                if (tableOffset >= tableBottom) {
-                    [self loadMore];
-                }
-            }
-        }
-    }
+//    if ([self shouldLoadMore]) {
+//        if ([scrollView isKindOfClass:[UITableView class]]) {
+//            UITableView *tableView = (UITableView *)scrollView;
+//            if (!self.reloading && _hasMore && [[tableView visibleCells] count] > 0) {
+//                CGFloat tableOffset = tableView.contentOffset.y + tableView.height;
+//                CGFloat tableBottom = tableView.contentSize.height - tableView.rowHeight;
+//                
+//                if (tableOffset >= tableBottom) {
+//                    [self loadMore];
+//                }
+//            }
+//        }
+//    }
 }
 
 - (void)scrollEndedTrigger {
@@ -560,57 +496,26 @@
 
 #pragma mark - EGORefreshTableHeaderDelegate Methods
 - (void)egoRefreshTableHeaderDidTriggerRefresh:(EGORefreshTableHeaderView*)view {
-    [self loadDataSource];
+    [self reloadDataSource];
 }
 
 - (BOOL)egoRefreshTableHeaderDataSourceIsLoading:(EGORefreshTableHeaderView*)view {
-    return _reloading; // should return if data source model is reloading
+    return self.reloading; // should return if data source model is reloading
 }
 
 - (NSDate*)egoRefreshTableHeaderDataSourceLastUpdated:(EGORefreshTableHeaderView*)view {
     return [NSDate date]; // should return date data source was last changed
 }
 
-#pragma mark - ADBannerViewDelegate
-//- (void)bannerViewDidLoadAd:(ADBannerView *)banner {
-//  if (_adShowing) {
-//    return;
-//  } else {
-//    _adShowing = YES;
-//  }
-//  
-//  banner.top = self.view.bottom;
-//  [self.view addSubview:banner];
-//  [UIView animateWithDuration:0.4
-//                   animations:^{
-//                     banner.top -= banner.height;
-//                     _tableView.height -= banner.height;
-//                   }
-//                   completion:^(BOOL finished) {
-//                   }];
-//}
-//
-//- (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error {
-//  DLog(@"iAd failed to load with error: %@", error);
-//  if (!_adShowing) return;
-//  
-//  [UIView animateWithDuration:0.4
-//                   animations:^{
-//                     banner.top += banner.height;
-//                     _tableView.height += banner.height;
-//                   }
-//                   completion:^(BOOL finished) {
-//                     _adShowing = NO;
-//                     [banner removeFromSuperview];
-//                   }];
-//}
-//
-//- (BOOL)bannerViewActionShouldBegin:(ADBannerView *)banner willLeaveApplication:(BOOL)willLeave {
-//  return YES;
-//}
-//
-//- (void)bannerViewActionDidFinish:(ADBannerView *)banner {
-//  
-//}
+#pragma mark - Refresh
+- (void)beginRefresh {
+    self.reloading = YES;
+    [self.pullRefreshView setState:EGOOPullRefreshLoading];
+}
+
+- (void)endRefresh {
+    self.reloading = NO;
+    [self.pullRefreshView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
+}
 
 @end

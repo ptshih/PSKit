@@ -10,16 +10,14 @@
 
 @implementation PSViewController
 
-@synthesize headerView = _headerView;
-@synthesize contentView = _contentView;
-@synthesize footerView = _footerView;
+@synthesize
+activeScrollView = _activeScrollView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
-    _activeScrollView = nil;
-//    VLog(@"#%@", [self class]);
+//  VLog(@"#%@", [self class]);
   }
   return self;
 }
@@ -27,18 +25,12 @@
 - (void)dealloc
 {
 //  VLog(@"#%@", [self class]);
-  RELEASE_SAFELY(_headerView);
-  RELEASE_SAFELY(_contentView);
-  RELEASE_SAFELY(_footerView);
   [super dealloc];
 }
 
 - (void)viewDidUnload
 {
   VLog(@"#%@", [self class]);
-  RELEASE_SAFELY(_headerView);
-  RELEASE_SAFELY(_contentView);
-  RELEASE_SAFELY(_footerView);
   [super viewDidUnload];
 }
 
@@ -48,44 +40,9 @@
   [super didReceiveMemoryWarning];
 }
 
-#pragma mark - Setters/Getters
-- (void)setHeaderView:(UIView *)headerView {
-  [_headerView autorelease];
-  [_headerView removeFromSuperview];
-  _headerView = [headerView retain];
-  
-  // Add to view, adjust contentView
-  _headerView.left = 0.0;
-  _headerView.top = 0.0;
-  _contentView.top = _headerView.bottom;
-  _contentView.height -= _headerView.height;
-  [self.view addSubview:_headerView];
-}
-
-- (void)setFooterView:(UIView *)footerView {
-  [_footerView autorelease];
-  [_footerView removeFromSuperview];
-  _footerView = [footerView retain];
-  
-  // Add to view, adjust contentView
-  _footerView.left = 0.0;
-  _footerView.top = self.view.height - _footerView.height;
-  _contentView.height -= _footerView.height;
-  [self.view addSubview:_footerView];
-}
-
 #pragma mark - View
 - (void)loadView {
-  CGRect frame = [[UIScreen mainScreen] applicationFrame];
-  UIView *view = [[UIView alloc] initWithFrame:frame];
-  view.backgroundColor = [UIColor blackColor];
-  view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-  self.view = view;
-  [view release];
-  
-  _contentView = [[UIView alloc] initWithFrame:self.view.bounds];
-  _contentView.autoresizingMask = self.view.autoresizingMask;
-  [self.view addSubview:_contentView];
+    self.view = [[[UIView alloc] initWithFrame:self.parentViewController.view.bounds] autorelease];
 }
 
 - (void)viewDidLoad {
@@ -157,8 +114,8 @@
 
 #pragma mark - Scroll State
 - (void)updateScrollsToTop:(BOOL)isEnabled {
-  if (_activeScrollView) {
-    _activeScrollView.scrollsToTop = isEnabled;
+  if (self.activeScrollView) {
+    self.activeScrollView.scrollsToTop = isEnabled;
   }
 }
 

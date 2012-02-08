@@ -14,45 +14,30 @@
 
 @implementation PSBaseViewController
 
-@synthesize viewHasLoadedOnce = _viewHasLoadedOnce;
+@synthesize
+reloading = _reloading,
+dataDidError = _dataDidError;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        _reloading = NO;
-        _dataDidError = NO;
-        _viewHasLoadedOnce = NO;
+        self.reloading = NO;
+        self.dataDidError = NO;
     }
     return self;
 }
 
 - (void)viewDidUnload {
-    RELEASE_SAFELY(_nullView);
     [super viewDidUnload];
 }
 
 - (void)dealloc {
-    RELEASE_SAFELY(_nullView);
     [super dealloc];
 }
 
 #pragma mark - View
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    // NullView
-    _nullView = [[PSNullView alloc] initWithFrame:_contentView.bounds];
-    _nullView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [_nullView setState:PSNullViewStateDisabled];
-    [_contentView addSubview:_nullView];
-    
-    _viewHasLoadedOnce = YES;
-}
-
-#pragma mark - PSNullViewDelegate
-- (void)nullViewTapped:(id)sender {
-    // When a nullView is tapped, reload the dataSource
-    [self reloadDataSource];
 }
 
 #pragma mark - PSStateMachine
@@ -61,71 +46,44 @@
 }
 
 - (BOOL)dataIsLoading {
-    return _reloading;
-}
-
-- (BOOL)dataDidError {
-    return _dataDidError;
-}
-
-// DataSource
-- (void)setupDataSource {
-    
-}
-
-- (void)reloadDataSource {
-    
-}
-
-- (void)restoreDataSource {
-    
-}
-
-- (void)loadDataSource {
-    if (_reloading) return;
-    _reloading = YES;
-    _dataDidError = NO;
-    [self updateState];
-}
-
-- (void)dataSourceDidLoad {
-    _reloading = NO;
-    _dataDidError = NO;
-    [self updateState];
-}
-
-- (void)dataSourceDidLoadMore {
-    _reloading = NO;
-    [self updateState];
+    return self.reloading;
 }
 
 - (void)dataSourceDidError {
-    _reloading = NO;
-    _dataDidError = YES;
-    [self updateState];
 }
 
 - (void)updateState {
     if ([self dataIsAvailable]) {
         // We have data to display
-        [self.view sendSubviewToBack:_nullView];
-        _nullView.state = PSNullViewStateDisabled;
     } else {
         // We don't have data available to display
-        [self.view bringSubviewToFront:_nullView];
         if ([self dataIsLoading]) {
             // We are loading for the first time
-            _nullView.state = PSNullViewStateLoading;
         } else {
             if ([self dataDidError]) {
                 // There was a dataSource error, show the error screen
-                _nullView.state = PSNullViewStateError;
             } else {
                 // We have no data to display, show the empty screen
-                _nullView.state = PSNullViewStateEmpty;
             }
         }
     }
 }
+
+- (id)parseData:(id)data httpResponse:(NSHTTPURLResponse *)httpResponse {
+    id results = nil;
+    
+    // Parse JSON if Content-Type is "application/json"
+    NSString *contentType = [[httpResponse allHeaderFields] objectForKey:@"Content-Type"];
+    BOOL isJSON = contentType ? [contentType rangeOfString:@"application/json"].location != NSNotFound : NO;
+    if (isJSON) {
+        NSError *jsonError = nil;
+        results = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&jsonError];
+    } else {
+        results = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+    }
+    return results;
+}
+
+
 
 @end

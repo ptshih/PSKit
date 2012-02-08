@@ -12,43 +12,28 @@
 //#import "UIViewController+Ad.h"
 
 @interface PSTableViewController : PSBaseViewController <UITableViewDelegate, UITableViewDataSource, UISearchDisplayDelegate, UISearchBarDelegate, EGORefreshTableHeaderDelegate> {
-  UITableView *_tableView;
-  NSMutableArray *_items;
-  NSMutableArray *_searchItems;
-  NSMutableDictionary *_selectedIndexes;
-  NSArray *_visibleCells;
-  NSArray *_visibleIndexPaths;
-  NSMutableArray *_cellCache;
-  
-//  ADBannerView *_adView;
-//  BOOL _adShowing;
-  
-  UISearchBar *_searchBar;
-  EGORefreshTableHeaderView *_refreshHeaderView;
-  UIView *_loadMoreView;
   
   // Paging
   NSInteger _pagingStart;
   NSInteger _pagingCount;
   NSInteger _pagingTotal;
-  
-  // View State
-  CGPoint _contentOffset;
-  
-  BOOL _hasMore;  
 }
 
-@property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) NSMutableArray *items;
 @property (nonatomic, retain) NSMutableArray *searchItems;
 @property (nonatomic, retain) NSMutableArray *sectionTitles;
+@property (nonatomic, retain) NSMutableDictionary *selectedIndexes;
+@property (nonatomic, retain) NSMutableArray *cellCache;
+@property (nonatomic, assign) CGPoint contentOffset;
+
+@property (nonatomic, retain) UITableView *tableView;
+@property (nonatomic, retain) EGORefreshTableHeaderView *pullRefreshView;
+@property (nonatomic, retain) UISearchBar *searchBar;
+@property (nonatomic, retain) UIView *loadMoreView;
 
 // View Setup
 - (void)setupTableViewWithFrame:(CGRect)frame style:(UITableViewStyle)style separatorStyle:(UITableViewCellSeparatorStyle)separatorStyle separatorColor:(UIColor *)separatorColor;
 - (void)setupPullRefresh;
-- (void)setupTableHeader;
-- (void)setupTableFooter;
-- (void)setupLoadMoreView;
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles;
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles andPlaceholder:(NSString *)placeholder;
 
@@ -67,6 +52,8 @@
 // ScrollView Stuff
 - (void)scrollEndedTrigger;
 
-- (void)reloadDataSafely;
+// Refresh
+- (void)beginRefresh;
+- (void)endRefresh;
 
 @end

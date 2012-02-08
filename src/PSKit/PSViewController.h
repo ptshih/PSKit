@@ -12,16 +12,9 @@
 
 #import "PSNavigationController.h"
 
-@interface PSViewController : UIViewController <PSStateMachine> {
-  UIScrollView *_activeScrollView; // subclasses should set this if they have a scrollView
-  UIView *_headerView;
-  UIView *_contentView;
-  UIView *_footerView;
-}
+@interface PSViewController : UIViewController <PSStateMachine>
 
-@property (nonatomic, retain) UIView *headerView;
-@property (nonatomic, retain) UIView *contentView;
-@property (nonatomic, retain) UIView *footerView;
+@property (nonatomic, assign) UIScrollView *activeScrollView; // subclasses should set this if they have a scrollView
 
 /**
  Used to update the view when the orientation changes

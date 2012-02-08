@@ -9,16 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "PSViewController.h"
 
-@interface PSBaseViewController : PSViewController <PSNullViewDelegate> {
-  PSNullView *_nullView;
-  
-  BOOL _reloading;
-  BOOL _dataDidError;
-  BOOL _viewHasLoadedOnce;
-}
+@interface PSBaseViewController : PSViewController
 
-@property (nonatomic, assign) BOOL viewHasLoadedOnce;
-
-
+@property (nonatomic, assign) BOOL reloading;
+@property (nonatomic, assign) BOOL dataDidError;
 
 @end
