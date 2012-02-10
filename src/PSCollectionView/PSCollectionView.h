@@ -11,19 +11,12 @@
 
 @protocol PSCollectionViewDelegate, PSCollectionViewDataSource;
 
-@interface PSCollectionView : UIScrollView <NSCoding, UIGestureRecognizerDelegate> {
-  NSMutableSet *_reusableCards;
-  NSMutableDictionary *_visibleCards;
-  NSMutableArray *_cardKeysToRemove;
-  
-  CGFloat _rowHeight;
-  
-  id <PSCollectionViewDelegate> _collectionViewDelegate;
-  id <PSCollectionViewDataSource> _collectionViewDataSource;
-}
+@interface PSCollectionView : UIScrollView <NSCoding, UIGestureRecognizerDelegate>
 
+@property (nonatomic, retain) NSMutableSet *reuseableCards;
+@property (nonatomic, retain) NSMutableDictionary *visibleCards;
+@property (nonatomic, retain) NSMutableArray *cardKeysToRemove;
 @property (nonatomic, assign) CGFloat rowHeight;
-
 @property (nonatomic, assign) id <PSCollectionViewDelegate> collectionViewDelegate;
 @property (nonatomic, assign) id <PSCollectionViewDataSource> collectionViewDataSource;
 
