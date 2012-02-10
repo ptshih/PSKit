@@ -251,6 +251,8 @@ loadMoreView = _loadMoreView;
         }
     }
     
+#warning animated is broken
+    if (animated) animated = NO;
     if (hasData && animated) {
         // Delete all existing data
         NSIndexSet *newSectionIndexSet = nil;
@@ -384,7 +386,7 @@ loadMoreView = _loadMoreView;
     
     cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
     if(cell == nil) { 
-        cell = [[[cellClass alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:reuseIdentifier] autorelease];
+        cell = [[[cellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier] autorelease];
         [_cellCache addObject:cell];
     }
     
