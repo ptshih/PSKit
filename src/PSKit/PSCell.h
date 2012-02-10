@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
+#import "PSCachedImageView.h"
 
 enum {
   PSCellTypePlain = 0,
@@ -16,11 +17,10 @@ enum {
 typedef uint32_t PSCellType;
 
 
-@interface PSCell : UITableViewCell {
-  BOOL _isExpanded;
-  BOOL _cellShouldAnimate;
-}
+@interface PSCell : UITableViewCell
 
+@property (nonatomic, retain) PSCachedImageView *psImageView;
+@property (nonatomic, assign) UITableView *parentTableView;
 @property (nonatomic, assign) BOOL isExpanded;
 
 /**
@@ -47,9 +47,6 @@ typedef uint32_t PSCellType;
 
 + (CGFloat)rowHeightForObject:(id)object expanded:(BOOL)expanded forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation;
 
-- (void)fillCellWithObject:(id)object;
-- (void)fillCellWithObject:(id)object shouldLoadImages:(BOOL)shouldLoadImages;
-
-- (void)setShouldAnimate:(NSNumber *)shouldAnimate;
+- (void)tableView:(UITableView *)tableView fillCellWithObject:(id)object;
 
 @end

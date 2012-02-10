@@ -10,84 +10,78 @@
 
 @implementation PSCell
 
-@synthesize isExpanded = _isExpanded;
+@synthesize
+psImageView = _psImageView,
+parentTableView = _parentTableView,
+isExpanded = _isExpanded;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
-  self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-  if (self) {
-//    VLog(@"#%@", [self class]);
-    
-    _isExpanded = NO;
-    self.opaque = YES;
-//    self.contentMode = UIViewContentModeRedraw;
-  }
-  return self;
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        //    VLog(@"#%@", [self class]);
+        
+        self.isExpanded = NO;
+    }
+    return self;
 }
 
 - (void)dealloc {
-//  VLog(@"#%@", [self class]);
-  [super dealloc];
+    //  VLog(@"#%@", [self class]);
+    self.psImageView = nil;
+    [super dealloc];
 }
 
 - (void)prepareForReuse {
-  [super prepareForReuse];
-  _isExpanded = NO;
+    [super prepareForReuse];
+    [self.psImageView prepareForReuse];
+    self.isExpanded = NO;
 }
 
 + (NSString *)reuseIdentifier {
-  return NSStringFromClass(self);
+    return NSStringFromClass(self);
 }
 
 + (PSCellType)cellType {
-  return PSCellTypePlain;
+    return PSCellTypePlain;
 }
 
 + (CGFloat)rowWidthForInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-  if (UIInterfaceOrientationIsPortrait(interfaceOrientation)) {
-    if (isDeviceIPad()) {
-      return 768.0;
+    if (UIInterfaceOrientationIsPortrait(interfaceOrientation)) {
+        if (isDeviceIPad()) {
+            return 768.0;
+        } else {
+            return 320.0;
+        }
     } else {
-      return 320.0;
+        if (isDeviceIPad()) {
+            return 1024.0;
+        } else {
+            return 480.0;
+        }
     }
-  } else {
-    if (isDeviceIPad()) {
-      return 1024.0;
-    } else {
-      return 480.0;
-    }
-  }
 }
 
 + (CGFloat)rowHeightForObject:(id)object expanded:(BOOL)expanded forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-  return [[self class] rowHeightForObject:object forInterfaceOrientation:interfaceOrientation];
+    return [[self class] rowHeightForObject:object forInterfaceOrientation:interfaceOrientation];
 }
 
 + (CGFloat)rowHeight {
     // subclass may implement this or rowHeightForObject
-  return 0.0;
+    return 0.0;
 }
 
 // This is a class method because it is called before the cell has finished its layout
 + (CGFloat)rowHeightForObject:(id)object forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-  // subclass must implement
-  return 0.0;
+    // subclass must implement
+    return 0.0;
 }
 
-- (void)fillCellWithObject:(id)object {
-  // Subclasses must implement
-  [self fillCellWithObject:object shouldLoadImages:NO];
-}
-
-- (void)fillCellWithObject:(id)object shouldLoadImages:(BOOL)shouldLoadImages {
-  // Subclasses must implement
-}
-
-- (void)setShouldAnimate:(NSNumber *)shouldAnimate {
-  _cellShouldAnimate = [shouldAnimate boolValue];
+- (void)tableView:(UITableView *)tableView fillCellWithObject:(id)object {
+    // Subclasses must implement
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-  [super setSelected:selected animated:animated];
+    [super setSelected:selected animated:animated];
 }
 
 @end
