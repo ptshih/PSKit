@@ -34,6 +34,11 @@ url = _url;
     [super dealloc];
 }
 
+- (void)prepareForReuse {
+    self.url = nil;
+    self.image = nil;
+}
+
 - (void)loadImageWithURL:(NSURL *)URL {
     self.url = URL;
     [[NSNotificationCenter defaultCenter] removeObserver:self];

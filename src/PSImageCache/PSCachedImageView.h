@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "PSImageView.h"
 #import "PSImageCache.h"
 
 @interface PSCachedImageView : PSImageView {
@@ -20,5 +21,7 @@
 - (void)unloadImage;
 
 - (UIImage *)originalImage;
+
+- (void)prepareForReuse;
 
 @end
