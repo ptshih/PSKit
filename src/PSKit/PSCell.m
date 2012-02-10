@@ -13,6 +13,7 @@
 @synthesize
 psImageView = _psImageView,
 parentTableView = _parentTableView,
+indexPath = _indexPath,
 isExpanded = _isExpanded;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -34,6 +35,8 @@ isExpanded = _isExpanded;
 - (void)prepareForReuse {
     [super prepareForReuse];
     [self.psImageView prepareForReuse];
+    self.parentTableView = nil;
+    self.indexPath = nil;
     self.isExpanded = NO;
 }
 
@@ -61,8 +64,8 @@ isExpanded = _isExpanded;
     }
 }
 
-+ (CGFloat)rowHeightForObject:(id)object expanded:(BOOL)expanded forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    return [[self class] rowHeightForObject:object forInterfaceOrientation:interfaceOrientation];
++ (CGFloat)rowHeightForObject:(id)object atIndexPath:(NSIndexPath *)indexPath expanded:(BOOL)expanded forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    return [[self class] rowHeightForObject:object atIndexPath:indexPath forInterfaceOrientation:interfaceOrientation];
 }
 
 + (CGFloat)rowHeight {
@@ -71,12 +74,12 @@ isExpanded = _isExpanded;
 }
 
 // This is a class method because it is called before the cell has finished its layout
-+ (CGFloat)rowHeightForObject:(id)object forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
++ (CGFloat)rowHeightForObject:(id)object atIndexPath:(NSIndexPath *)indexPath forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // subclass must implement
     return 0.0;
 }
 
-- (void)tableView:(UITableView *)tableView fillCellWithObject:(id)object {
+- (void)tableView:(UITableView *)tableView fillCellWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath {
     // Subclasses must implement
 }
 

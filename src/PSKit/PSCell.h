@@ -21,6 +21,7 @@ typedef uint32_t PSCellType;
 
 @property (nonatomic, retain) PSCachedImageView *psImageView;
 @property (nonatomic, assign) UITableView *parentTableView;
+@property (nonatomic, copy) NSIndexPath *indexPath;
 @property (nonatomic, assign) BOOL isExpanded;
 
 /**
@@ -43,10 +44,10 @@ typedef uint32_t PSCellType;
  Attempts to call layoutSubviews for the corresponding cell class
  With the object passed
  */
-+ (CGFloat)rowHeightForObject:(id)object forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation;
++ (CGFloat)rowHeightForObject:(id)object atIndexPath:(NSIndexPath *)indexPath forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation;
 
-+ (CGFloat)rowHeightForObject:(id)object expanded:(BOOL)expanded forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation;
++ (CGFloat)rowHeightForObject:(id)object atIndexPath:(NSIndexPath *)indexPath expanded:(BOOL)expanded forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation;
 
-- (void)tableView:(UITableView *)tableView fillCellWithObject:(id)object;
+- (void)tableView:(UITableView *)tableView fillCellWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath;
 
 @end
