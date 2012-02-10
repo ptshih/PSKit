@@ -7,43 +7,42 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "CardView.h"
 
 @protocol PSCollectionViewDelegate, PSCollectionViewDataSource;
 
 @interface PSCollectionView : UIScrollView <NSCoding, UIGestureRecognizerDelegate>
 
-@property (nonatomic, retain) NSMutableSet *reuseableCards;
-@property (nonatomic, retain) NSMutableDictionary *visibleCards;
-@property (nonatomic, retain) NSMutableArray *cardKeysToRemove;
+@property (nonatomic, retain) NSMutableSet *reuseableViews;
+@property (nonatomic, retain) NSMutableDictionary *visibleViews;
+@property (nonatomic, retain) NSMutableArray *viewKeysToRemove;
 @property (nonatomic, assign) CGFloat rowHeight;
 @property (nonatomic, assign) id <PSCollectionViewDelegate> collectionViewDelegate;
 @property (nonatomic, assign) id <PSCollectionViewDataSource> collectionViewDataSource;
 
-#pragma mark - Card DataSource
-- (void)reloadCards;
+#pragma mark - DataSource
+- (void)reloadViews;
 
-#pragma mark - Reusing Card Views
-- (CardView *)dequeueReusableCardView;
-- (void)enqueueReusableCardView:(CardView *)cardView;
+#pragma mark - Reusing Views
+- (UIView *)dequeueReusableView;
+- (void)enqueueReusableView:(UIView *)view;
 - (void)removeAndAddCellsIfNecessary;
 
 
-+ (NSString *)cardKeyForIndex:(NSInteger)index;
++ (NSString *)viewKeyForIndex:(NSInteger)index;
 
 @end
 
 
 @protocol PSCollectionViewDelegate <NSObject>
 @optional
-- (void)collectionView:(PSCollectionView *)collectionView didSelectCardAtIndex:(NSInteger)index;
+- (void)collectionView:(PSCollectionView *)collectionView didSelectViewAtIndex:(NSInteger)index;
 
 @end
 
 @protocol PSCollectionViewDataSource <NSObject>
 
 @required
-- (NSInteger)numberOfCardsInCollectionView:(PSCollectionView *)collectionView;
-- (CardView *)collectionView:(PSCollectionView *)collectionView cardAtIndex:(NSInteger)index;
+- (NSInteger)numberOfViewsInCollectionView:(PSCollectionView *)collectionView;
+- (UIView *)collectionView:(PSCollectionView *)collectionView viewAtIndex:(NSInteger)index;
 
 @end

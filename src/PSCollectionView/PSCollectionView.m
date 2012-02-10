@@ -13,9 +13,9 @@
 @implementation PSCollectionView
 
 @synthesize
-reusableCards = _reusableCards,
-visibleCards = _visibleCards,
-cardKeysToRemove = _cardKeysToRemove,
+reuseableViews = _reuseableViews,
+visibleViews = _visibleViews,
+viewKeysToRemove = _viewKeysToRemove,
 rowHeight = _rowHeight,
 collectionViewDelegate = _collectionViewDelegate,
 collectionViewDataSource = _collectionViewDataSource;
@@ -23,9 +23,9 @@ collectionViewDataSource = _collectionViewDataSource;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.reusableCards = [NSMutableSet set];
-        self.visibleCards = [NSMutableDictionary dictionary];
-        self.cardKeysToRemove = [NSMutableArray array];
+        self.reuseableViews = [NSMutableSet set];
+        self.visibleViews = [NSMutableDictionary dictionary];
+        self.viewKeysToRemove = [NSMutableArray array];
         self.rowHeight = 0.0;
     }
     return self;
@@ -37,9 +37,9 @@ collectionViewDataSource = _collectionViewDataSource;
     self.collectionViewDelegate = nil;
     
     // release retains
-    self.reusableCards = nil;
-    self.visibleCards = nil;
-    self.cardKeysToRemove = nil;
+    self.reuseableViews = nil;
+    self.visibleViews = nil;
+    self.viewKeysToRemove = nil;
     [super dealloc];
 }
 
@@ -58,20 +58,18 @@ collectionViewDataSource = _collectionViewDataSource;
     CGFloat visibleBottom = yOffset + self.height;
     
     // Remove cells if they are off screen
-    [self.cardKeysToRemove removeAllObjects];
-    [_visibleCards enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop){
-        CardView *card = (CardView *)obj;
-        NSString *cardKey = (NSString *)key;
-        CGFloat cardTop = card.top - CARD_SPACING;
-        CGFloat cardBottom = card.bottom + CARD_SPACING;
-        if (cardBottom < visibleTop || cardTop > visibleBottom) {
-            CardView *discardedCard = [_visibleCards objectForKey:cardKey];
-            [self enqueueReusableCardView:discardedCard];
-            [self.cardKeysToRemove addObject:cardKey];
-            NSLog(@"### Removing card at index: %@ ###", cardKey);
+    [self.viewKeysToRemove removeAllObjects];
+    [_visibleViews enumerateKeysAndObjectsUsingBlock:^(NSString *key, UIView *view, BOOL *stop){
+        CGFloat top = view.top - CARD_SPACING;
+        CGFloat bottom = view.bottom + CARD_SPACING;
+        if (bottom < visibleTop || top > visibleBottom) {
+            UIView *discardedView = [self.visibleViews objectForKey:key];
+            [self enqueueReusableView:discardedView];
+            [self.viewKeysToRemove addObject:key];
+            NSLog(@"### Removing view at index: %@ ###", key);
         }
     }];
-    [_visibleCards removeObjectsForKeys:self.cardKeysToRemove];
+    [self.visibleViews removeObjectsForKeys:self.viewKeysToRemove];
     
     // Add cells if necessary
     NSInteger cardHeight = (NSInteger)_rowHeight + (NSInteger)CARD_SPACING;
@@ -81,16 +79,16 @@ collectionViewDataSource = _collectionViewDataSource;
     if (bottomIndex >= numCards) bottomIndex = numCards - 1;
     
     for (int i = topIndex; i <= bottomIndex; i++) {
-        NSString *cardKey = [[self class] cardKeyForIndex:i];
-        CardView *visibleCard = [_visibleCards objectForKey:cardKey];
-        if (!visibleCard) {
-            CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:i];
-            [newCardView setNeedsLayout];
-            [_visibleCards setObject:newCardView forKey:cardKey];
-            newCardView.top = (i * _rowHeight) + ((i + 1) * CARD_SPACING);
-            newCardView.left = ceilf((self.width - newCardView.width) / 2);
-            [self addSubview:newCardView];
-            NSLog(@"### Adding card at index: %@ ###", cardKey);
+        NSString *viewKey = [[self class] viewKeyForIndex:i];
+        UIView *visibleView = [self.visibleViews objectForKey:viewKey];
+        if (!visibleView) {
+            UIView *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
+            [newView setNeedsLayout];
+            [self.visibleViews setObject:newView forKey:viewKey];
+            newView.top = (i * self.rowHeight) + ((i + 1) * CARD_SPACING);
+            newView.left = ceilf((self.width - newView.width) / 2);
+            [self addSubview:newView];
+            NSLog(@"### Adding card at index: %@ ###", viewKey);
         }
     }
     
@@ -98,21 +96,21 @@ collectionViewDataSource = _collectionViewDataSource;
 }
 
 #pragma mark - Card DataSource
-- (void)reloadCards {
-    // Find out how many cards are in the data source
-    NSInteger numCards = 0;
+- (void)reloadViews {
+    // Find out how many views are in the data source
+    NSInteger numViews = 0;
     if (self.collectionViewDataSource && [self.collectionViewDataSource respondsToSelector:@selector(numberOfCardsInCollectionView:)]) {
-        numCards = [self.collectionViewDataSource numberOfCardsInCollectionView:self];
+        numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
     }
     
     // Remove all existing cards
-    for (CardView *cardView in _visibleCards) {
-        [self enqueueReusableCardView:cardView];
+    for (UIView *view in self.visibleViews) {
+        [self enqueueReusableView:view];
     }
-    [_visibleCards removeAllObjects];
+    [self.visibleViews removeAllObjects];
     
     // Calculate expected total height
-    CGFloat totalHeight = (_rowHeight * numCards) + ((numCards + 1) * CARD_SPACING);
+    CGFloat totalHeight = (self.rowHeight * numViews) + ((numViews + 1) * CARD_SPACING);
     self.contentSize = CGSizeMake(self.width, totalHeight);
     self.contentOffset = CGPointZero; // go back to top
     
@@ -120,60 +118,60 @@ collectionViewDataSource = _collectionViewDataSource;
     CGFloat visibleTop = yOffset;
     CGFloat visibleBottom = yOffset + self.height;
     
-    NSInteger cardHeight = (NSInteger)_rowHeight + CARD_SPACING;
+    NSInteger viewHeight = (NSInteger)self.rowHeight + CARD_SPACING;
     
-    NSInteger topIndex = (NSInteger)visibleTop / cardHeight;
+    NSInteger topIndex = (NSInteger)visibleTop / viewHeight;
     if (topIndex < 0) topIndex = 0;
-    NSInteger bottomIndex = (NSInteger)visibleBottom / cardHeight;
-    if (bottomIndex >= numCards) bottomIndex = numCards - 1;
+    NSInteger bottomIndex = (NSInteger)visibleBottom / viewHeight;
+    if (bottomIndex >= numViews) bottomIndex = numViews - 1;
     
     // Add initially visible cards
     NSInteger numVisible = bottomIndex + 1;
-    if (numVisible > numCards) numVisible = numCards;
+    if (numVisible > numViews) numVisible = numViews;
     
     for (int i = 0; i < numVisible; i++) {
-        CardView *newCardView = [self.collectionViewDataSource collectionView:self cardAtIndex:i];
-        [newCardView setNeedsLayout];
-        [_visibleCards setObject:newCardView forKey:[[self class] cardKeyForIndex:i]];
-        newCardView.top = (i * _rowHeight) + ((i + 1) * CARD_SPACING);
-        newCardView.left = ceilf((self.width - newCardView.width) / 2);
-        [self addSubview:newCardView];
+        UIView *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
+        [newView setNeedsLayout];
+        [self.visibleViews setObject:newView forKey:[[self class] viewKeyForIndex:i]];
+        newView.top = (i * self.rowHeight) + ((i + 1) * CARD_SPACING);
+        newView.left = ceilf((self.width - newView.width) / 2);
+        [self addSubview:newView];
     }
     
     [self setNeedsLayout];
 }
 
-+ (NSString *)cardKeyForIndex:(NSInteger)index {
++ (NSString *)viewKeyForIndex:(NSInteger)index {
     return [NSString stringWithFormat:@"pscv_key_%d", index];
 }
 
 #pragma mark - Reusing Card Views
-- (CardView *)dequeueReusableCardView {
-    CardView *cardView = [self.reusableCards anyObject];
-    if (cardView) {
+- (UIView *)dequeueReusableView {
+    UIView *view = [self.reuseableViews anyObject];
+    if (view) {
         // Found a reusable card view, remove it from the set
-        [cardView retain];
-        [self.reusableCards removeObject:cardView];
-        [cardView autorelease];
+        [view retain];
+        [self.reuseableViews removeObject:view];
+        [view autorelease];
     } else {
-        cardView = [[[CardView alloc] initWithFrame:CGRectZero] autorelease];
+        view = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
         
         // Setup gesture recognizer
-        UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectCard:)] autorelease];
-        [cardView addGestureRecognizer:gr];
+        UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
+        [view addGestureRecognizer:gr];
     }
     
-    return cardView;
+    return view;
 }
 
-- (void)enqueueReusableCardView:(CardView *)cardView {
-    [self.reusableCards addObject:cardView];
-    [cardView removeFromSuperview];
+- (void)enqueueReusableView:(UIView *)view {
+    [self.reuseableViews addObject:view];
+    [view removeFromSuperview];
 }
 
 #pragma mark - Gesture Recognizer
-- (void)didSelectCard:(UITapGestureRecognizer *)gestureRecognizer {
-    NSLog(@"card tapped: %@", gestureRecognizer.view);
+- (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
+    NSLog(@"view tapped: %@", gestureRecognizer.view);
 }
 
 @end
