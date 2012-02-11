@@ -57,6 +57,10 @@
     return [[NSUserDefaults standardUserDefaults] objectForKey:@"fbMe"];
 }
 
+- (void)logout {
+    [_facebook logout];
+}
+
 #pragma mark - Permissions
 - (void)authorizeBasicPermissions {
     // Check if already authorized
@@ -184,7 +188,12 @@
 }
 
 - (void)fbDidLogout {
-    
+    // Clear FB user defaults keys
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"fbId"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"fbMe"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"fbAccessToken"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"fbExpirationDate"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)fbDidExtendToken:(NSString*)accessToken

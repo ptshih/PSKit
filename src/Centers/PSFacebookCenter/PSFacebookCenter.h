@@ -29,6 +29,9 @@
 // Login
 - (BOOL)isLoggedIn;
 
+// Logout
+- (void)logout;
+
 // Permissions
 - (void)authorizeBasicPermissions;
 - (BOOL)hasPublishStreamPermission;
