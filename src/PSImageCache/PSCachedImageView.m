@@ -22,7 +22,7 @@ url = _url;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageCacheDidCache:) name:kPSImageCacheDidCacheImage object:nil];
     }
     return self;
 }
@@ -41,16 +41,12 @@ url = _url;
 
 - (void)loadImageWithURL:(NSURL *)URL {
     self.url = URL;
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageCacheDidCache:) name:kPSImageCacheDidCacheImage object:self.url];
     NSData *imageData = [[PSImageCache sharedCache] cachedImageDataForURL:self.url];
     [self setImageWithCachedImageData:imageData];
 }
 
 - (void)loadThumbnailWithURL:(NSURL *)URL {
     self.url = URL;
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageCacheDidCache:) name:kPSImageCacheDidCacheImage object:self.url];
     NSData *imageData = [[PSImageCache sharedCache] cachedThumbnailDataForURL:self.url];
     [self setImageWithCachedImageData:imageData];
 }
