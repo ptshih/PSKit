@@ -24,6 +24,7 @@
 
 #include <Availability.h>
 
+#if __MAC_OS_X_VERSION_MIN_REQUIRED
 static dispatch_queue_t af_xml_request_operation_processing_queue;
 static dispatch_queue_t xml_request_operation_processing_queue() {
     if (af_xml_request_operation_processing_queue == NULL) {
@@ -32,6 +33,7 @@ static dispatch_queue_t xml_request_operation_processing_queue() {
     
     return af_xml_request_operation_processing_queue;
 }
+#endif
 
 @interface AFXMLRequestOperation ()
 @property (readwrite, nonatomic, retain) NSXMLParser *responseXMLParser;
@@ -82,14 +84,17 @@ static dispatch_queue_t xml_request_operation_processing_queue() {
         
         if (operation.error) {
             if (failure) {
+                NSXMLDocument *XMLDocument = operation.responseXMLDocument;
+                
                 dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    failure(operation.request, operation.response, operation.error, [(AFXMLRequestOperation *)operation responseXMLDocument]);
+                    failure(operation.request, operation.response, operation.error, XMLDocument);
                 });
             }
         } else {
             dispatch_async(xml_request_operation_processing_queue(), ^(void) {
-                NSXMLDocument *XMLDocument = operation.responseXMLDocument;
                 if (success) {
+                    NSXMLDocument *XMLDocument = operation.responseXMLDocument;
+
                     dispatch_async(dispatch_get_main_queue(), ^(void) {
                         success(operation.request, operation.response, XMLDocument);
                     });
@@ -134,7 +139,7 @@ static dispatch_queue_t xml_request_operation_processing_queue() {
 }
 
 - (NSXMLParser *)responseXMLParser {
-    if (!_responseXMLParser && [self isFinished]) {
+    if (!_responseXMLParser && [self.responseData length] > 0 && [self isFinished]) {
         self.responseXMLParser = [[[NSXMLParser alloc] initWithData:self.responseData] autorelease];
     }
     
@@ -143,7 +148,7 @@ static dispatch_queue_t xml_request_operation_processing_queue() {
 
 #if __MAC_OS_X_VERSION_MIN_REQUIRED
 - (NSXMLDocument *)responseXMLDocument {
-    if (!_responseXMLDocument && [self isFinished]) {
+    if (!_responseXMLDocument && [self.responseData length] > 0 && [self isFinished]) {
         NSError *error = nil;
         self.responseXMLDocument = [[[NSXMLDocument alloc] initWithData:self.responseData options:0 error:&error] autorelease];
         self.error = error;

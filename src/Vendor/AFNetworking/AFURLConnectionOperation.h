@@ -75,6 +75,10 @@ extern NSString * const AFNetworkingOperationDidFinishNotification;
  */
 @interface AFURLConnectionOperation : NSOperation {
 @private
+    unsigned short _state;
+    BOOL _cancelled;
+    NSRecursiveLock *_lock;
+    
     NSSet *_runLoopModes;
     
     NSURLConnection *_connection;
@@ -184,5 +188,11 @@ extern NSString * const AFNetworkingOperationDidFinishNotification;
  @see setUploadProgressBlock
  */
 - (void)setDownloadProgressBlock:(void (^)(NSInteger bytesRead, NSInteger totalBytesRead, NSInteger totalBytesExpectedToRead))block;
+
+///-------------------------------------------------
+/// @name Setting Authentication Challenge Callbacks
+///-------------------------------------------------
+
+- (void)setAuthenticationChallengeBlock:(void (^)(NSURLConnection *connection, NSURLAuthenticationChallenge *challenge))block;
 
 @end
