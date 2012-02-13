@@ -9,7 +9,11 @@
 #import "PSCollectionView.h"
 #import "UIView+PSKit.h"
 
-#define VIEW_SPACING 0.0
+#define VIEW_SPACING 8.0
+
+static NSString *PSVisibleKeyForRow(NSInteger row) {
+    return [NSString stringWithFormat:@"%d", row];
+}
 
 @implementation PSCollectionView
 
@@ -18,6 +22,7 @@ reuseableViews = _reuseableViews,
 visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
 rowHeight = _rowHeight,
+numCols = _numCols,
 collectionViewDelegate = _collectionViewDelegate,
 collectionViewDataSource = _collectionViewDataSource;
 
@@ -28,6 +33,7 @@ collectionViewDataSource = _collectionViewDataSource;
         self.visibleViews = [NSMutableDictionary dictionary];
         self.viewKeysToRemove = [NSMutableArray array];
         self.rowHeight = 0.0;
+        self.numCols = 0;
         self.scrollEnabled = YES;
         self.bounces = YES;
     }
@@ -54,106 +60,110 @@ collectionViewDataSource = _collectionViewDataSource;
 }
 
 - (void)removeAndAddCellsIfNecessary {
-    NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
+    static CGFloat margin = 8.0;
     
-    CGFloat yOffset = self.contentOffset.y - (VIEW_SPACING / 2);
-    CGFloat visibleTop = yOffset;
-    CGFloat visibleBottom = yOffset + self.height;
+    NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
+    NSInteger numRows = ceil((CGFloat)numViews / (CGFloat)self.numCols);
+    
+    // Find out what rows are visible
+    CGFloat yOffset = self.contentOffset.y - margin; // subtract top margin
+    NSInteger visibleRowTop = floor(yOffset / (self.rowHeight + margin));
+    visibleRowTop = MAX(0, visibleRowTop);
+    NSInteger visibleRowBottom = floor((yOffset + self.height) / (self.rowHeight + margin));
+    visibleRowBottom = MIN(visibleRowBottom, numRows - 1);
+    
+//    NSLog(@"visible rows top: %d, bottom: %d", visibleRowTop, visibleRowBottom);
     
     // Remove cells if they are off screen
-    [self.viewKeysToRemove removeAllObjects];
-    [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(NSString *key, UIView *view, BOOL *stop){
-        CGFloat top = view.top - VIEW_SPACING;
-        CGFloat bottom = view.bottom + VIEW_SPACING;
-        if (bottom < visibleTop || top > visibleBottom) {
-            UIView *discardedView = [self.visibleViews objectForKey:key];
-            [self enqueueReusableView:discardedView];
-            [self.viewKeysToRemove addObject:key];
-            NSLog(@"### Removing view at index: %@ ###", key);
-        }
-    }];
-    [self.visibleViews removeObjectsForKeys:self.viewKeysToRemove];
-    
-    // Add cells if necessary
-    NSInteger viewHeight = (NSInteger)self.rowHeight + (NSInteger)VIEW_SPACING;
-    NSInteger topIndex = (NSInteger)visibleTop / viewHeight;
-    if (topIndex < 0) topIndex = 0;
-    NSInteger bottomIndex = (NSInteger)visibleBottom / viewHeight;
-    if (bottomIndex >= numViews) bottomIndex = numViews - 1;
-    
-    for (int i = topIndex; i <= bottomIndex; i++) {
-        NSString *viewKey = [[self class] viewKeyForIndex:i];
-        UIView *visibleView = [self.visibleViews objectForKey:viewKey];
-        if (!visibleView) {
-            UIView *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
-            
-            // Setup gesture recognizer
-            if ([newView.gestureRecognizers count] == 0) {
-                UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
-                [newView addGestureRecognizer:gr];
-            }
-            
-            [newView setNeedsLayout];
-            [self.visibleViews setObject:newView forKey:viewKey];
-            newView.top = (i * self.rowHeight) + ((i + 1) * VIEW_SPACING);
-            newView.left = ceilf((self.width - newView.width) / 2);
-            [self addSubview:newView];
-            NSLog(@"### Adding view at index: %@ ###", viewKey);
+    for (NSInteger i = 0; i < visibleRowTop; i++) {
+        // remove all rows above visibleRowTop
+        NSString *key = PSVisibleKeyForRow(i);
+        NSMutableArray *visibleViews = [self.visibleViews objectForKey:key];
+        if (visibleViews) {
+            NSLog(@"Removing row: %d", i);
+            [visibleViews enumerateObjectsUsingBlock:^(UIView *discardedView, NSUInteger idx, BOOL *stop) {
+                [self enqueueReusableView:discardedView];
+            }];
+            [visibleViews removeAllObjects];
+            [self.visibleViews removeObjectForKey:key];
         }
     }
     
-    //  NSLog(@"visible views: %@", _visibleViews);
+    for (NSInteger i = visibleRowBottom + 1; i < numRows; i++) {
+        // remove all rows below visibleRowBottom
+        NSString *key = PSVisibleKeyForRow(i);
+        NSMutableArray *visibleViews = [self.visibleViews objectForKey:key];
+        if (visibleViews) {
+            NSLog(@"Removing row: %d", i);
+            [visibleViews enumerateObjectsUsingBlock:^(UIView *discardedView, NSUInteger idx, BOOL *stop) {
+                [self enqueueReusableView:discardedView];
+            }];
+            [visibleViews removeAllObjects];
+            [self.visibleViews removeObjectForKey:key];
+        }
+    }
+    
+    // Add cells if necessary
+    for (NSInteger i = visibleRowTop; i <= visibleRowBottom; i++) {
+        // add cells for all rows within visible range
+        NSString *key = PSVisibleKeyForRow(i);
+        NSMutableArray *visibleViews = [self.visibleViews objectForKey:key];
+        if (!visibleViews) {
+            NSLog(@"Adding row: %d", i);
+            visibleViews = [NSMutableArray array];
+            // This row has no views, let's fill it
+            for (NSInteger j = 0; j < self.numCols; j++) {
+                NSInteger k = (i * self.numCols) + j;
+                
+                // If we ran out of views, stop populating
+                if (k == numViews) break;
+                
+                UIView *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:k];
+                // Setup gesture recognizer
+                if ([newView.gestureRecognizers count] == 0) {
+                    UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
+                    [newView addGestureRecognizer:gr];
+                    newView.userInteractionEnabled = YES;
+                }
+                
+                // Set Frame
+                newView.top = margin + (i * margin) + (i * self.rowHeight);
+                newView.left = margin + (j * margin) + (j * 96.0);
+                [newView setNeedsLayout];
+                [self addSubview:newView];
+                
+                // Add
+                [visibleViews addObject:newView];
+            }
+            [self.visibleViews setObject:visibleViews forKey:key];
+        }
+    }
 }
 
 #pragma mark - DataSource
 - (void)reloadViews {
-    // Find out how many views are in the data source
-    NSInteger numViews = 0;
-    if (self.collectionViewDataSource && [self.collectionViewDataSource respondsToSelector:@selector(numberOfViewsInCollectionView:)]) {
-        numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
-    }
+    static CGFloat margin = 8.0;
+    
+    BLOCK_SELF;
     
     // Remove all existing views
-    for (UIView *view in self.visibleViews) {
-        [self enqueueReusableView:view];
-    }
+    [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        NSMutableArray *row = (NSMutableArray *)obj;
+        [row enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            [blockSelf enqueueReusableView:obj];
+        }];
+        [row removeAllObjects];
+    }];
     [self.visibleViews removeAllObjects];
     
+    // Find out how many views are in the data source
+    NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
+    NSInteger numRows = ceil((CGFloat)numViews / (CGFloat)self.numCols);
+
     // Calculate expected total height
-    CGFloat totalHeight = (self.rowHeight * numViews) + ((numViews + 1) * VIEW_SPACING);
+    CGFloat totalHeight = (self.rowHeight * numRows) + (margin * numRows) + margin;
     self.contentSize = CGSizeMake(self.width, totalHeight);
     self.contentOffset = CGPointZero; // go back to top
-    
-    CGFloat yOffset = self.contentOffset.y - (VIEW_SPACING / 2);
-    CGFloat visibleTop = yOffset;
-    CGFloat visibleBottom = yOffset + self.height;
-    
-    NSInteger viewHeight = (NSInteger)self.rowHeight + VIEW_SPACING;
-    
-    NSInteger topIndex = (NSInteger)visibleTop / viewHeight;
-    if (topIndex < 0) topIndex = 0;
-    NSInteger bottomIndex = (NSInteger)visibleBottom / viewHeight;
-    if (bottomIndex >= numViews) bottomIndex = numViews - 1;
-    
-    // Add initially visible views
-    NSInteger numVisible = bottomIndex + 1;
-    if (numVisible > numViews) numVisible = numViews;
-    
-    for (int i = 0; i < numVisible; i++) {
-        UIView *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
-        
-        // Setup gesture recognizer
-        if ([newView.gestureRecognizers count] == 0) {
-            UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
-            [newView addGestureRecognizer:gr];
-        }
-        
-        [newView setNeedsLayout];
-        [self.visibleViews setObject:newView forKey:[[self class] viewKeyForIndex:i]];
-        newView.top = (i * self.rowHeight) + ((i + 1) * VIEW_SPACING);
-        newView.left = ceilf((self.width - newView.width) / 2);
-        [self addSubview:newView];
-    }
     
     [self setNeedsLayout];
 }
