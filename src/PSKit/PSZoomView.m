@@ -62,6 +62,8 @@ newFrame = _newFrame;
 }
 
 - (void)showInRect:(CGRect)rect {
+    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
+    
     self.frame = [[UIScreen mainScreen] bounds];
     _backgroundView.frame = self.bounds;
     
@@ -91,6 +93,7 @@ newFrame = _newFrame;
             }
         } completion:^(BOOL finished){
             _zoomedView.userInteractionEnabled = YES;
+            [[UIApplication sharedApplication] endIgnoringInteractionEvents];
         }];
     }];
 }
