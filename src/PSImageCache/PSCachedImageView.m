@@ -17,7 +17,9 @@
 @implementation PSCachedImageView
 
 @synthesize
-url = _url;
+url = _url,
+sourceURL = _sourceURL,
+thumbnailURL = _thumbnailURL;
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -30,11 +32,15 @@ url = _url;
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    RELEASE_SAFELY(_url);
+    self.url = nil;
+    self.sourceURL = nil;
+    self.thumbnailURL = nil;
     [super dealloc];
 }
 
 - (void)prepareForReuse {
+    self.thumbnailURL = nil;
+    self.sourceURL = nil;
     self.url = nil;
     self.image = nil;
 }
@@ -53,7 +59,7 @@ url = _url;
 
 - (void)unloadImage {
     [[PSImageCache sharedCache] cancelDownloadForURL:self.url];
-    self.image = _placeholderImage;
+    self.image = self.placeholderImage;
 }
 
 - (UIImage *)originalImage {
@@ -71,7 +77,7 @@ url = _url;
                 self.image = cachedImage;
                 [cachedImage release];
             } else {
-                self.image = _placeholderImage;
+                self.image = self.placeholderImage;
             }
         });
     });
