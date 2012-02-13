@@ -132,44 +132,6 @@
     NSLog(@"Got FB Token: %@", _facebook.accessToken);
     
     // Get Me
-    // Setup the network request
-    // This block is passed in to NSURLConnection equivalent to a finish block, it is run inside the provided operation queue
-    void (^handlerBlock)(NSURLResponse *response, NSData *data, NSError *error);
-    handlerBlock = ^(NSURLResponse *response, NSData *data, NSError *error) {
-        NSLog(@"# NSURLConnection completed on thread: %@", [NSThread currentThread]);
-        
-        // How to check response
-        // First check error and data
-        if (!error && data) {
-            // This is equivalent to the completion block
-            // Check the HTTP Status code if available
-            if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
-                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-                NSInteger statusCode = [httpResponse statusCode];
-                if (statusCode == 200) {
-                    NSLog(@"# NSURLConnection succeeded with statusCode: %d", statusCode);
-                    // We got an HTTP OK code, start reading the response
-                    NSDictionary *me = [data objectFromJSONData];
-                    NSString *fbId = [me objectForKey:@"id"];
-                    if (me) {
-                        [[NSUserDefaults standardUserDefaults] setObject:fbId forKey:@"fbId"];
-                        [[NSUserDefaults standardUserDefaults] setObject:me forKey:@"fbMe"];
-                        [[NSUserDefaults standardUserDefaults] synchronize];
-                        
-                        [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidSucceed object:nil];
-                    } else {
-                        [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidFail object:nil];
-                    }
-                } else {
-                    // Failed, read status code
-                    [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidFail object:nil];
-                }
-            }
-        } else {
-            [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidFail object:nil];
-        }
-    };
-    
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
     [parameters setObject:_facebook.accessToken forKey:@"access_token"];
     [parameters setObject:@"id,name,first_name,last_name,middle_name,username,gender,locale,friends" forKey:@"fields"];
@@ -178,7 +140,27 @@
     NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/me", @"https://graph.facebook.com"]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL method:@"GET" headers:nil parameters:parameters];
     
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:handlerBlock];
+    AFJSONRequestOperation *op = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON){
+        if ([response statusCode] != 200) {
+            // Handle server status codes?
+            [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidFail object:nil];
+        } else {
+            NSDictionary *me = (NSDictionary *)JSON;
+            NSString *fbId = [me objectForKey:@"id"];
+            if (me) {
+                [[NSUserDefaults standardUserDefaults] setObject:fbId forKey:@"fbId"];
+                [[NSUserDefaults standardUserDefaults] setObject:me forKey:@"fbMe"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidSucceed object:nil];
+            } else {
+                [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidFail object:nil];
+            }
+        }
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidFail object:nil];
+    }];
+    [op start];
 }
 
 - (void)fbDidNotLogin:(BOOL)cancelled {
