@@ -9,16 +9,11 @@
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>
 
-@interface PSImageView : UIImageView {
-  UIActivityIndicatorView *_loadingIndicator;
-  UIImage *_placeholderImage;
-  
-  BOOL _shouldScale;
-  BOOL _shouldAnimate;
-}
+@interface PSImageView : UIImageView
 
 - (void)animateImageFade:(UIImage *)image;
 
+@property (nonatomic, retain) UIActivityIndicatorView *loadingIndicator;
 @property (nonatomic, retain) UIImage *placeholderImage;
 @property (nonatomic, assign) BOOL shouldScale;
 @property (nonatomic, assign) BOOL shouldAnimate;
