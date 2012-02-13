@@ -32,6 +32,8 @@
 - (UIImage *)cachedThumbnailForURL:(NSURL *)url;
 - (NSData *)cachedThumbnailDataForURL:(NSURL *)url;
 
+- (void)cachedImageDataForURL:(NSURL *)url withCompletionBlock:(void (^)(NSData *imageData))completionBlock;
+
 /**
  This caches a UIImage keyed to a URL
  */
