@@ -33,7 +33,7 @@ typedef enum {
 @end
 
 // Delegate
-@protocol PSPullRefreshViewDelegate
+@protocol PSPullRefreshViewDelegate <NSObject>
 
 @optional
 - (void)pullRefreshViewDidBeginRefreshing:(PSPullRefreshView *)pullRefreshView;

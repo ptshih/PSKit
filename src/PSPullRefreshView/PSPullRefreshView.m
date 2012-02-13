@@ -25,7 +25,6 @@ statusLabel = _statusLabel;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        static CGFloat margin = 8.0;
         CGFloat width = self.width;
         CGFloat left = 0.0;
         
