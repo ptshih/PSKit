@@ -62,7 +62,7 @@ collectionViewDataSource = _collectionViewDataSource;
     
     // Remove cells if they are off screen
     [self.viewKeysToRemove removeAllObjects];
-    [_visibleViews enumerateKeysAndObjectsUsingBlock:^(NSString *key, UIView *view, BOOL *stop){
+    [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(NSString *key, UIView *view, BOOL *stop){
         CGFloat top = view.top - VIEW_SPACING;
         CGFloat bottom = view.bottom + VIEW_SPACING;
         if (bottom < visibleTop || top > visibleBottom) {
@@ -75,7 +75,7 @@ collectionViewDataSource = _collectionViewDataSource;
     [self.visibleViews removeObjectsForKeys:self.viewKeysToRemove];
     
     // Add cells if necessary
-    NSInteger viewHeight = (NSInteger)_rowHeight + (NSInteger)VIEW_SPACING;
+    NSInteger viewHeight = (NSInteger)self.rowHeight + (NSInteger)VIEW_SPACING;
     NSInteger topIndex = (NSInteger)visibleTop / viewHeight;
     if (topIndex < 0) topIndex = 0;
     NSInteger bottomIndex = (NSInteger)visibleBottom / viewHeight;
