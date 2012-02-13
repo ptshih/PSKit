@@ -129,6 +129,7 @@ const CGFloat kOverlayViewAlpha = 0.75;
     [disappearingViewController.view addSubview:_overlayView];
     
     // Transition
+    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     UIViewAnimationOptions animationOptions = UIViewAnimationCurveEaseInOut;
     NSTimeInterval animationDuration = animated ? 0.3 : 0.0;
     [self transitionFromViewController:disappearingViewController toViewController:self.topViewController duration:animationDuration options:animationOptions animations:^{
@@ -146,6 +147,8 @@ const CGFloat kOverlayViewAlpha = 0.75;
         
         // Remove gray layer
         [_overlayView removeFromSuperview];
+        
+        [[UIApplication sharedApplication] endIgnoringInteractionEvents];
     }];
 }
 
@@ -157,7 +160,7 @@ const CGFloat kOverlayViewAlpha = 0.75;
     UIViewController *poppedViewController = nil;
     
     // Don't pop if at root
-    if ([self.childViewControllers count] == 1) return nil;
+    if ([self.viewControllers count] == 1) return nil;
     
     poppedViewController = [self.topViewController retain];
     [self.viewControllers removeObject:poppedViewController];
@@ -200,6 +203,7 @@ const CGFloat kOverlayViewAlpha = 0.75;
     [self.topViewController.view addSubview:_overlayView];
     
     // Transition
+    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     UIViewAnimationOptions animationOptions = UIViewAnimationCurveEaseInOut;
     NSTimeInterval animationDuration = animated ? 0.3 : 0.0;
     [self transitionFromViewController:poppedViewController toViewController:self.topViewController duration:animationDuration options:animationOptions animations:^{
@@ -242,15 +246,16 @@ const CGFloat kOverlayViewAlpha = 0.75;
         
         [poppedViewController removeFromParentViewController];
         [poppedViewController release];
+        
+        [[UIApplication sharedApplication] endIgnoringInteractionEvents];
     }];
     
     return poppedViewController;
 }
 
 - (NSArray *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated {
-#warning UNTESTED
     // Make sure the view controller is in the stack
-    BOOL isInStack = [self.childViewControllers containsObject:viewController];
+    BOOL isInStack = [self.viewControllers containsObject:viewController];
     if (!isInStack) return nil;
     
     // If the viewController is already at the top, don't do anything
@@ -258,14 +263,14 @@ const CGFloat kOverlayViewAlpha = 0.75;
     
     NSMutableArray *poppedViewControllers = [NSMutableArray array];
     
-    while (![[self.childViewControllers lastObject] isEqual:viewController]) {
-        UIViewController *poppedViewController = [self.childViewControllers lastObject];
+    while (![[self.viewControllers lastObject] isEqual:viewController]) {
+        UIViewController *poppedViewController = [self.viewControllers lastObject];
         [poppedViewControllers addObject:poppedViewController];
-        [poppedViewController removeFromParentViewController];
+        [self.viewControllers removeObject:poppedViewController];
     }
     
     // Add the previous top controller back
-    [self addChildViewController:[poppedViewControllers firstObject]];
+    [self.viewControllers addObject:[poppedViewControllers firstObject]];
     
     // Pop the top view controller with or without animation
     [self popViewControllerAnimated:animated];
@@ -274,8 +279,7 @@ const CGFloat kOverlayViewAlpha = 0.75;
 }
 
 - (NSArray *)popToRootViewControllerAnimated:(BOOL)animated {
-#warning UNTESTED
-    return [self popToViewController:[self.childViewControllers firstObject] animated:animated];
+    return [self popToViewController:[self.viewControllers firstObject] animated:animated];
 }
 
 @end
