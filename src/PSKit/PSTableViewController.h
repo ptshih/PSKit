@@ -8,10 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "PSBaseViewController.h"
-#import "EGORefreshTableHeaderView.h"
-//#import "UIViewController+Ad.h"
+#import "PSPullRefreshView.h"
 
-@interface PSTableViewController : PSBaseViewController <UITableViewDelegate, UITableViewDataSource, UISearchDisplayDelegate, UISearchBarDelegate, EGORefreshTableHeaderDelegate> {
+@interface PSTableViewController : PSBaseViewController <UITableViewDelegate, UITableViewDataSource, UISearchDisplayDelegate, UISearchBarDelegate, PSPullRefreshViewDelegate> {
   
   // Paging
   NSInteger _pagingStart;
@@ -27,7 +26,7 @@
 @property (nonatomic, assign) CGPoint contentOffset;
 
 @property (nonatomic, retain) UITableView *tableView;
-@property (nonatomic, retain) EGORefreshTableHeaderView *pullRefreshView;
+@property (nonatomic, retain) PSPullRefreshView *pullRefreshView;
 @property (nonatomic, retain) UISearchBar *searchBar;
 @property (nonatomic, retain) UIView *loadMoreView;
 

@@ -145,13 +145,11 @@ loadMoreView = _loadMoreView;
 // SUBCLASS CAN OPTIONALLY CALL
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
-        self.pullRefreshView = [[[EGORefreshTableHeaderView alloc] initWithFrame:CGRectMake(0.0f, 0.0f - self.tableView.bounds.size.height, self.view.frame.size.width, self.tableView.bounds.size.height)] autorelease];
+        self.pullRefreshView = [[[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.view.frame.size.width, 48.0)] autorelease];
+        self.pullRefreshView.scrollView = self.tableView;
         self.pullRefreshView.delegate = self;
         [self.tableView addSubview:self.pullRefreshView];		
     }
-    
-    //  update the last update date
-    [self.pullRefreshView refreshLastUpdatedDate];
 }
 
 // This is the automatic load more style
@@ -214,31 +212,6 @@ loadMoreView = _loadMoreView;
         return NO;
     }
 }
-//
-//- (void)loadDataSource {
-//    [super loadDataSource];
-//    if (self.pullRefreshView) {
-//        [self.pullRefreshView setState:EGOOPullRefreshLoading];
-//    }
-//}
-//
-//- (void)dataSourceDidLoad {
-//    [super dataSourceDidLoad];
-//    if (self.pullRefreshView) {
-//        [self.pullRefreshView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
-//    }
-//}
-//
-//- (void)dataSourceDidLoadMore {
-//    [super dataSourceDidLoadMore];
-//}
-
-//- (void)dataSourceDidError {
-//    [super dataSourceDidError];
-//    if (self.pullRefreshView) {
-//        [self.pullRefreshView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
-//    }
-//}
 
 - (void)dataSourceShouldLoadObjects:(id)objects animated:(BOOL)animated {
     self.items = objects;
@@ -459,13 +432,9 @@ loadMoreView = _loadMoreView;
 
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    if (!decelerate) {
-        //    [self scrollEndedTrigger];
-    }
-    if (!self.searchDisplayController.active) {
-        if (self.pullRefreshView) {
-            [self.pullRefreshView egoRefreshScrollViewDidEndDragging:scrollView];
-        }
+    if (self.pullRefreshView) {
+        [self.pullRefreshView pullRefreshScrollViewDidEndDragging:scrollView
+                                                   willDecelerate:decelerate];
     }
 }
 
@@ -475,7 +444,7 @@ loadMoreView = _loadMoreView;
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (self.pullRefreshView) {
-        [self.pullRefreshView egoRefreshScrollViewDidScroll:scrollView];
+        [self.pullRefreshView pullRefreshScrollViewDidScroll:scrollView];
     }
     
 //    if ([self shouldLoadMore]) {
@@ -496,28 +465,20 @@ loadMoreView = _loadMoreView;
 - (void)scrollEndedTrigger {
 }
 
-#pragma mark - EGORefreshTableHeaderDelegate Methods
-- (void)egoRefreshTableHeaderDidTriggerRefresh:(EGORefreshTableHeaderView*)view {
+#pragma mark - PSPullRefreshViewDelegate
+- (void)pullRefreshViewDidBeginRefreshing:(PSPullRefreshView *)pullRefreshView {
     [self reloadDataSource];
-}
-
-- (BOOL)egoRefreshTableHeaderDataSourceIsLoading:(EGORefreshTableHeaderView*)view {
-    return self.reloading; // should return if data source model is reloading
-}
-
-- (NSDate*)egoRefreshTableHeaderDataSourceLastUpdated:(EGORefreshTableHeaderView*)view {
-    return [NSDate date]; // should return date data source was last changed
 }
 
 #pragma mark - Refresh
 - (void)beginRefresh {
     self.reloading = YES;
-    [self.pullRefreshView setState:EGOOPullRefreshLoading];
+    [self.pullRefreshView setState:PSPullRefreshStateRefreshing];
 }
 
 - (void)endRefresh {
     self.reloading = NO;
-    [self.pullRefreshView egoRefreshScrollViewDataSourceDidFinishedLoading:self.tableView];
+    [self.pullRefreshView setState:PSPullRefreshStateIdle];
 }
 
 @end
