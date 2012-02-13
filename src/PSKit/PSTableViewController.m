@@ -123,7 +123,7 @@ loadMoreView = _loadMoreView;
     self.tableView.separatorStyle = separatorStyle;
     self.tableView.separatorColor = separatorColor;
 //    self.tableView.backgroundColor = [UIColor clearColor];
-    self.tableView.backgroundView = nil;
+//    self.tableView.backgroundView = nil;
     
     [self.view addSubview:self.tableView];
     
