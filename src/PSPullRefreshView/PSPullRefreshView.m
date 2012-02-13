@@ -33,7 +33,7 @@ statusLabel = _statusLabel;
         
         self.state = PSPullRefreshStateIdle;
         
-        self.iconView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"IconRefreshWhite"]] autorelease];
+        self.iconView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSPullRefreshView.bundle/IconRefreshWhite.png"]] autorelease];
         self.iconView.contentMode = UIViewContentModeCenter;
         self.iconView.frame = CGRectMake(0, 0, self.height, self.height);
         
