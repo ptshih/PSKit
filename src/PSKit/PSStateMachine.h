@@ -13,6 +13,7 @@
 
 @optional
 
+// Data Source
 - (void)loadDataSource;
 - (void)reloadDataSource;
 
@@ -30,7 +31,21 @@
 
 //- (void)dataSourceShouldLoadMoreObjects:(id)objects forSection:(NSInteger)section shouldAnimate:(BOOL)shouldAnimate;
 
+- (void)dataSourceDidLoad;
+- (void)dataSourceDidError;
 
+/**
+ Helps determine if a loading/empty screen is shown
+ Or if data has been loaded to display
+ Subclasses should implement
+ */
+- (BOOL)dataIsAvailable;
+- (BOOL)dataIsLoading;
+- (BOOL)dataDidError;
+
+// Refresh
+- (void)beginRefresh;
+- (void)endRefresh;
 
 // Views
 - (void)setupSubviews;
@@ -41,22 +56,12 @@
 - (void)setupTableFooter;
 - (void)setupLoadMoreView;
 
+
 // Convenience
+// UNUSED
 - (id)parseData:(id)data httpResponse:(NSHTTPURLResponse *)httpResponse;
 
-/**
- Helps determine if a loading/empty screen is shown
- Or if data has been loaded to display
- Subclasses should implement
- */
-- (BOOL)dataIsAvailable;
-- (BOOL)dataIsLoading;
-//- (BOOL)dataDidError;
 
-/**
- Tell the state machine to either show a loading/empty view or show data
- */
-- (void)updateState;
 
 /**
  Configure/layout any subviews used in the view controller
@@ -65,6 +70,8 @@
 - (void)setupFooter;
 - (void)setupSubviews;
 
+
+// DEPRECATED
 
 /**
  Used by tableView to page in more data

@@ -49,26 +49,38 @@ dataDidError = _dataDidError;
     return self.reloading;
 }
 
+- (BOOL)dataDidError {
+    return self.dataDidError;
+}
+
+// Data Source
+- (void)loadDataSource {
+    [self beginRefresh];
+}
+
+- (void)reloadDataSource {
+    if (self.reloading) return;
+    [self beginRefresh];
+}
+
+- (void)dataSourceDidLoad {
+    [self endRefresh];
+}
+
 - (void)dataSourceDidError {
+    [self endRefresh];
 }
 
-- (void)updateState {
-    if ([self dataIsAvailable]) {
-        // We have data to display
-    } else {
-        // We don't have data available to display
-        if ([self dataIsLoading]) {
-            // We are loading for the first time
-        } else {
-            if ([self dataDidError]) {
-                // There was a dataSource error, show the error screen
-            } else {
-                // We have no data to display, show the empty screen
-            }
-        }
-    }
+- (void)beginRefresh {
+    self.reloading = YES;
 }
 
+- (void)endRefresh {
+    self.reloading = NO;
+}
+
+#pragma mark - Convenience
+// DEPRECATED
 - (id)parseData:(id)data httpResponse:(NSHTTPURLResponse *)httpResponse {
     id results = nil;
     

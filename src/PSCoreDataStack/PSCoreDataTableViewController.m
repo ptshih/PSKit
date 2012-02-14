@@ -120,7 +120,6 @@ sectionNameKeyPath = _sectionNameKeyPath;
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
   [self.tableView endUpdates];
-  [self updateState];
 }
 
 #pragma mark UITableView

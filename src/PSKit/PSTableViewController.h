@@ -51,8 +51,4 @@
 // ScrollView Stuff
 - (void)scrollEndedTrigger;
 
-// Refresh
-- (void)beginRefresh;
-- (void)endRefresh;
-
 @end

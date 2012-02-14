@@ -292,6 +292,8 @@ loadMoreView = _loadMoreView;
     } else {
         [self.tableView reloadData];
     }
+    
+    [self dataSourceDidLoad];
 }
 
 - (void)dataSourceShouldLoadMoreObjects:(id)objects forSection:(NSInteger)section shouldAnimate:(BOOL)shouldAnimate {
@@ -327,7 +329,6 @@ loadMoreView = _loadMoreView;
 
 - (void)loadMore {
     self.reloading = YES;
-    [self updateState];
 }
 
 #pragma mark - Custom TableView Methods
@@ -472,12 +473,12 @@ loadMoreView = _loadMoreView;
 
 #pragma mark - Refresh
 - (void)beginRefresh {
-    self.reloading = YES;
+    [super beginRefresh];
     [self.pullRefreshView setState:PSPullRefreshStateRefreshing];
 }
 
 - (void)endRefresh {
-    self.reloading = NO;
+    [super endRefresh];
     [self.pullRefreshView setState:PSPullRefreshStateIdle];
 }
 
