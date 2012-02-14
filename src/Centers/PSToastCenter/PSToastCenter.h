@@ -10,18 +10,18 @@
 #import <QuartzCore/QuartzCore.h>
 
 typedef enum {
-  PSToastTypeAlert = 0,
-  PSToastTypeWarning = 1,
-  PSToastTypeError = 2
+    PSToastTypeAlert = 0,
+    PSToastTypeWarning = 1,
+    PSToastTypeError = 2
 } PSToastType;
 
 @interface PSToastCenter : PSObject {
-  UIView *_toastView;
-  UIButton *_toastButton;
-  NSMutableArray *_toastQueue;
-  
-  NSTimeInterval _toastAnimationDuration;
-  BOOL _isShowing;
+    UIView *_toastView;
+    UIButton *_toastButton;
+    NSMutableArray *_toastQueue;
+    
+    NSTimeInterval _toastAnimationDuration;
+    BOOL _isShowing;
 }
 
 + (id)defaultCenter;
