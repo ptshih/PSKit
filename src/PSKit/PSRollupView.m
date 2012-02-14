@@ -24,7 +24,7 @@
     // Initialization code
     _desiredHeight = 0.0;
     
-#warning switch this to PSStyleSheet
+    // TODO: switch to PSStyleSheet
     _headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     _headerLabel.backgroundColor = [UIColor clearColor];
     _headerLabel.textColor = [UIColor whiteColor];

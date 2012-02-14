@@ -13,6 +13,7 @@
 #import "UIScreen+PSKit.h"
 #import "UIView+PSKit.h"
 #import "NSMutableURLRequest+PSKit.h"
+#import "NSJSONSerialization+PSKit.h"
 
 // Vendor Categories
 #import "NSDate+Helper.h"

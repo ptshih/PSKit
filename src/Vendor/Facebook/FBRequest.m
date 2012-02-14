@@ -196,7 +196,7 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
     return nil;
   }
 
-    id result = [responseString objectFromJSONString];
+    id result = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
 
   if (![result isKindOfClass:[NSArray class]]) {
     if ([result objectForKey:@"error"] != nil) {
