@@ -18,8 +18,8 @@
 - (void)reloadDataSource;
 
 // Models
-- (void)loadFromCache;
-- (void)loadFromRemote;
+- (void)loadFromCacheWithCompletionBlock:(void (^)(void))completionBlock failureBlock:(void (^)(void))failureBlock;
+- (void)loadFromRemoteWithCompletionBlock:(void (^)(void))completionBlock failureBlock:(void (^)(void))failureBlock;
 
 // Load a single NSDictionary into the dataSource (not used for tableViews)
 - (void)dataSourceShouldLoadObject:(id)object;

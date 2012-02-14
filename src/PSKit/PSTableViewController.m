@@ -292,8 +292,6 @@ loadMoreView = _loadMoreView;
     } else {
         [self.tableView reloadData];
     }
-    
-    [self dataSourceDidLoad];
 }
 
 - (void)dataSourceShouldLoadMoreObjects:(id)objects forSection:(NSInteger)section shouldAnimate:(BOOL)shouldAnimate {
