@@ -1,6 +1,6 @@
 //
 //  PSBaseViewController.m
-//  PhotoTime
+//  Linsanity
 //
 //  Created by Peter Shih on 2/10/11.
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.

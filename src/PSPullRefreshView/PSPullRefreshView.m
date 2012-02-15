@@ -1,6 +1,6 @@
 //
 //  PSPullRefreshView.m
-//  Phototime
+//  Linsanity
 //
 //  Created by Peter on 2/12/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
@@ -25,7 +25,7 @@ statusLabel = _statusLabel;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        CGFloat width = self.width;
+        CGFloat width = 0.0;
         CGFloat left = 0.0;
         
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
