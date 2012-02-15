@@ -203,7 +203,7 @@ static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
     return thumbData;
 }
 
-- (void)cachedImageDataForURL:(NSURL *)url withCompletionBlock:(void (^)(NSData *imageData))completionBlock {
+- (void)cachedImageDataForURL:(NSURL *)url withCompletionBlock:(void (^)(NSData *imageData))completionBlock failureBlock:(void (^)(void))failureBlock {
     NSString *imageKey = PSImageCacheImageKeyWithURL(url);
     
     // Read image from disk
@@ -220,7 +220,7 @@ static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
                 completionBlock(imageData);
             }
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-            
+            failureBlock();
         }];
         [op start];
     } else {
