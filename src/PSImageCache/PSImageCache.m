@@ -15,11 +15,11 @@
 @synthesize cachePath = _cachePath;
 
 static inline NSString *PSImageCacheImageKeyWithURL(NSURL *url) {
-    return [[NSString stringWithFormat:@"PSImageCache#%@", [url absoluteString]] stringWithPercentEscape];
+    return [[NSString stringWithFormat:@"PSImageCache#%@", [url absoluteString]] stringFromMD5Hash];
 }
 
 static inline NSString *PSImageCacheThumbKeyWithURL(NSURL *url) {
-    return [[NSString stringWithFormat:@"PSImageCacheThumb#%@", [url absoluteString]] stringWithPercentEscape];
+    return [[NSString stringWithFormat:@"PSImageCacheThumb#%@", [url absoluteString]] stringFromMD5Hash];
 }
 
 + (id)sharedCache {
