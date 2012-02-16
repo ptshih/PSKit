@@ -13,15 +13,10 @@
 @interface PSCachedImageView : PSImageView
 
 @property (nonatomic, copy) NSURL *url;
-@property (nonatomic, copy) NSURL *sourceURL;
+@property (nonatomic, copy) NSURL *originalURL;
 @property (nonatomic, copy) NSURL *thumbnailURL;
 
 - (void)loadImageWithURL:(NSURL *)URL;
-- (void)loadThumbnailWithURL:(NSURL *)URL;
-- (void)unloadImage;
-
-- (UIImage *)originalImage;
-
 - (void)prepareForReuse;
 
 @end

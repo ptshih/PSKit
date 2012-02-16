@@ -18,7 +18,7 @@
 
 @synthesize
 url = _url,
-sourceURL = _sourceURL,
+originalURL = _originalURL,
 thumbnailURL = _thumbnailURL;
 
 - (id)initWithFrame:(CGRect)frame {
@@ -33,70 +33,39 @@ thumbnailURL = _thumbnailURL;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     self.url = nil;
-    self.sourceURL = nil;
+    self.originalURL = nil;
     self.thumbnailURL = nil;
     [super dealloc];
 }
 
 - (void)prepareForReuse {
     self.thumbnailURL = nil;
-    self.sourceURL = nil;
+    self.originalURL = nil;
     self.url = nil;
     self.image = nil;
 }
 
 - (void)loadImageWithURL:(NSURL *)URL {
     self.url = URL;
-    NSData *imageData = [[PSImageCache sharedCache] cachedImageDataForURL:self.url];
-    [self setImageWithCachedImageData:imageData];
-}
-
-- (void)loadThumbnailWithURL:(NSURL *)URL {
-    self.url = URL;
-    NSData *imageData = [[PSImageCache sharedCache] cachedThumbnailDataForURL:self.url];
-    [self setImageWithCachedImageData:imageData];
-}
-
-- (void)unloadImage {
-    [[PSImageCache sharedCache] cancelDownloadForURL:self.url];
-    self.image = self.placeholderImage;
-}
-
-- (UIImage *)originalImage {
-    return [[PSImageCache sharedCache] cachedImageForURL:self.url];
-}
-
-- (void)setImageWithCachedImageData:(NSData *)imageData {
-    if (!imageData) return;
-    [imageData retain];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        UIImage *cachedImage = [[UIImage alloc] initWithData:imageData];
-        [imageData release];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (cachedImage) {
-                self.image = cachedImage;
-                [cachedImage release];
-            } else {
-                self.image = self.placeholderImage;
-            }
-        });
-    });
+    
+    [[PSImageCache sharedCache] loadImageDataWithURL:self.url cacheType:PSImageCacheTypePermanent completionBlock:^(NSData *imageData) {
+        self.image = [UIImage imageWithData:imageData];
+    } failureBlock:^(NSError *error) {
+        self.image = self.placeholderImage;
+    }];
 }
 
 #pragma mark - PSImageCacheNotification
 - (void)imageCacheDidCache:(NSNotification *)notification {
     NSDictionary *userInfo = [notification userInfo];
     NSURL *url = [userInfo objectForKey:@"url"];
-    BOOL showThumbnail = [[userInfo objectForKey:@"showThumbnail"] boolValue];
     
     if ([url isEqual:self.url]) {
-        NSData *imageData = nil;
-        if (showThumbnail) {
-            imageData = [[PSImageCache sharedCache] cachedThumbnailDataForURL:url];
-        } else {
-            imageData = [[PSImageCache sharedCache] cachedImageDataForURL:url];
-        }
-        [self setImageWithCachedImageData:imageData];
+        [[PSImageCache sharedCache] loadImageDataWithURL:self.url cacheType:PSImageCacheTypePermanent completionBlock:^(NSData *imageData) {
+            self.image = [UIImage imageWithData:imageData];
+        } failureBlock:^(NSError *error) {
+            self.image = self.placeholderImage;
+        }];
     }
 }
 

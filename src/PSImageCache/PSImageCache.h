@@ -7,52 +7,31 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "AFNetworking.h"
 
-#define kPSImageCacheDidCacheImage @"PSImageCacheDidCacheImage"
+#define kPSImageCacheDidCacheImage @"kPSImageCacheDidCacheImage"
 
-@interface PSImageCache : PSObject <NSCacheDelegate> {
-  NSCache *_memCache;
-  NSString *_cachePath;
-  NSSearchPathDirectory _cacheDirectory;
-  NSOperationQueue *_opQueue;
-}
+typedef enum {
+    PSImageCacheTypeSession = 1,
+    PSImageCacheTypePermanent = 2
+} PSImageCacheType;
 
-@property (nonatomic, retain) NSString *cachePath;
-@property (nonatomic, assign) NSSearchPathDirectory cacheDirectory;
+@interface PSImageCache : PSObject
 
+@property (nonatomic, retain) NSString *cacheBasePath;
+
+// Singleton access
 + (id)sharedCache;
-- (void)setupCachePathWithCacheDirectory:(NSSearchPathDirectory)cacheDirectory;
 
-/**
- This tries to retrieve the image with a given URL from the cache
- */
-- (UIImage *)cachedImageForURL:(NSURL *)url;
-- (NSData *)cachedImageDataForURL:(NSURL *)url;
-- (UIImage *)cachedThumbnailForURL:(NSURL *)url;
-- (NSData *)cachedThumbnailDataForURL:(NSURL *)url;
+// Write to Cache
+- (void)cacheImageData:(NSData *)imageData URL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType;
 
-- (void)cachedImageDataForURL:(NSURL *)url withCompletionBlock:(void (^)(NSData *imageData))completionBlock failureBlock:(void (^)(void))failureBlock;
+// Read from Cache (block style)
+// Blocks are called on the main thread
+- (void)loadImageDataWithURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType completionBlock:(void (^)(NSData *imageData))completionBlock failureBlock:(void (^)(NSError *error))failureBlock;
 
-/**
- This caches a UIImage keyed to a URL
- */
-- (void)cacheImage:(UIImage *)image forURL:(NSURL *)url;
-- (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)url;
-- (void)cacheImageData:(NSData *)imageData forURL:(NSURL *)imageURL showThumbnail:(BOOL)showThumbnail;
+// Purge Cache
+- (void)purgeSessionCache;
+- (void)purgeCacheWithCacheType:(PSImageCacheType)cacheType;
 
-
-// Remote Request
-- (void)downloadImageForURL:(NSURL *)url;
-- (void)downloadImageForURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
-- (void)cancelDownloadForURL:(NSURL *)url;
-
-// Asset Library
-- (void)loadImageForAssetURL:(NSURL *)url;
-- (void)loadImageForAssetURL:(NSURL *)url showThumbnail:(BOOL)showThumbnail;
-
-// Helpers
-+ (NSString *)documentDirectory;
-+ (NSString *)cachesDirectory;
 
 @end
