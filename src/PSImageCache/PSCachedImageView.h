@@ -17,6 +17,7 @@
 @property (nonatomic, copy) NSURL *thumbnailURL;
 
 - (void)loadImageWithURL:(NSURL *)URL;
+- (void)loadImageWithURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType;
 - (void)prepareForReuse;
 
 @end

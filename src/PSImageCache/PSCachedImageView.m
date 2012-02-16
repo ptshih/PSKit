@@ -46,9 +46,13 @@ thumbnailURL = _thumbnailURL;
 }
 
 - (void)loadImageWithURL:(NSURL *)URL {
+    [self loadImageWithURL:URL cacheType:PSImageCacheTypePermanent];
+}
+
+- (void)loadImageWithURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType {
     self.url = URL;
     
-    [[PSImageCache sharedCache] loadImageDataWithURL:self.url cacheType:PSImageCacheTypePermanent completionBlock:^(NSData *imageData) {
+    [[PSImageCache sharedCache] loadImageDataWithURL:self.url cacheType:cacheType completionBlock:^(NSData *imageData) {
         self.image = [UIImage imageWithData:imageData];
     } failureBlock:^(NSError *error) {
         self.image = self.placeholderImage;
