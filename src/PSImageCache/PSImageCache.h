@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+#define kPSImageCacheDidIdle @"kPSImageCacheDidIdle"
 #define kPSImageCacheDidCacheImage @"kPSImageCacheDidCacheImage"
 
 typedef enum {
@@ -17,10 +18,15 @@ typedef enum {
 
 @interface PSImageCache : PSObject
 
-@property (nonatomic, retain) NSString *cacheBasePath;
+@property (nonatomic, retain) NSOperationQueue *networkQueue;
+@property (nonatomic, retain) NSMutableArray *pendingOperations;
 
 // Singleton access
 + (id)sharedCache;
+
+// Queue
+- (void)resume;
+- (void)suspend;
 
 // Write to Cache
 - (void)cacheImageData:(NSData *)imageData URL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType;
@@ -30,7 +36,6 @@ typedef enum {
 - (void)loadImageDataWithURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType completionBlock:(void (^)(NSData *imageData, NSURL *cachedURL))completionBlock failureBlock:(void (^)(NSError *error))failureBlock;
 
 // Purge Cache
-- (void)purgeSessionCache;
 - (void)purgeCacheWithCacheType:(PSImageCacheType)cacheType;
 
 

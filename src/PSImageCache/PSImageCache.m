@@ -7,8 +7,8 @@
 //
 
 #import "PSImageCache.h"
-#import <AssetsLibrary/AssetsLibrary.h>
-#import <ImageIO/ImageIO.h>
+
+typedef void (^PSImageCacheNetworkBlock)(void);
 
 // This encodes a given URL into a file system safe string
 static inline NSString * FSImageCacheImageKeyWithURL(NSURL *URL) {
@@ -35,7 +35,8 @@ static inline NSString * FSImageCacheImageKeyWithURL(NSURL *URL) {
 @implementation PSImageCache
 
 @synthesize
-cacheBasePath = _cacheBasePath;
+networkQueue = _networkQueue,
+pendingOperations = _pendingOperations;
 
 + (id)sharedCache {
     static id sharedCache;
@@ -48,15 +49,46 @@ cacheBasePath = _cacheBasePath;
 - (id)init {
     self = [super init];
     if (self) {
-        self.cacheBasePath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] 
-                              stringByAppendingPathComponent:NSStringFromClass([self class])];
+        self.networkQueue = [[[NSOperationQueue alloc] init] autorelease];
+        self.networkQueue.maxConcurrentOperationCount = 4;
+        
+        self.pendingOperations = [NSMutableArray array];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self 
+                                                 selector:@selector(resume) 
+                                                     name:kPSImageCacheDidIdle 
+                                                   object:self];
     }
     return self;
 }
 
 - (void)dealloc {
-    self.cacheBasePath = nil;
     [super dealloc];
+}
+
+#pragma mark - Queue
+- (void)resume {    
+    // Reverse the order of pending operations before adding them back into the queue
+    NSInteger i = 0;
+    NSInteger j = [self.pendingOperations count] - 1;
+    while (i < j) {
+        [self.pendingOperations exchangeObjectAtIndex:i withObjectAtIndex:j];
+        i++;
+        j--;
+    }
+    
+    [self.pendingOperations enumerateObjectsUsingBlock:^(id networkBlock, NSUInteger idx, BOOL *stop) {
+        [self.networkQueue addOperationWithBlock:networkBlock];
+    }];
+    [self.pendingOperations removeAllObjects];
+    [self.networkQueue setSuspended:NO];
+}
+
+- (void)suspend {
+    [self.networkQueue setSuspended:YES];
+    [[NSNotificationQueue defaultQueue] enqueueNotification:[NSNotification 
+                                                             notificationWithName:kPSImageCacheDidIdle object:self] 
+                                               postingStyle:NSPostWhenIdle];
 }
 
 #pragma mark - Cache
@@ -87,35 +119,36 @@ cacheBasePath = _cacheBasePath;
     if (imageData) {
         completionBlock(imageData, cachedURL);
     } else {
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
-        [NSURLConnection sendAsynchronousRequest:request 
-                                           queue:[NSOperationQueue mainQueue] 
-                               completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-                                   if (data && !error) {
-                                       [self cacheImageData:data URL:URL cacheType:cacheType];
-                                       completionBlock(data, cachedURL);
-                                   } else {
-                                       failureBlock(error);
-                                   }
-                               }];
+        PSImageCacheNetworkBlock networkBlock = ^(void){
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+            [NSURLConnection sendAsynchronousRequest:request 
+                                               queue:[NSOperationQueue mainQueue] 
+                                   completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                                       if (data && !error) {
+                                           [self cacheImageData:data URL:URL cacheType:cacheType];
+                                           completionBlock(data, cachedURL);
+                                       } else {
+                                           failureBlock(error);
+                                       }
+                                   }];
+        };
+             
+        // Queue up a network request
+        if (self.networkQueue.isSuspended) {
+            [self.pendingOperations addObject:Block_copy(networkBlock)];
+            Block_release(networkBlock);
+        } else {
+            [self.networkQueue addOperationWithBlock:networkBlock];
+        }
     }
 }
 
 #pragma mark - Cache Path
 - (NSString *)cacheDirectoryPathForCacheType:(PSImageCacheType)cacheType {
-    NSString *cacheDirectoryPath = nil;
+    NSString *cacheBaseDirectory = (cacheType == PSImageCacheTypeSession) ? NSTemporaryDirectory() : (NSString *)[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
     
-    switch (cacheType) {
-        case PSImageCacheTypeSession:
-            cacheDirectoryPath = [self.cacheBasePath stringByAppendingPathComponent:@"SessionCache"];
-            break;
-        case PSImageCacheTypePermanent:
-            cacheDirectoryPath = [self.cacheBasePath stringByAppendingPathComponent:@"PermanentCache"];
-            break;
-        default:
-            cacheDirectoryPath = [self.cacheBasePath stringByAppendingPathComponent:@"SessionCache"];
-            break;
-    }
+    
+    NSString *cacheDirectoryPath = [cacheBaseDirectory stringByAppendingPathComponent:NSStringFromClass([self class])];
     
     // Creates directory if necessary
     BOOL isDir = NO;
@@ -140,10 +173,6 @@ cacheBasePath = _cacheBasePath;
 }
 
 #pragma mark - Purge Cache
-- (void)purgeSessionCache {
-    [self purgeCacheWithCacheType:PSImageCacheTypeSession];
-}
-
 - (void)purgeCacheWithCacheType:(PSImageCacheType)cacheType {
     NSString *cacheDirectoryPath = [self cacheDirectoryPathForCacheType:cacheType];
     

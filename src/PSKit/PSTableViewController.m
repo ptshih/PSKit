@@ -437,6 +437,10 @@ loadMoreView = _loadMoreView;
     }
 }
 
+- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
+    [[PSImageCache sharedCache] suspend];
+}
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     //  [self scrollEndedTrigger];
 }
