@@ -35,7 +35,6 @@ viewControllers = _viewControllers;
     self = [self initWithNibName:nil bundle:nil];
     if (self) {
         [self.viewControllers addObject:rootViewController];
-        [self addChildViewController:rootViewController];
     }
     return self;
 }
@@ -55,8 +54,13 @@ viewControllers = _viewControllers;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.rootViewController.view.frame = self.view.bounds;
+
+    [self addChildViewController:self.rootViewController];
     [self.view addSubview:self.rootViewController.view];
+    [self.rootViewController didMoveToParentViewController:self];
+    self.rootViewController.view.frame = self.view.bounds;
+    self.rootViewController.view.autoresizingMask = ~UIViewAutoresizingNone;
+  
     
     _overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
     _overlayView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
