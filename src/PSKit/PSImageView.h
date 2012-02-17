@@ -15,7 +15,7 @@
 
 @property (nonatomic, retain) UIActivityIndicatorView *loadingIndicator;
 @property (nonatomic, retain) UIImage *placeholderImage;
-@property (nonatomic, assign) BOOL shouldScale;
+@property (nonatomic, assign) BOOL shouldResize;
 @property (nonatomic, assign) BOOL shouldAnimate;
 
 @end
