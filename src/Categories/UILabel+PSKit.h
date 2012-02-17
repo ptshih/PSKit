@@ -11,6 +11,7 @@
 @interface UILabel (PSKit)
 
 #pragma mark - Variable Sizing
+- (CGSize)sizeForLabelInWidth:(CGFloat)width;
 + (CGSize)sizeForText:(NSString*)text width:(CGFloat)width font:(UIFont*)font numberOfLines:(NSInteger)numberOfLines lineBreakMode:(UILineBreakMode)lineBreakMode;
 
 + (UILabel *)labelWithText:(NSString *)text style:(NSString *)style;

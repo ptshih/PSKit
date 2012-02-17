@@ -24,4 +24,6 @@
 + (NSInteger)numberOfLinesForStyle:(NSString *)style;
 + (UILineBreakMode)lineBreakModeForStyle:(NSString *)style;
 
++ (CGSize)sizeForText:(NSString *)text width:(CGFloat)width style:(NSString *)style;
+
 @end

@@ -11,6 +11,10 @@
 @implementation UILabel (PSKit)
 
 #pragma mark - Variable Sizing
+- (CGSize)sizeForLabelInWidth:(CGFloat)width {
+    return [UILabel sizeForText:self.text width:width font:self.font numberOfLines:self.numberOfLines lineBreakMode:self.lineBreakMode];
+}
+
 + (CGSize)sizeForText:(NSString*)text width:(CGFloat)width font:(UIFont*)font numberOfLines:(NSInteger)numberOfLines lineBreakMode:(UILineBreakMode)lineBreakMode {
   
   if (numberOfLines == 0) numberOfLines = INT_MAX;

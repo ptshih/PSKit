@@ -152,4 +152,9 @@ static NSMutableDictionary *_styles = nil;
   return lineBreakMode;
 }
 
++ (CGSize)sizeForText:(NSString *)text width:(CGFloat)width style:(NSString *)style {
+    CGSize size = [UILabel sizeForText:text width:width font:[[self class] fontForStyle:style] numberOfLines:[[self class] numberOfLinesForStyle:style] lineBreakMode:[[self class] lineBreakModeForStyle:style]];
+    return size;
+}
+
 @end
