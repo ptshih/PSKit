@@ -23,6 +23,7 @@ typedef uint32_t PSCellType;
 @property (nonatomic, assign) UITableView *parentTableView;
 @property (nonatomic, copy) NSIndexPath *indexPath;
 @property (nonatomic, assign) BOOL isExpanded;
+@property (nonatomic, retain) UIImageView *separatorLine;
 
 /**
  Reusable Cell Identifier

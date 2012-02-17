@@ -14,7 +14,8 @@
 psImageView = _psImageView,
 parentTableView = _parentTableView,
 indexPath = _indexPath,
-isExpanded = _isExpanded;
+isExpanded = _isExpanded,
+separatorLine = _separatorLine;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -29,6 +30,7 @@ isExpanded = _isExpanded;
 - (void)dealloc {
     //  VLog(@"#%@", [self class]);
     self.psImageView = nil;
+    self.separatorLine = nil;
     [super dealloc];
 }
 
