@@ -83,7 +83,7 @@ const CGFloat kPushPopScale = 0.95;
 const CGFloat kOverlayViewAlpha = 0.75;
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    [self pushViewController:viewController direction:PSNavigationControllerDirectionRight animated:animated];
+    [self pushViewController:viewController direction:PSNavigationControllerDirectionLeft animated:animated];
 }
 
 - (void)pushViewController:(UIViewController *)viewController direction:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
@@ -153,7 +153,7 @@ const CGFloat kOverlayViewAlpha = 0.75;
 }
 
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated {
-    return [self popViewControllerWithDirection:PSNavigationControllerDirectionLeft animated:YES];
+    return [self popViewControllerWithDirection:PSNavigationControllerDirectionRight animated:YES];
 }
 
 - (UIViewController *)popViewControllerWithDirection:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
