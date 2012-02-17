@@ -69,8 +69,8 @@ cacheBasePath = _cacheBasePath;
     [imageData writeToFile:cachePath atomically:YES];
     
     // Broadcast to all observers that 'cachedURL' has been cached
-    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:cachedURL forKey:@"url"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:userInfo];
+//    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:cachedURL forKey:@"url"];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:userInfo];
 }
 
 // Read from Cache
