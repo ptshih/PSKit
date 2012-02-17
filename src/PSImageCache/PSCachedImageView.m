@@ -19,11 +19,19 @@
 @synthesize
 URL = _URL,
 originalURL = _originalURL,
-thumbnailURL = _thumbnailURL;
+thumbnailURL = _thumbnailURL,
+loadingIndicator = _loadingIndicator;
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.loadingIndicator = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray] autorelease];
+        self.loadingIndicator.hidesWhenStopped = YES;
+        self.loadingIndicator.frame = self.bounds;
+        self.loadingIndicator.contentMode = UIViewContentModeCenter;
+        [self.loadingIndicator startAnimating];
+        [self addSubview:self.loadingIndicator];
+        
 //        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageCacheDidCache:) name:kPSImageCacheDidCacheImage object:nil];
     }
     return self;
@@ -35,10 +43,17 @@ thumbnailURL = _thumbnailURL;
     self.URL = nil;
     self.originalURL = nil;
     self.thumbnailURL = nil;
+    self.loadingIndicator = nil;
     [super dealloc];
 }
 
+- (void)setFrame:(CGRect)frame {
+    [super setFrame:frame];
+    self.loadingIndicator.frame = self.bounds;
+}
+
 - (void)prepareForReuse {
+    [self.loadingIndicator startAnimating];
     self.thumbnailURL = nil;
     self.originalURL = nil;
     self.URL = nil;
@@ -54,9 +69,11 @@ thumbnailURL = _thumbnailURL;
     
     [[PSImageCache sharedCache] loadImageDataWithURL:self.URL cacheType:cacheType completionBlock:^(NSData *imageData, NSURL *cachedURL) {
         if ([self.URL isEqual:cachedURL]) {
+            [self.loadingIndicator stopAnimating];
             self.image = [UIImage imageWithData:imageData];
         }
     } failureBlock:^(NSError *error) {
+        [self.loadingIndicator stopAnimating];
         self.image = self.placeholderImage;
     }];
 }

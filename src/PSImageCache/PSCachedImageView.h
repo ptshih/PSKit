@@ -15,6 +15,7 @@
 @property (nonatomic, copy) NSURL *URL;
 @property (nonatomic, copy) NSURL *originalURL;
 @property (nonatomic, copy) NSURL *thumbnailURL;
+@property (nonatomic, retain) UIActivityIndicatorView *loadingIndicator;
 
 - (void)loadImageWithURL:(NSURL *)URL;
 - (void)loadImageWithURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType;
