@@ -76,7 +76,7 @@ cacheBasePath = _cacheBasePath;
 // Read from Cache
 - (void)loadImageDataWithURL:(NSURL *)URL 
                    cacheType:(PSImageCacheType)cacheType 
-             completionBlock:(void (^)(NSData *imageData))completionBlock 
+             completionBlock:(void (^)(NSData *imageData, NSURL *cachedURL))completionBlock 
                 failureBlock:(void (^)(NSError *error))failureBlock {
     if (!URL) failureBlock(nil);
     
@@ -85,7 +85,7 @@ cacheBasePath = _cacheBasePath;
     NSData *imageData = [NSData dataWithContentsOfFile:cachePath];
     
     if (imageData) {
-        completionBlock(imageData);
+        completionBlock(imageData, cachedURL);
     } else {
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
         [NSURLConnection sendAsynchronousRequest:request 
@@ -93,7 +93,7 @@ cacheBasePath = _cacheBasePath;
                                completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
                                    if (data && !error) {
                                        [self cacheImageData:data URL:URL cacheType:cacheType];
-                                       completionBlock(data);
+                                       completionBlock(data, cachedURL);
                                    } else {
                                        failureBlock(error);
                                    }

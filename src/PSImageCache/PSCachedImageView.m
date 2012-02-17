@@ -17,7 +17,7 @@
 @implementation PSCachedImageView
 
 @synthesize
-url = _url,
+URL = _URL,
 originalURL = _originalURL,
 thumbnailURL = _thumbnailURL;
 
@@ -32,7 +32,7 @@ thumbnailURL = _thumbnailURL;
 - (void)dealloc {
 //    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    self.url = nil;
+    self.URL = nil;
     self.originalURL = nil;
     self.thumbnailURL = nil;
     [super dealloc];
@@ -41,7 +41,7 @@ thumbnailURL = _thumbnailURL;
 - (void)prepareForReuse {
     self.thumbnailURL = nil;
     self.originalURL = nil;
-    self.url = nil;
+    self.URL = nil;
     self.image = nil;
 }
 
@@ -50,10 +50,12 @@ thumbnailURL = _thumbnailURL;
 }
 
 - (void)loadImageWithURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType {
-    self.url = URL;
+    self.URL = URL;
     
-    [[PSImageCache sharedCache] loadImageDataWithURL:self.url cacheType:cacheType completionBlock:^(NSData *imageData) {
-        self.image = [UIImage imageWithData:imageData];
+    [[PSImageCache sharedCache] loadImageDataWithURL:self.URL cacheType:cacheType completionBlock:^(NSData *imageData, NSURL *cachedURL) {
+        if ([self.URL isEqual:cachedURL]) {
+            self.image = [UIImage imageWithData:imageData];
+        }
     } failureBlock:^(NSError *error) {
         self.image = self.placeholderImage;
     }];
@@ -62,11 +64,13 @@ thumbnailURL = _thumbnailURL;
 #pragma mark - PSImageCacheNotification
 - (void)imageCacheDidCache:(NSNotification *)notification {
     NSDictionary *userInfo = [notification userInfo];
-    NSURL *url = [userInfo objectForKey:@"url"];
+    NSURL *URL = [userInfo objectForKey:@"url"];
     
-    if ([url isEqual:self.url]) {
-        [[PSImageCache sharedCache] loadImageDataWithURL:self.url cacheType:PSImageCacheTypePermanent completionBlock:^(NSData *imageData) {
-            self.image = [UIImage imageWithData:imageData];
+    if ([URL isEqual:self.URL]) {
+        [[PSImageCache sharedCache] loadImageDataWithURL:self.URL cacheType:PSImageCacheTypePermanent completionBlock:^(NSData *imageData, NSURL *cachedURL) {
+            if ([self.URL isEqual:cachedURL]) {
+                self.image = [UIImage imageWithData:imageData];
+            }
         } failureBlock:^(NSError *error) {
             self.image = self.placeholderImage;
         }];

@@ -12,7 +12,7 @@
 
 @interface PSCachedImageView : PSImageView
 
-@property (nonatomic, copy) NSURL *url;
+@property (nonatomic, copy) NSURL *URL;
 @property (nonatomic, copy) NSURL *originalURL;
 @property (nonatomic, copy) NSURL *thumbnailURL;
 

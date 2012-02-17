@@ -27,7 +27,7 @@ typedef enum {
 
 // Read from Cache (block style)
 // Blocks are called on the main thread
-- (void)loadImageDataWithURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType completionBlock:(void (^)(NSData *imageData))completionBlock failureBlock:(void (^)(NSError *error))failureBlock;
+- (void)loadImageDataWithURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType completionBlock:(void (^)(NSData *imageData, NSURL *cachedURL))completionBlock failureBlock:(void (^)(NSError *error))failureBlock;
 
 // Purge Cache
 - (void)purgeSessionCache;
