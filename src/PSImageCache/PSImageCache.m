@@ -63,6 +63,7 @@ pendingOperations = _pendingOperations;
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kPSImageCacheDidIdle object:self];
     self.networkQueue = nil;
     self.pendingOperations = nil;
     [super dealloc];
