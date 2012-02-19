@@ -63,6 +63,8 @@ pendingOperations = _pendingOperations;
 }
 
 - (void)dealloc {
+    self.networkQueue = nil;
+    self.pendingOperations = nil;
     [super dealloc];
 }
 
