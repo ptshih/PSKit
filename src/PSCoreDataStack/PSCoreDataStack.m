@@ -159,8 +159,6 @@ static NSURL *_storeURL = nil;
     if (_storeURL) {
         [[NSFileManager defaultManager] removeItemAtURL:_storeURL error:nil];
     }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:kCoreDataDidReset object:nil];
 }
 
 #pragma mark - Application's Documents directory

@@ -54,15 +54,15 @@ static NSInteger _ageFilter = 60; // seconds
     
     [self startUpdates];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startUpdates) name:kApplicationResumed object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopUpdates) name:kApplicationSuspended object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(startUpdates) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopUpdates) name:UIApplicationDidEnterBackgroundNotification object:nil];
   }
   return self;
 }
 
 - (void)dealloc {
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:kApplicationResumed object:nil];
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:kApplicationSuspended object:nil];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidEnterBackgroundNotification object:nil];
   
   _locationManager.delegate = nil;
   INVALIDATE_TIMER(_pollTimer);
