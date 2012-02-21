@@ -16,12 +16,14 @@
 
 @synthesize
 reloading = _reloading,
+hasLoadedOnce = _hasLoadedOnce,
 dataDidError = _dataDidError;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.reloading = NO;
+        self.hasLoadedOnce = NO;
         self.dataDidError = NO;
     }
     return self;

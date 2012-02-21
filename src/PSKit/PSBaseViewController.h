@@ -12,6 +12,7 @@
 @interface PSBaseViewController : PSViewController
 
 @property (nonatomic, assign) BOOL reloading;
+@property (nonatomic, assign) BOOL hasLoadedOnce;
 @property (nonatomic, assign) BOOL dataDidError;
 
 @end
