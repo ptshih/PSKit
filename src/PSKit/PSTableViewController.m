@@ -438,7 +438,7 @@ loadMoreView = _loadMoreView;
 }
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
-    [[PSImageCache sharedCache] suspend];
+    [[PSURLCache sharedCache] suspend];
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {

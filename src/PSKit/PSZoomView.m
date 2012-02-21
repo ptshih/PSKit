@@ -7,7 +7,7 @@
 //
 
 #import "PSZoomView.h"
-#import "PSImageCache.h"
+#import "PSURLCache.h"
 
 #define ZOOM_DURATION 0.2
 

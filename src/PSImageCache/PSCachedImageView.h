@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "PSImageView.h"
-#import "PSImageCache.h"
+#import "PSURLCache.h"
 
 @interface PSCachedImageView : PSImageView
 
@@ -18,7 +18,7 @@
 @property (nonatomic, retain) UIActivityIndicatorView *loadingIndicator;
 
 - (void)loadImageWithURL:(NSURL *)URL;
-- (void)loadImageWithURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType;
+- (void)loadImageWithURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType;
 - (void)prepareForReuse;
 
 @end

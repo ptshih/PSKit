@@ -1,38 +1,37 @@
 //
-//  PSImageCache.m
+//  PSURLCache.m
 //  PSKit
 //
 //  Created by Peter Shih on 3/10/11.
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.
 //
 
-#import "PSImageCache.h"
+#import "PSURLCache.h"
 
-typedef void (^PSImageCacheNetworkBlock)(void);
+typedef void (^PSURLCacheNetworkBlock)(void);
 
 // This encodes a given URL into a file system safe string
-static inline NSString * FSImageCacheImageKeyWithURL(NSURL *URL) {
+static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
     // NOTE: If the URL is extremely long, the path becomes too long for the file system to handle and it fails
-    NSString *imageKey = [NSString stringWithFormat:@"FSImageCache#%@", [URL absoluteString]];
     return (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
-                                                               (CFStringRef)imageKey,
+                                                               (CFStringRef)[URL absoluteString],
                                                                NULL,
                                                                (CFStringRef)@"!*'();:@&=+$,/?%#[]",
                                                                kCFStringEncodingUTF8);
 }
 
-@interface PSImageCache ()
+@interface PSURLCache ()
 
 // Retrieves the corresponding directory for a cache type
-- (NSString *)cacheDirectoryPathForCacheType:(PSImageCacheType)cacheType;
+- (NSString *)cacheDirectoryPathForCacheType:(PSURLCacheType)cacheType;
 
 // Retrieves a file system path for a given URL and cache type
-- (NSString *)cachePathForURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType;
+- (NSString *)cachePathForURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType;
 
 @end
 
 
-@implementation PSImageCache
+@implementation PSURLCache
 
 @synthesize
 networkQueue = _networkQueue,
@@ -56,14 +55,14 @@ pendingOperations = _pendingOperations;
         
         [[NSNotificationCenter defaultCenter] addObserver:self 
                                                  selector:@selector(resume) 
-                                                     name:kPSImageCacheDidIdle 
+                                                     name:kPSURLCacheDidIdle 
                                                    object:self];
     }
     return self;
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kPSImageCacheDidIdle object:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kPSURLCacheDidIdle object:self];
     self.networkQueue = nil;
     self.pendingOperations = nil;
     [super dealloc];
@@ -90,46 +89,44 @@ pendingOperations = _pendingOperations;
 - (void)suspend {
     [self.networkQueue setSuspended:YES];
     [[NSNotificationQueue defaultQueue] enqueueNotification:[NSNotification 
-                                                             notificationWithName:kPSImageCacheDidIdle object:self] 
+                                                             notificationWithName:kPSURLCacheDidIdle object:self] 
                                                postingStyle:NSPostWhenIdle];
 }
 
 #pragma mark - Cache
 // Write to Cache
-- (void)cacheImageData:(NSData *)imageData URL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType {
-    if (!imageData || !URL) return;
+- (void)cacheData:(NSData *)data URL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType {
+    if (!data || !URL) return;
     
     NSURL *cachedURL = [[URL copy] autorelease];
     NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
-    [imageData writeToFile:cachePath atomically:YES];
-    
-    // Broadcast to all observers that 'cachedURL' has been cached
-//    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:cachedURL forKey:@"url"];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:kPSImageCacheDidCacheImage object:nil userInfo:userInfo];
+    [data writeToFile:cachePath atomically:YES];
 }
 
 // Read from Cache
-- (void)loadImageDataWithURL:(NSURL *)URL 
-                   cacheType:(PSImageCacheType)cacheType 
-             completionBlock:(void (^)(NSData *imageData, NSURL *cachedURL))completionBlock 
-                failureBlock:(void (^)(NSError *error))failureBlock {
-    if (!URL) failureBlock(nil);
+- (void)loadURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL))completionBlock failureBlock:(void (^)(NSError *error))failureBlock {
     
-    NSURL *cachedURL = [[URL copy] autorelease];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL method:@"GET" headers:nil parameters:nil];
+    
+    [self loadRequest:request cacheType:cacheType usingCache:usingCache completionBlock:completionBlock failureBlock:failureBlock];
+}
+
+- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL))completionBlock failureBlock:(void (^)(NSError *error))failureBlock {
+    
+    NSURL *cachedURL = [[request.URL copy] autorelease];
     NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
-    NSData *imageData = [NSData dataWithContentsOfFile:cachePath];
+    NSData *data = [NSData dataWithContentsOfFile:cachePath];
     
-    if (imageData) {
-        completionBlock(imageData, cachedURL);
+    if (data && usingCache) {
+        completionBlock(data, cachedURL);
     } else {
-        PSImageCacheNetworkBlock networkBlock = ^(void){
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+        PSURLCacheNetworkBlock networkBlock = ^(void){
             [NSURLConnection sendAsynchronousRequest:request 
                                                queue:[NSOperationQueue mainQueue] 
-                                   completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-                                       if (data && !error) {
-                                           [self cacheImageData:data URL:URL cacheType:cacheType];
-                                           completionBlock(data, cachedURL);
+                                   completionHandler:^(NSURLResponse *response, NSData *cachedData, NSError *error) {
+                                       if (cachedData && !error) {
+                                           [self cacheData:cachedData URL:cachedURL cacheType:cacheType];
+                                           completionBlock(cachedData, cachedURL);
                                        } else {
                                            failureBlock(error);
                                        }
@@ -147,8 +144,8 @@ pendingOperations = _pendingOperations;
 }
 
 #pragma mark - Cache Path
-- (NSString *)cacheDirectoryPathForCacheType:(PSImageCacheType)cacheType {
-    NSString *cacheBaseDirectory = (cacheType == PSImageCacheTypeSession) ? NSTemporaryDirectory() : (NSString *)[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+- (NSString *)cacheDirectoryPathForCacheType:(PSURLCacheType)cacheType {
+    NSString *cacheBaseDirectory = (cacheType == PSURLCacheTypeSession) ? NSTemporaryDirectory() : (NSString *)[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
     
     
     NSString *cacheDirectoryPath = [cacheBaseDirectory stringByAppendingPathComponent:NSStringFromClass([self class])];
@@ -166,17 +163,17 @@ pendingOperations = _pendingOperations;
     return cacheDirectoryPath;
 }
 
-- (NSString *)cachePathForURL:(NSURL *)URL cacheType:(PSImageCacheType)cacheType {
+- (NSString *)cachePathForURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType {
     NSString *cacheDirectoryPath = [self cacheDirectoryPathForCacheType:cacheType];
     
-    NSString *imageKey = FSImageCacheImageKeyWithURL(URL);
-    NSString *cachePath = [cacheDirectoryPath stringByAppendingPathComponent:imageKey];
+    NSString *cacheKey = PSURLCacheKeyWithURL(URL);
+    NSString *cachePath = [cacheDirectoryPath stringByAppendingPathComponent:cacheKey];
     
     return cachePath;
 }
 
 #pragma mark - Purge Cache
-- (void)purgeCacheWithCacheType:(PSImageCacheType)cacheType {
+- (void)purgeCacheWithCacheType:(PSURLCacheType)cacheType {
     NSString *cacheDirectoryPath = [self cacheDirectoryPathForCacheType:cacheType];
     
     // Removes and recreates directory
