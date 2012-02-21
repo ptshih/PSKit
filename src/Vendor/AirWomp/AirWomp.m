@@ -16,20 +16,34 @@ typedef enum {
 
 #pragma mark - AWAlert Model
 
+static inline AirWompType AirWompTypeForTypeString(NSString *typeString) {
+    AirWompType type = AirWompTypeLink;
+    if ([typeString isEqualToString:@"link"]) {
+        type = AirWompTypeLink;
+    } else if ([typeString isEqualToString:@"video"]) {
+        type = AirWompTypeVideo;
+    } else if ([typeString isEqualToString:@"survey"]) {
+        type = AirWompTypeSurvey;
+    }
+    return type;
+}
+
 @interface AWAlert : NSObject
 
-@property (nonatomic, retain) NSDictionary *dictionary;
+@property (nonatomic, copy) NSDictionary *dictionary;
 @property (nonatomic, assign) AirWompType type;
 @property (nonatomic, assign) id target;
 @property (nonatomic, assign) SEL action;
 @property (nonatomic, assign) BOOL hasBlock;
 @property (nonatomic, copy) void (^Block)(void);
 
+// Eventually AWAlert should have its own properties
+- (id)initWithDictionary:(NSDictionary *)dictionary;
+
 @end
 
 
 @implementation AWAlert
-
 
 @synthesize
 dictionary = _dictionary,
@@ -39,7 +53,19 @@ action = _action,
 hasBlock = _hasBlock,
 Block = _Block;
 
+- (id)initWithDictionary:(NSDictionary *)dictionary {
+    self = [super init];
+    if (self) {
+        self.dictionary = dictionary;
+        self.type = AirWompTypeForTypeString([self.dictionary objectForKey:@"type"]);
+    }
+    return self;
+}
 
+- (void)dealloc {
+    self.dictionary = nil;
+    [super dealloc];
+}
 
 @end
 
@@ -59,6 +85,11 @@ Block = _Block;
 
 @synthesize
 alert = _alert;
+
+- (void)dealloc {
+    self.alert = nil;
+    [super dealloc];
+}
 
 @end
 
@@ -111,44 +142,55 @@ pendingAlerts = _pendingAlerts;
         self.pendingAlerts = [NSMutableArray arrayWithCapacity:3];
         
 #warning TESTING
-        AWAlert *testAlert = [[[AWAlert alloc] init] autorelease];
-        NSDictionary *testAlertDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                   @"link", @"type",
-                                   @"http://itunes.apple.com/us/app/angry-birds/id343200656?mt=8&uo=4", @"link",
-                                   @"Angry Birds", @"title",
-                                   @"Download the new Angry Birds?", @"message",
-                                   @"Okay", @"acceptText",
-                                   @"No Thanks", @"declineText",
-                                   nil];
-        testAlert.dictionary = testAlertDict;
-        testAlert.type = AirWompTypeLink;
-        [self.pendingAlerts addObject:testAlert];
+        AWAlert *a = nil;
+        a = [[[AWAlert alloc] initWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                           @"link", @"type",
+                                                           @"http://itunes.apple.com/us/app/angry-birds/id343200656?mt=8&uo=4", @"link",
+                                                           @"Angry Birds", @"title",
+                                                           @"Download the new Angry Birds?", @"message",
+                                                           @"Okay", @"acceptText",
+                                                           @"No Thanks", @"declineText",
+                                                           nil]] autorelease];
+        [self.pendingAlerts addObject:a];
         
-        AWAlert *testVideoAlert = [[[AWAlert alloc] init] autorelease];
-        NSDictionary *testVideoAlertDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                       @"video", @"type",
-                                       @"http://www.youtube.com/watch?v=hzixp8s4pyg", @"link",
-                                       @"Ice Age 4", @"title",
-                                       @"Coming to theaters July 13th, 2012. Watch the trailer now?", @"message",
-                                       @"Watch", @"acceptText",
-                                       @"Skip", @"declineText",
-                                       nil];
-        testVideoAlert.dictionary = testVideoAlertDict;
-        testVideoAlert.type = AirWompTypeLink;
-        [self.pendingAlerts addObject:testVideoAlert];
+        a = [[[AWAlert alloc] initWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                  @"video", @"type",
+                                                  @"http://www.youtube.com/watch?v=hzixp8s4pyg", @"link",
+                                                  @"Ice Age 4", @"title",
+                                                  @"Coming to theaters July 13th, 2012. Watch the trailer now?", @"message",
+                                                  @"Watch", @"acceptText",
+                                                  @"Skip", @"declineText",
+                                                  nil]] autorelease];
+        [self.pendingAlerts addObject:a];
         
-        AWAlert *testSurveyAlert = [[[AWAlert alloc] init] autorelease];
-        NSDictionary *testSurveyAlertDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                            @"survey", @"type",
-                                            @"Trivia", @"title",
-                                            @"Which is better?", @"message",
-                                            @"Coca Cola", @"acceptText",
-                                            @"Pepsi", @"declineText",
-                                            nil];
-        testSurveyAlert.dictionary = testSurveyAlertDict;
-        testSurveyAlert.type = AirWompTypeSurvey;
-        [self.pendingAlerts addObject:testSurveyAlert];
-                                   
+        a = [[[AWAlert alloc] initWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                  @"survey", @"type",
+                                                  @"Ice Age 4", @"title",
+                                                  @"Do you plan on watching Ice Age 4?", @"message",
+                                                  @"Yes", @"acceptText",
+                                                  @"No", @"declineText",
+                                                  nil]] autorelease];
+        [self.pendingAlerts addObject:a];
+        
+        a = [[[AWAlert alloc] initWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                  @"link", @"type",
+                                                  @"http://touch.groupon.com/deals/cellar-58-nyc-1", @"link",
+                                                  @"Groupon", @"title",
+                                                  @"$20 for $40 Worth of Wine and Italian Fare at Cellar 58.", @"message",
+                                                  @"View", @"acceptText",
+                                                  @"Skip", @"declineText",
+                                                  nil]] autorelease];
+        [self.pendingAlerts addObject:a];                           
+        
+        a = [[[AWAlert alloc] initWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                  @"link", @"type",
+                                                  @"https://touch.livingsocial.com/cities/865/deals/261274-two-comedy-tickets-and-two-non-alcoholic-drinks", @"link",
+                                                  @"LivingSocial", @"title",
+                                                  @"The World Comedy Club. Two Tickets to Any Show, Two Non-Alcoholic Drinks, and Two Tickets to a Future Show. $20", @"message",
+                                                  @"View", @"acceptText",
+                                                  @"Skip", @"declineText",
+                                                  nil]] autorelease];
+        [self.pendingAlerts addObject:a];
     }
     return self;
 }
