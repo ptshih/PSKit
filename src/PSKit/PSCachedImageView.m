@@ -63,7 +63,7 @@ loadingIndicator = _loadingIndicator;
 - (void)loadImageWithURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType {
     self.URL = URL;
     
-    [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL) {
+    [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL, BOOL isCached) {
         if ([self.URL isEqual:cachedURL]) {
             [self.loadingIndicator stopAnimating];
             self.image = [UIImage imageWithData:cachedData];

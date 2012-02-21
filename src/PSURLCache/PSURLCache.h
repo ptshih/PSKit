@@ -32,9 +32,9 @@ typedef enum {
 
 // Read from Cache (block style)
 // Blocks are called on the main thread
-- (void)loadURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL))completionBlock failureBlock:(void (^)(NSError *error))failureBlock;
+- (void)loadURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached))completionBlock failureBlock:(void (^)(NSError *error))failureBlock;
 
-- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL))completionBlock failureBlock:(void (^)(NSError *error))failureBlock;
+- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached))completionBlock failureBlock:(void (^)(NSError *error))failureBlock;
 
 // Purge Cache
 - (void)purgeCacheWithCacheType:(PSURLCacheType)cacheType;

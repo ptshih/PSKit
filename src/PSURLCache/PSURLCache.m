@@ -104,21 +104,21 @@ pendingOperations = _pendingOperations;
 }
 
 // Read from Cache
-- (void)loadURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL))completionBlock failureBlock:(void (^)(NSError *error))failureBlock {
+- (void)loadURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached))completionBlock failureBlock:(void (^)(NSError *error))failureBlock {
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL method:@"GET" headers:nil parameters:nil];
     
     [self loadRequest:request cacheType:cacheType usingCache:usingCache completionBlock:completionBlock failureBlock:failureBlock];
 }
 
-- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL))completionBlock failureBlock:(void (^)(NSError *error))failureBlock {
+- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached))completionBlock failureBlock:(void (^)(NSError *error))failureBlock {
     
     NSURL *cachedURL = [[request.URL copy] autorelease];
     NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
     NSData *data = [NSData dataWithContentsOfFile:cachePath];
     
     if (data && usingCache) {
-        completionBlock(data, cachedURL);
+        completionBlock(data, cachedURL, YES);
     } else {
         PSURLCacheNetworkBlock networkBlock = ^(void){
             [NSURLConnection sendAsynchronousRequest:request 
@@ -126,7 +126,7 @@ pendingOperations = _pendingOperations;
                                    completionHandler:^(NSURLResponse *response, NSData *cachedData, NSError *error) {
                                        if (cachedData && !error) {
                                            [self cacheData:cachedData URL:cachedURL cacheType:cacheType];
-                                           completionBlock(cachedData, cachedURL);
+                                           completionBlock(cachedData, cachedURL, NO);
                                        } else {
                                            failureBlock(error);
                                        }
