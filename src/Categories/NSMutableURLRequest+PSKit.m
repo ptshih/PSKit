@@ -72,6 +72,12 @@ NSString *FSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
     }
     
     // Configure Headers
+    // Add default Headers
+    [request addValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
+    NSString *preferredLanguageCodes = [[NSLocale preferredLanguages] componentsJoinedByString:@", "];
+    [request addValue:[NSString stringWithFormat:@"%@, en-us;q=0.8", preferredLanguageCodes] forHTTPHeaderField:@"Accept-Language"];
+    
+    // Add custom headers
     if (headers) {
         [headers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
             // Header keys and values MUST be strings
