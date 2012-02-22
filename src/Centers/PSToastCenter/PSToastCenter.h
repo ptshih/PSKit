@@ -15,7 +15,7 @@ typedef enum {
     PSToastTypeError = 2
 } PSToastType;
 
-@interface PSToastCenter : PSObject {
+@interface PSToastCenter : NSObject {
     UIView *_toastView;
     UIButton *_toastButton;
     NSMutableArray *_toastQueue;

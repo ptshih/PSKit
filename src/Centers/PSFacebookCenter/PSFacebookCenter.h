@@ -17,7 +17,7 @@
 #define kPSFacebookCenterDialogDidSucceed @"PSFacebookCenterDialogDidSucceed"
 #define kPSFacebookCenterDialogDidFail @"PSFacebookCenterDialogDidFail"
 
-@interface PSFacebookCenter : PSObject <FBDialogDelegate, FBSessionDelegate, UIAlertViewDelegate> {
+@interface PSFacebookCenter : NSObject <FBDialogDelegate, FBSessionDelegate, UIAlertViewDelegate> {
   Facebook *_facebook;
   NSArray *_newPermissions;
 }

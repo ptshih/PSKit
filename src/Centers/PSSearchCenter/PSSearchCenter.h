@@ -10,7 +10,7 @@
 
 #define PS_SEARCH_CENTER_PLIST @"pssearchcenter.plist"
 
-@interface PSSearchCenter : PSObject {
+@interface PSSearchCenter : NSObject {
   NSMutableDictionary *_terms;
 }
 

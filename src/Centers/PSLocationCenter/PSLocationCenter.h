@@ -13,7 +13,7 @@
 #define kLocationAcquired @"LocationAcquired"
 #define kLocationUnchanged @"LocationUnchanged"
 
-@interface PSLocationCenter : PSObject <CLLocationManagerDelegate> {
+@interface PSLocationCenter : NSObject <CLLocationManagerDelegate> {
   CLLocationManager *_locationManager;
   CLLocation *_lastLocation; // last known good location
   
