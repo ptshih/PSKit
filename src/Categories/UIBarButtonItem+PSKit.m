@@ -1,6 +1,6 @@
 //
 //  UIBarButtonItem+PSKit.m
-//  Linsanity
+//  PSKit
 //
 //  Created by Peter Shih on 8/7/11.
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.

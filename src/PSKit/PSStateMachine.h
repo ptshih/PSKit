@@ -1,6 +1,6 @@
 //
 //  PSStateMachine.h
-//  Linsanity
+//  PSKit
 //
 //  Created by Peter Shih on 2/27/11.
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.
