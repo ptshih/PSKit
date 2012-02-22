@@ -63,14 +63,16 @@ loadingIndicator = _loadingIndicator;
 - (void)loadImageWithURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType {
     self.URL = URL;
     
-    [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL, BOOL isCached) {
-        if ([self.URL isEqual:cachedURL]) {
+    [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error) {
+        if (error) {
             [self.loadingIndicator stopAnimating];
-            self.image = [UIImage imageWithData:cachedData];
+            self.image = self.placeholderImage;
+        } else {
+            if ([self.URL isEqual:cachedURL]) {
+                [self.loadingIndicator stopAnimating];
+                self.image = [UIImage imageWithData:cachedData];
+            }
         }
-    } failureBlock:^(NSError *error) {
-        [self.loadingIndicator stopAnimating];
-        self.image = self.placeholderImage;
     }];
 }
 

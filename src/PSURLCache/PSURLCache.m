@@ -104,32 +104,28 @@ pendingOperations = _pendingOperations;
 }
 
 // Read from Cache
-- (void)loadURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached))completionBlock failureBlock:(void (^)(NSError *error))failureBlock {
+- (void)loadURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock {
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL method:@"GET" headers:nil parameters:nil];
     
-    [self loadRequest:request cacheType:cacheType usingCache:usingCache completionBlock:completionBlock failureBlock:failureBlock];
+    [self loadRequest:request cacheType:cacheType usingCache:usingCache completionBlock:completionBlock];
 }
 
-- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached))completionBlock failureBlock:(void (^)(NSError *error))failureBlock {
+- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock {
     
     NSURL *cachedURL = [[request.URL copy] autorelease];
     NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
     NSData *data = [NSData dataWithContentsOfFile:cachePath];
     
     if (data && usingCache) {
-        completionBlock(data, cachedURL, YES);
+        completionBlock(data, cachedURL, YES, nil);
     } else {
         PSURLCacheNetworkBlock networkBlock = ^(void){
             [NSURLConnection sendAsynchronousRequest:request 
                                                queue:[NSOperationQueue mainQueue] 
                                    completionHandler:^(NSURLResponse *response, NSData *cachedData, NSError *error) {
-                                       if (cachedData && !error) {
-                                           [self cacheData:cachedData URL:cachedURL cacheType:cacheType];
-                                           completionBlock(cachedData, cachedURL, NO);
-                                       } else {
-                                           failureBlock(error);
-                                       }
+                                       [self cacheData:cachedData URL:cachedURL cacheType:cacheType];
+                                       completionBlock(cachedData, cachedURL, NO, error);
                                    }];
         };
              
