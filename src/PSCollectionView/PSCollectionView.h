@@ -15,6 +15,7 @@
 @property (nonatomic, retain) NSMutableSet *reuseableViews;
 @property (nonatomic, retain) NSMutableDictionary *visibleViews;
 @property (nonatomic, retain) NSMutableArray *viewKeysToRemove;
+@property (nonatomic, retain) NSMutableDictionary *indexToRectMap;
 @property (nonatomic, assign) CGFloat rowHeight;
 @property (nonatomic, assign) NSInteger numCols;
 @property (nonatomic, assign) id <PSCollectionViewDelegate> collectionViewDelegate;
@@ -28,15 +29,12 @@
 - (void)enqueueReusableView:(UIView *)view;
 - (void)removeAndAddCellsIfNecessary;
 
-
-+ (NSString *)viewKeyForIndex:(NSInteger)index;
-
 @end
 
 
 @protocol PSCollectionViewDelegate <NSObject>
 @optional
-- (void)collectionView:(PSCollectionView *)collectionView didSelectViewAtIndex:(NSInteger)index;
+- (void)collectionView:(PSCollectionView *)collectionView didSelectView:(UIView *)view atIndex:(NSInteger)index;
 
 @end
 
@@ -45,5 +43,6 @@
 @required
 - (NSInteger)numberOfViewsInCollectionView:(PSCollectionView *)collectionView;
 - (UIView *)collectionView:(PSCollectionView *)collectionView viewAtIndex:(NSInteger)index;
+- (CGSize)sizeForViewAtIndex:(NSInteger)index;
 
 @end
