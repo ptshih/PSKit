@@ -31,6 +31,8 @@
 - (void)dataSourceDidLoad;
 - (void)dataSourceDidError;
 
+- (void)reloadAfterError:(UIButton *)button;
+
 /**
  Helps determine if a loading/empty screen is shown
  Or if data has been loaded to display
