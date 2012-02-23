@@ -151,6 +151,10 @@ collectionViewDataSource = _collectionViewDataSource;
     // This is where we should layout the entire grid first
     
     // Reset all state
+    [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        UIView *view = (UIView *)obj;
+        [self enqueueReusableView:view];
+    }];
     [self.visibleViews removeAllObjects];
     [self.viewKeysToRemove removeAllObjects];
     [self.indexToRectMap removeAllObjects];
