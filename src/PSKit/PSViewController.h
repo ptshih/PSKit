@@ -14,6 +14,7 @@
 
 @interface PSViewController : UIViewController <PSStateMachine>
 
+@property (nonatomic, assign) UIView *headerView;
 @property (nonatomic, assign) UIScrollView *activeScrollView; // subclasses should set this if they have a scrollView
 
 /**

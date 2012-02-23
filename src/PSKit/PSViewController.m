@@ -11,6 +11,7 @@
 @implementation PSViewController
 
 @synthesize
+headerView = _headerView,
 activeScrollView = _activeScrollView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
