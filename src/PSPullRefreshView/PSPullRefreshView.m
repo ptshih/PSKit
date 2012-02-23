@@ -19,34 +19,52 @@ static NSString * const PSPullRefreshRefreshingStatus = @"Refreshing New Data";
 delegate = _delegate,
 scrollView = _scrollView,
 state = _state,
+style = _style,
 iconView = _iconView,
 statusLabel = _statusLabel;
 
-- (id)initWithFrame:(CGRect)frame {
+- (id)initWithFrame:(CGRect)frame style:(PSPullRefreshStyle)style {
     self = [super initWithFrame:frame];
     if (self) {
-        CGFloat width = 0.0;
-        CGFloat left = 0.0;
-        
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         self.backgroundColor = [UIColor clearColor];
         
         self.state = PSPullRefreshStateIdle;
         
-        self.iconView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSPullRefreshView.bundle/IconRefreshWhite.png"]] autorelease];
+        self.style = style;
+        
+        UIImage *icon = nil;
+        NSString *labelStyle = nil;
+        if (self.style == PSPullRefreshStyleWhite) {
+            icon = [UIImage imageNamed:@"PSPullRefreshView.bundle/IconRefreshWhite.png"];
+            labelStyle = @"pullRefreshWhiteLabel";
+        } else {
+            icon = [UIImage imageNamed:@"PSPullRefreshView.bundle/IconRefreshBlack.png"];
+            labelStyle = @"pullRefreshBlackLabel";
+        }
+        self.iconView = [[[UIImageView alloc] initWithImage:icon] autorelease];
         self.iconView.contentMode = UIViewContentModeCenter;
         self.iconView.frame = CGRectMake(0, 0, self.height, self.height);
         
+        CGFloat width = 0.0;
+        CGFloat left = 0.0;
         left = self.iconView.width;
         width = self.width - self.iconView.width * 2;
         
-        self.statusLabel = [UILabel labelWithText:@"PSPullRefreshView Status" style:@"pullRefreshLabel"];
+        self.statusLabel = [UILabel labelWithText:@"PSPullRefreshView Status" style:labelStyle];
         self.statusLabel.frame = CGRectMake(left, 0, width, self.height);
         self.statusLabel.autoresizingMask = self.autoresizingMask;
         self.statusLabel.textAlignment = UITextAlignmentCenter;
-    
+        
         [self addSubview:self.iconView];
         [self addSubview:self.statusLabel];
+    }
+    return self;
+}
+
+- (id)initWithFrame:(CGRect)frame {
+    self = [self initWithFrame:frame style:PSPullRefreshStyleWhite];
+    if (self) {
     }
     return self;
 }

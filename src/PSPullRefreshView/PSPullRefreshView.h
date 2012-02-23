@@ -12,6 +12,11 @@
 @protocol PSPullRefreshViewDelegate;
 
 typedef enum {
+    PSPullRefreshStyleWhite = 0,
+    PSPullRefreshStyleBlack = 1
+} PSPullRefreshStyle;
+
+typedef enum {
     PSPullRefreshStateIdle = 0,
     PSPullRefreshStateRefreshing
 } PSPullRefreshState;
@@ -21,8 +26,11 @@ typedef enum {
 @property (nonatomic, assign) id <PSPullRefreshViewDelegate> delegate;
 @property (nonatomic, assign) UIScrollView *scrollView;
 @property (nonatomic, assign) PSPullRefreshState state;
+@property (nonatomic, assign) PSPullRefreshStyle style;
 @property (nonatomic, retain) UIImageView *iconView;
 @property (nonatomic, retain) UILabel *statusLabel;
+
+- (id)initWithFrame:(CGRect)frame style:(PSPullRefreshStyle)style;
 
 - (void)pullRefreshScrollViewDidScroll:(UIScrollView *)scrollView;
 - (void)pullRefreshScrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate;

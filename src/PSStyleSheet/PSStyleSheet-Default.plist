@@ -51,7 +51,7 @@
 		<key>shadowOffset</key>
 		<string>{0,1}</string>
 	</dict>
-	<key>pullRefreshLabel</key>
+	<key>pullRefreshWhiteLabel</key>
 	<dict>
 		<key>fontName</key>
 		<string>HelveticaNeueLT-MediumCond</string>
@@ -59,6 +59,19 @@
 		<integer>18</integer>
 		<key>textColor</key>
 		<string>0xefefef</string>
+		<key>shadowColor</key>
+		<string>0xefefef</string>
+		<key>shadowOffset</key>
+		<string>{0,0}</string>
+	</dict>
+	<key>pullRefreshBlackLabel</key>
+	<dict>
+		<key>fontName</key>
+		<string>HelveticaNeueLT-MediumCond</string>
+		<key>fontSize</key>
+		<integer>18</integer>
+		<key>textColor</key>
+		<string>0x000000</string>
 		<key>shadowColor</key>
 		<string>0xefefef</string>
 		<key>shadowOffset</key>
