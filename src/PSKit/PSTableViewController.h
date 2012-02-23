@@ -48,7 +48,4 @@
 
 - (void)tableView:(UITableView *)tableView configureCell:(id)cell atIndexPath:(NSIndexPath *)indexPath;
 
-// ScrollView Stuff
-- (void)scrollEndedTrigger;
-
 @end

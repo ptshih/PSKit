@@ -442,30 +442,12 @@ loadMoreView = _loadMoreView;
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    //  [self scrollEndedTrigger];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if (self.pullRefreshView) {
         [self.pullRefreshView pullRefreshScrollViewDidScroll:scrollView];
     }
-    
-//    if ([self shouldLoadMore]) {
-//        if ([scrollView isKindOfClass:[UITableView class]]) {
-//            UITableView *tableView = (UITableView *)scrollView;
-//            if (!self.reloading && _hasMore && [[tableView visibleCells] count] > 0) {
-//                CGFloat tableOffset = tableView.contentOffset.y + tableView.height;
-//                CGFloat tableBottom = tableView.contentSize.height - tableView.rowHeight;
-//                
-//                if (tableOffset >= tableBottom) {
-//                    [self loadMore];
-//                }
-//            }
-//        }
-//    }
-}
-
-- (void)scrollEndedTrigger {
 }
 
 #pragma mark - PSPullRefreshViewDelegate
