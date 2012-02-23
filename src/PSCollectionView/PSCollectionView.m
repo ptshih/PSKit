@@ -9,8 +9,6 @@
 #import "PSCollectionView.h"
 #import "UIView+PSKit.h"
 
-#define VIEW_SPACING 8.0
-
 static inline NSString * PSCollectionKeyForIndex(NSInteger index) {
     return [NSString stringWithFormat:@"%d", index];
 }
@@ -26,7 +24,6 @@ reuseableViews = _reuseableViews,
 visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
 indexToRectMap = _indexToRectMap,
-rowHeight = _rowHeight,
 numCols = _numCols,
 collectionViewDelegate = _collectionViewDelegate,
 collectionViewDataSource = _collectionViewDataSource;
@@ -38,15 +35,18 @@ collectionViewDataSource = _collectionViewDataSource;
         self.visibleViews = [NSMutableDictionary dictionary];
         self.viewKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
-        self.rowHeight = 0.0;
         self.numCols = 0;
         self.scrollEnabled = YES;
         self.bounces = YES;
+        
+//        [self addObserver:self forKeyPath:@"contentOffset" options:0 context:nil];
     }
     return self;
 }
 
 - (void)dealloc {
+//    [self removeObserver:self forKeyPath:@"contentOffset"];
+    
     // clear delegates
     self.collectionViewDataSource = nil;
     self.collectionViewDelegate = nil;
@@ -58,6 +58,13 @@ collectionViewDataSource = _collectionViewDataSource;
     self.indexToRectMap = nil;
     [super dealloc];
 }
+
+#pragma mark - KVO
+//- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+//    if ([object isEqual:self]) {
+//        [self removeAndAddCellsIfNecessary];
+//    }
+//}
 
 #pragma mark - View
 - (void)layoutSubviews {
@@ -72,6 +79,8 @@ collectionViewDataSource = _collectionViewDataSource;
     
     NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
     
+    if (numViews == 0) return;
+    
     // Find out what rows are visible
     CGRect visibleRect = CGRectMake(self.contentOffset.x, self.contentOffset.y, self.width, self.height);
     
@@ -79,45 +88,43 @@ collectionViewDataSource = _collectionViewDataSource;
     [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         UIView *view = (UIView *)obj;
         CGRect viewRect = view.frame;
-        if (CGRectIntersectsRect(visibleRect, viewRect) != 1) {
+        if (!CGRectIntersectsRect(visibleRect, viewRect)) {
+            [self enqueueReusableView:view];
             [self.viewKeysToRemove addObject:key];
         }
     }];
     
-    NSArray *keys = [self.visibleViews allKeys];                     
-    NSArray *sortedKeys = [keys sortedArrayUsingComparator:^(id obj1, id obj2) {
-    if ([obj1 integerValue] < [obj2 integerValue]) {
-        return (NSComparisonResult)NSOrderedAscending;
-    } else if ([obj1 integerValue] > [obj2 integerValue]) {
-        return (NSComparisonResult)NSOrderedDescending;
-    } else {
-        return (NSComparisonResult)NSOrderedSame;
-    }
-    }];
-    
-    if ([sortedKeys count] > 0) {
-        topIndex = [[sortedKeys objectAtIndex:0] integerValue];
-        bottomIndex = [[sortedKeys lastObject] integerValue];
-//        NSLog(@"topIndex: %d bottomIndex: %d", topIndex, bottomIndex);
-    } else {
-        topIndex = 0;
-        bottomIndex = 0;
-    }
-    
-    for (NSString *key in self.viewKeysToRemove) {
-        UIView *view = [self.visibleViews objectForKey:key];
-        [view removeFromSuperview];
-        [self.visibleViews removeObjectForKey:key];
-    }
+    [self.visibleViews removeObjectsForKeys:self.viewKeysToRemove];
     [self.viewKeysToRemove removeAllObjects];
     
+    if ([self.visibleViews count] == 0) {
+        topIndex = 0;
+        bottomIndex = numViews;
+    } else {
+        NSArray *sortedKeys = [[self.visibleViews allKeys] sortedArrayUsingComparator:^(id obj1, id obj2) {
+            if ([obj1 integerValue] < [obj2 integerValue]) {
+                return (NSComparisonResult)NSOrderedAscending;
+            } else if ([obj1 integerValue] > [obj2 integerValue]) {
+                return (NSComparisonResult)NSOrderedDescending;
+            } else {
+                return (NSComparisonResult)NSOrderedSame;
+            }
+        }];
+        topIndex = [[sortedKeys objectAtIndex:0] integerValue];
+        bottomIndex = [[sortedKeys lastObject] integerValue];
+        
+        topIndex = MAX(0, topIndex - 20);
+        bottomIndex = MIN(numViews, bottomIndex + 20);
+    }
+//    NSLog(@"topIndex: %d, bottomIndex: %d", topIndex, bottomIndex);
+    
     // Add views
-    for (NSInteger i = MAX(0, topIndex - 20); i < MIN(numViews, bottomIndex + 20); i++) {
+    for (NSInteger i = topIndex; i < bottomIndex; i++) {
         NSString *key = PSCollectionKeyForIndex(i);
         CGRect rect = CGRectFromString([self.indexToRectMap objectForKey:key]);
         
         // If view is within visible rect and is not already shown
-        if (![self.visibleViews objectForKey:key] && (CGRectIntersectsRect(visibleRect, rect) == 1)) {
+        if (![self.visibleViews objectForKey:key] && CGRectIntersectsRect(visibleRect, rect)) {
             // Only add views if not visible
             UIView *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
             newView.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
@@ -131,9 +138,6 @@ collectionViewDataSource = _collectionViewDataSource;
             }
             
             [self.visibleViews setObject:newView forKey:key];
-            
-            topIndex = (topIndex < i) ? topIndex : i;
-            bottomIndex = (bottomIndex > i) ? bottomIndex : i;
         }
     }
 }
@@ -161,7 +165,20 @@ collectionViewDataSource = _collectionViewDataSource;
     CGFloat colWidth = floorf((self.width - margin * (self.numCols + 1)) / self.numCols);
     for (NSInteger i = 0; i < numViews; i++) {
         NSString *key = PSCollectionKeyForIndex(i);
-        NSInteger col = i % self.numCols;
+        
+        // Find the shortest column
+        __block NSInteger col = 0;
+        __block CGFloat h = 0.0;
+        [colOffsets enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            if (idx == 0) {
+                col = idx;
+                h = [obj floatValue];
+            } else if (h > [obj floatValue]) {
+                col = idx;
+            }
+        }];
+        
+//        NSInteger col = i % self.numCols;
         CGFloat left = margin + (col * margin) + (col * colWidth);
         CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
         CGSize size = [self.collectionViewDataSource sizeForViewAtIndex:i];
@@ -214,6 +231,10 @@ collectionViewDataSource = _collectionViewDataSource;
 }
 
 - (void)enqueueReusableView:(UIView *)view {
+    if ([view respondsToSelector:@selector(prepareForReuse)]) {
+        [view performSelector:@selector(prepareForReuse)];
+    }
+    view.frame = CGRectZero;
     [self.reuseableViews addObject:view];
     [view removeFromSuperview];
 }

@@ -16,7 +16,6 @@
 @property (nonatomic, retain) NSMutableDictionary *visibleViews;
 @property (nonatomic, retain) NSMutableArray *viewKeysToRemove;
 @property (nonatomic, retain) NSMutableDictionary *indexToRectMap;
-@property (nonatomic, assign) CGFloat rowHeight;
 @property (nonatomic, assign) NSInteger numCols;
 @property (nonatomic, assign) id <PSCollectionViewDelegate> collectionViewDelegate;
 @property (nonatomic, assign) id <PSCollectionViewDataSource> collectionViewDataSource;
