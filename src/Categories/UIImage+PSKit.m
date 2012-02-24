@@ -39,21 +39,6 @@
   return [UIImage imageWithCGImage:self.CGImage scale:s orientation:self.imageOrientation];
 }
 
-#pragma mark - NSCoding
-- (id)initWithCoder:(NSCoder *)decoder {
-  self = [super init];
-  if (self) {
-    NSData *data = [decoder decodeObjectForKey:kEncodingKey];
-    self = [self initWithData:data];
-  }
-  return self;
-}
-
-- (void)encodeWithCoder:(NSCoder *)encoder {
-  NSData *data = UIImagePNGRepresentation(self);
-  [encoder encodeObject:data forKey:kEncodingKey];
-}
-
 #pragma mark - Screenshot
 // Helper
 + (void)beginImageContextWithSize:(CGSize)size {

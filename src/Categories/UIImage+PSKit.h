@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 
-@interface UIImage (PSKit) <NSCoding>
+@interface UIImage (PSKit)
 
 #pragma mark - Orientation
 - (BOOL)isPortrait;
@@ -21,10 +21,6 @@
 
 #pragma mark - Screen Scale
 - (UIImage *)imageScaledForScreen;
-
-#pragma mark - NSCoding
-- (id)initWithCoder:(NSCoder *)decoder;
-- (void)encodeWithCoder:(NSCoder *)encoder;
 
 #pragma mark - Screenshot
 + (UIImage *)imageFromView:(UIView*)view;
