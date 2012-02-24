@@ -121,6 +121,8 @@
 
 #pragma mark - FBSessionDelegate
 - (void)fbDidLogin {
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidBegin object:nil];
+    
     if (_newPermissions) {
         [[NSUserDefaults standardUserDefaults] setObject:_newPermissions forKey:@"fbExtendedPermissions"];
         [_newPermissions release], _newPermissions = nil;

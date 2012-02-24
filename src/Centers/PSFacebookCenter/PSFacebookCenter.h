@@ -14,6 +14,7 @@
 #define FB_PERMISSIONS_PUBLISH @"publish_stream"
 #define FB_BASIC_PERMISISONS [NSArray arrayWithObjects:@"offline_access", @"user_photos", nil]
 
+#define kPSFacebookCenterDialogDidBegin @"kPSFacebookCenterDialogDidBegin"
 #define kPSFacebookCenterDialogDidSucceed @"PSFacebookCenterDialogDidSucceed"
 #define kPSFacebookCenterDialogDidFail @"PSFacebookCenterDialogDidFail"
 
