@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "PSImageView.h"
-#import "PSURLCache.h"
 
 @interface PSCachedImageView : PSImageView
 

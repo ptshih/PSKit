@@ -7,6 +7,7 @@
 //
 
 // Global Imports
+#import "PSURLCache.h"
 #import "PSStyleSheet.h"
 #import "PSObject.h"
 #import "PSView.h"
