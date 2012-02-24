@@ -121,9 +121,11 @@ pendingOperations = _pendingOperations;
         completionBlock(data, cachedURL, YES, nil);
     } else {
         PSURLCacheNetworkBlock networkBlock = ^(void){
+            [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:self];
             [NSURLConnection sendAsynchronousRequest:request 
                                                queue:[NSOperationQueue mainQueue] 
                                    completionHandler:^(NSURLResponse *response, NSData *cachedData, NSError *error) {
+                                       [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:self];
                                        [self cacheData:cachedData URL:cachedURL cacheType:cacheType];
                                        completionBlock(cachedData, cachedURL, NO, error);
                                    }];
