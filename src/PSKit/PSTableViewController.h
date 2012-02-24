@@ -22,7 +22,6 @@
 @property (nonatomic, retain) NSMutableArray *searchItems;
 @property (nonatomic, retain) NSMutableArray *sectionTitles;
 @property (nonatomic, retain) NSMutableDictionary *selectedIndexes;
-@property (nonatomic, retain) NSMutableArray *cellCache;
 @property (nonatomic, assign) CGPoint contentOffset;
 
 @property (nonatomic, retain) UITableView *tableView;

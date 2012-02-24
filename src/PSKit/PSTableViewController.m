@@ -19,7 +19,6 @@ items = _items,
 searchItems = _searchItems,
 sectionTitles = _sectionTitles,
 selectedIndexes = _selectedIndexes,
-cellCache = _cellCache,
 contentOffset = _contentOffset,
 
 tableView = _tableView,
@@ -35,7 +34,6 @@ loadMoreView = _loadMoreView;
         self.searchItems = [NSMutableArray array];
         self.sectionTitles = [NSMutableArray array];
         self.selectedIndexes = [NSMutableDictionary dictionary];
-        self.cellCache = [NSMutableArray array];;
         
         // View State
         self.contentOffset = CGPointZero;
@@ -84,7 +82,6 @@ loadMoreView = _loadMoreView;
     RELEASE_SAFELY(_selectedIndexes);
     RELEASE_SAFELY(_items);
     RELEASE_SAFELY(_searchItems);
-    RELEASE_SAFELY(_cellCache);
     
     [super dealloc];
 }
@@ -185,12 +182,6 @@ loadMoreView = _loadMoreView;
     _pagingTotal = _pagingCount;
 }
 
-//- (void)reloadDataSafely {
-//    [_cellCache makeObjectsPerformSelector:@selector(setShouldAnimate:) withObject:[NSNumber numberWithBool:NO]];
-//    [self.tableView reloadData];
-//    [_cellCache makeObjectsPerformSelector:@selector(setShouldAnimate:) withObject:[NSNumber numberWithBool:YES]];
-//}
-
 #pragma mark - PSStateMachine
 - (BOOL)dataSourceIsEmpty {
     // Is this a searchResultsTable or just Table?
@@ -262,7 +253,6 @@ loadMoreView = _loadMoreView;
         //
         // BEGIN TABLEVIEW ANIMATION BLOCK
         //
-        [_cellCache makeObjectsPerformSelector:@selector(setShouldAnimate:) withObject:[NSNumber numberWithBool:NO]];
         [self.tableView beginUpdates];
         
         // These are the sections that need to be inserted
@@ -285,7 +275,6 @@ loadMoreView = _loadMoreView;
         }
         
         [self.tableView endUpdates];
-        [_cellCache makeObjectsPerformSelector:@selector(setShouldAnimate:) withObject:[NSNumber numberWithBool:YES]];
         //
         // END TABLEVIEW ANIMATION BLOCK
         //
@@ -359,7 +348,6 @@ loadMoreView = _loadMoreView;
     cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
     if(cell == nil) { 
         cell = [[[cellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier] autorelease];
-        [_cellCache addObject:cell];
     }
     
     [self tableView:tableView configureCell:cell atIndexPath:indexPath];
