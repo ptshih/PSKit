@@ -16,15 +16,13 @@
 
 @synthesize
 reloading = _reloading,
-hasLoadedOnce = _hasLoadedOnce,
-dataDidError = _dataDidError;
+hasLoadedOnce = _hasLoadedOnce;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.reloading = NO;
         self.hasLoadedOnce = NO;
-        self.dataDidError = NO;
     }
     return self;
 }
@@ -43,18 +41,6 @@ dataDidError = _dataDidError;
 }
 
 #pragma mark - PSStateMachine
-- (BOOL)dataIsAvailable {
-    return NO;
-}
-
-- (BOOL)dataIsLoading {
-    return self.reloading;
-}
-
-- (BOOL)dataDidError {
-    return self.dataDidError;
-}
-
 // Data Source
 - (void)loadDataSource {
     [self beginRefresh];
@@ -71,6 +57,10 @@ dataDidError = _dataDidError;
 
 - (void)dataSourceDidError {
     [self endRefresh];
+}
+
+- (BOOL)dataSourceIsEmpty {
+    return NO;
 }
 
 - (void)beginRefresh {

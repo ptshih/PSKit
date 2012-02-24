@@ -192,7 +192,7 @@ loadMoreView = _loadMoreView;
 //}
 
 #pragma mark - PSStateMachine
-- (BOOL)dataIsAvailable {
+- (BOOL)dataSourceIsEmpty {
     // Is this a searchResultsTable or just Table?
     NSArray *items = (self.tableView == self.searchDisplayController.searchResultsTableView) ? self.searchItems : self.items;
     
@@ -202,14 +202,14 @@ loadMoreView = _loadMoreView;
         for (NSArray *section in items) {
             if ([section count] > 0) {
                 // Found a non-empty section
-                return YES;
+                return NO;
             }
         }
         // All sections are empty
-        return NO;
+        return YES;
     } else {
         // Has no sections
-        return NO;
+        return YES;
     }
 }
 

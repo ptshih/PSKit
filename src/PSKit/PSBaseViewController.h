@@ -9,10 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "PSViewController.h"
 
-@interface PSBaseViewController : PSViewController
+@interface PSBaseViewController : PSViewController <PSErrorViewDelegate>
 
 @property (nonatomic, assign) BOOL reloading;
 @property (nonatomic, assign) BOOL hasLoadedOnce;
-@property (nonatomic, assign) BOOL dataDidError;
 
 @end

@@ -30,6 +30,7 @@
 
 - (void)dataSourceDidLoad;
 - (void)dataSourceDidError;
+- (BOOL)dataSourceIsEmpty;
 
 - (void)reloadAfterError:(UIButton *)button;
 
@@ -38,9 +39,6 @@
  Or if data has been loaded to display
  Subclasses should implement
  */
-- (BOOL)dataIsAvailable;
-- (BOOL)dataIsLoading;
-- (BOOL)dataDidError;
 
 // Refresh
 - (void)beginRefresh;
