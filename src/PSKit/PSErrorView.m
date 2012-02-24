@@ -17,7 +17,7 @@ delegate = _delegate;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"BackgroundPaper.jpg"]];
+        self.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"BackgroundPaper"]];
         
         self.messageLabel = [UILabel labelWithStyle:@"errorViewMessageLabel"];
         self.messageLabel.autoresizingMask = ~UIViewAutoresizingNone;
