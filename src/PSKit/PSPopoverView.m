@@ -16,7 +16,7 @@ delegate = _delegate;
 - (id)initWithTitle:(NSString *)title contentView:(UIView *)contentView {
     self = [super initWithFrame:[[UIScreen mainScreen] bounds]];
     if (self) {
-        UIImageView *backgroundView = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PopoverPortrait"] stretchableImageWithLeftCapWidth:0 topCapHeight:170]] autorelease];
+        UIImageView *backgroundView = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/PopoverPortrait"] stretchableImageWithLeftCapWidth:0 topCapHeight:170]] autorelease];
         [self addSubview:backgroundView];
         backgroundView.layer.masksToBounds = NO;
         backgroundView.layer.shadowColor = [[UIColor blackColor] CGColor];
@@ -25,7 +25,7 @@ delegate = _delegate;
         backgroundView.layer.shadowOpacity = 1.0;
         backgroundView.userInteractionEnabled = YES;
         
-        UIImageView *arrowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PopoverPortraitArrowUp"]] autorelease];
+        UIImageView *arrowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/PopoverPortraitArrowUp"]] autorelease];
         [self addSubview:arrowView];
         
         backgroundView.frame = CGRectMake(8, 20 + 44 + 8, 304, 400);
