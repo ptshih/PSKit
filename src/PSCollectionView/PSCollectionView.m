@@ -36,8 +36,7 @@ collectionViewDataSource = _collectionViewDataSource;
         self.viewKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
         self.numCols = 0;
-        self.scrollEnabled = YES;
-        self.bounces = YES;
+        self.alwaysBounceVertical = YES;
         
 //        [self addObserver:self forKeyPath:@"contentOffset" options:0 context:nil];
     }
