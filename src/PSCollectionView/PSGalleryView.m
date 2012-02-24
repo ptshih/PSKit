@@ -34,8 +34,7 @@ galleryViewDataSource = _galleryViewDataSource;
         self.viewKeysToRemove = [NSMutableArray array];
         self.rowHeight = 0.0;
         self.numCols = 0;
-        self.scrollEnabled = YES;
-        self.bounces = YES;
+        self.alwaysBounceVertical = YES;
     }
     return self;
 }
