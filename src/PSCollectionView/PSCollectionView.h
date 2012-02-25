@@ -17,6 +17,7 @@
 @property (nonatomic, retain) NSMutableArray *viewKeysToRemove;
 @property (nonatomic, retain) NSMutableDictionary *indexToRectMap;
 @property (nonatomic, assign) NSInteger numCols;
+@property (nonatomic, assign) CGFloat colWidth;
 @property (nonatomic, assign) id <PSCollectionViewDelegate> collectionViewDelegate;
 @property (nonatomic, assign) id <PSCollectionViewDataSource> collectionViewDataSource;
 
@@ -42,6 +43,6 @@
 @required
 - (NSInteger)numberOfViewsInCollectionView:(PSCollectionView *)collectionView;
 - (UIView *)collectionView:(PSCollectionView *)collectionView viewAtIndex:(NSInteger)index;
-- (CGSize)sizeForViewAtIndex:(NSInteger)index;
+- (CGFloat)heightForViewAtIndex:(NSInteger)index;
 
 @end

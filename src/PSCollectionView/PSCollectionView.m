@@ -25,6 +25,7 @@ visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
 indexToRectMap = _indexToRectMap,
 numCols = _numCols,
+colWidth = _colWidth,
 collectionViewDelegate = _collectionViewDelegate,
 collectionViewDataSource = _collectionViewDataSource;
 
@@ -36,6 +37,7 @@ collectionViewDataSource = _collectionViewDataSource;
         self.viewKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
         self.numCols = 0;
+        self.colWidth = 0.0;
         self.alwaysBounceVertical = YES;
         
 //        [self addObserver:self forKeyPath:@"contentOffset" options:0 context:nil];
@@ -165,7 +167,7 @@ collectionViewDataSource = _collectionViewDataSource;
     }
     
     // Calculate index to rect mapping
-    CGFloat colWidth = floorf((self.width - margin * (self.numCols + 1)) / self.numCols);
+    self.colWidth = floorf((self.width - margin * (self.numCols + 1)) / self.numCols);
     for (NSInteger i = 0; i < numViews; i++) {
         NSString *key = PSCollectionKeyForIndex(i);
         
@@ -182,20 +184,18 @@ collectionViewDataSource = _collectionViewDataSource;
         }];
         
 //        NSInteger col = i % self.numCols;
-        CGFloat left = margin + (col * margin) + (col * colWidth);
+        CGFloat left = margin + (col * margin) + (col * self.colWidth);
         CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
-        CGSize size = [self.collectionViewDataSource sizeForViewAtIndex:i];
-        if (CGSizeEqualToSize(CGSizeZero, size)) {
-            // If size is unacceptable, default to square
-            size = CGSizeMake(colWidth, colWidth);
+        CGFloat colHeight = [self.collectionViewDataSource heightForViewAtIndex:i];
+        if (colHeight == 0) {
+            colHeight = self.colWidth;
         }
-        CGFloat colHeight = floorf(size.height / (size.width / colWidth));
         
         if (top != top) {
             NSLog(@"nan");
         }
         
-        CGRect viewRect = CGRectMake(left, top, colWidth, colHeight);
+        CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
         
         // Add to index rect map
         [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
@@ -246,8 +246,14 @@ collectionViewDataSource = _collectionViewDataSource;
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
     NSLog(@"view tapped, no index here yet!: %@", gestureRecognizer.view);
     
+    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
+    
+    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
+    
+    NSInteger matchingIndex = PSCollectionIndexForKey([matchingKeys lastObject]);
+    
     if (self.collectionViewDelegate && [self.collectionViewDelegate respondsToSelector:@selector(collectionView:didSelectView:atIndex:)]) {
-        [self.collectionViewDelegate collectionView:self didSelectView:gestureRecognizer.view atIndex:0];
+        [self.collectionViewDelegate collectionView:self didSelectView:gestureRecognizer.view atIndex:matchingIndex];
     }
 }
 
