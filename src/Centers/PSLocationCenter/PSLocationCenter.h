@@ -10,33 +10,29 @@
 #import <CoreLocation/CoreLocation.h>
 #import <ImageIO/ImageIO.h>
 
-#define kLocationAcquired @"LocationAcquired"
-#define kLocationUnchanged @"LocationUnchanged"
+#define kPSLocationCenterDidUpdate @"kPSLocationCenterDidUpdate"
+#define kPSLocationCenterDidFail @"kPSLocationCenterDidFail"
 
 @interface PSLocationCenter : NSObject <CLLocationManagerDelegate> {
-  CLLocationManager *_locationManager;
-  CLLocation *_lastLocation; // last known good location
   
   NSDate *_startDate;
-  NSTimer *_pollTimer;
-  
-  BOOL _hasGPSLock;
-  BOOL _locationRequested;
-  BOOL _isUpdating;
-  BOOL _shouldDisableAfterLocationFix;
-  BOOL _shouldMonitorSignificantChange;
+
 }
 
 @property (nonatomic, retain) CLLocationManager *locationManager;
+@property (nonatomic, copy) CLLocation *location;
+@property (nonatomic, retain) NSTimer *pollTimer;
+@property (nonatomic, retain) NSDate *pollStartDate;
+@property (nonatomic, assign) BOOL isActive;
+@property (nonatomic, assign) BOOL locationRequested;
 @property (nonatomic, assign) BOOL shouldDisableAfterLocationFix;
-@property (nonatomic, assign) BOOL shouldMonitorSignificantChange;
-@property (nonatomic, readonly) BOOL hasGPSLock;
 
 + (id)defaultCenter;
 
 // Public Methods
-- (void)getMyLocation;
+- (void)updateMyLocation;
 - (BOOL)hasAcquiredLocation;
+- (BOOL)hasAcquiredAccurateLocation;
 - (CLLocation *)location;
 - (CLLocationCoordinate2D)locationCoordinate;
 - (CLLocationDegrees)latitude;
@@ -49,6 +45,8 @@
 // Private Methods
 - (void)startUpdates;
 - (void)stopUpdates;
+- (void)resumeUpdates;
+- (void)suspendUpdates;
 - (void)pollLocation:(NSTimer *)timer;
 
 @end

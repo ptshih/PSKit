@@ -11,6 +11,44 @@
 
 @implementation NSString (PSKit)
 
+double kmFromMeters(double meters) {
+    return meters * 0.001;
+}
+
+double feetFromMiles(double miles) {
+    return miles * 5280;
+}
+
+// imperial from metric
+
+double milesFromKM(double km) {
+    return km * 0.621371192;
+}
+
+double milesFromMeters(double meters) {
+    return meters * 0.000621371192;
+}
+
+double yardsFromMeters(double meters) {
+    return meters * 1.0936133;
+}
+
+double feetFromMeters(double meters) {
+    return meters * 3.2808399;
+}
+
+
+// metric from imperial
+
+double metersFromMiles(double miles) {
+    return miles * 1609.344;
+}
+
+double kmFromMiles(double miles) {
+    return miles * 1.609344;
+}
+
+
 #pragma mark - UUID
 + (NSString *)stringFromUUID {
   CFUUIDRef theUUID = CFUUIDCreate(NULL);
@@ -340,6 +378,47 @@
           result[8], result[9], result[10], result[11],
           result[12], result[13], result[14], result[15]
           ];
+}
+
++ (NSString *)localizedStringForDistance:(float)distance {
+    BOOL metric = [[[NSLocale currentLocale] objectForKey:NSLocaleUsesMetricSystem] boolValue];
+    
+    float value;
+    NSString* unit;
+    int precision = 0;
+    
+    if (metric) {
+        value = kmFromMeters(distance);
+        if (value >= 0.1) {
+            unit = NSLocalizedString(@"km", @"kilometers (abbreviated distance label)");
+            if (value < 10) precision = 1;
+        }
+        else {
+            unit = NSLocalizedString(@"m", @"meters (abbreviated distance label)");
+            value = distance;
+            if (value > 10)
+                value = ((int)value / 10) * 10; // clamp to nearest ten just to make it a little 'friendlier' looking
+        }
+    }
+    else {
+        value = milesFromMeters(distance);
+        if (value >= 0.1) {
+            unit = NSLocalizedString(@"mi", @"miles (abbreviated distance label)");
+            if (value < 10) precision = 1;
+        }
+        else {
+            unit = NSLocalizedString(@"ft", @"feet (abbreviated distance label)");
+            value = feetFromMeters(distance);
+            if (value > 10)
+                value = ((int)value / 10) * 10; // clamp to nearest ten just to make it a little 'friendlier' looking
+        }
+    }
+    
+    NSNumberFormatter *formatter = [[[NSNumberFormatter alloc] init] autorelease];
+    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    [formatter setMaximumFractionDigits:precision];
+    
+    return [NSString stringWithFormat:@"%@ %@", [formatter stringFromNumber:[NSNumber numberWithFloat:value]], unit];
 }
 
 @end
