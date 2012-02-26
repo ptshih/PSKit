@@ -61,7 +61,7 @@ delegate = _delegate;
     [[APP_DELEGATE window] addSubview:self];
     self.alpha = 0.0;
     
-    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
         self.alpha = 1.0;
     } completion:^(BOOL finished){
         [[UIApplication sharedApplication] endIgnoringInteractionEvents];
@@ -70,7 +70,7 @@ delegate = _delegate;
 
 - (void)dismiss {
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
-    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
         self.alpha = 0.0;
     } completion:^(BOOL finished){
         [[UIApplication sharedApplication] endIgnoringInteractionEvents];
