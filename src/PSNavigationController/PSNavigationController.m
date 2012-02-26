@@ -121,11 +121,12 @@ const CGFloat kOverlayViewAlpha = 0.75;
             break;
     }
     self.topViewController.view.frame = offscreenFrame;
-    self.topViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
-    self.topViewController.view.layer.shadowOffset = shadowSize;
-    self.topViewController.view.layer.shadowOpacity = 0.75;
-    self.topViewController.view.layer.shadowRadius = 5.0;
-    self.topViewController.view.layer.shouldRasterize = YES;
+    
+//    self.topViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
+//    self.topViewController.view.layer.shadowOffset = shadowSize;
+//    self.topViewController.view.layer.shadowOpacity = 0.75;
+//    self.topViewController.view.layer.shadowRadius = 5.0;
+//    self.topViewController.view.layer.shouldRasterize = YES;
     
     // Add Gray Layer
     _overlayView.frame = disappearingViewController.view.bounds;
@@ -143,11 +144,11 @@ const CGFloat kOverlayViewAlpha = 0.75;
         [self.topViewController didMoveToParentViewController:self];
         
         // Remove shadow
-        self.topViewController.view.layer.shadowColor = nil;
-        self.topViewController.view.layer.shadowOffset = CGSizeZero;
-        self.topViewController.view.layer.shadowOpacity = 0.0;
-        self.topViewController.view.layer.shadowRadius = 0.0;
-        self.topViewController.view.layer.shouldRasterize = NO;
+//        self.topViewController.view.layer.shadowColor = nil;
+//        self.topViewController.view.layer.shadowOffset = CGSizeZero;
+//        self.topViewController.view.layer.shadowOpacity = 0.0;
+//        self.topViewController.view.layer.shadowRadius = 0.0;
+//        self.topViewController.view.layer.shouldRasterize = NO;
         
         // Remove gray layer
         [_overlayView removeFromSuperview];
@@ -190,11 +191,11 @@ const CGFloat kOverlayViewAlpha = 0.75;
             break;
     }
 
-    poppedViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
-    poppedViewController.view.layer.shadowOffset = shadowSize;
-    poppedViewController.view.layer.shadowOpacity = 0.8;
-    poppedViewController.view.layer.shadowRadius = 5.0;
-    poppedViewController.view.layer.shouldRasterize = YES;
+//    poppedViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
+//    poppedViewController.view.layer.shadowOffset = shadowSize;
+//    poppedViewController.view.layer.shadowOpacity = 0.8;
+//    poppedViewController.view.layer.shadowRadius = 5.0;
+//    poppedViewController.view.layer.shouldRasterize = YES;
     
     // In case the previous view controller was reloaded due to memory, restore transform
     if (CGAffineTransformIsIdentity(self.topViewController.view.transform)) {
@@ -239,11 +240,11 @@ const CGFloat kOverlayViewAlpha = 0.75;
         _overlayView.alpha = 0.0;
     } completion:^(BOOL finished) {
         // Remove shadow
-        poppedViewController.view.layer.shadowColor = nil;
-        poppedViewController.view.layer.shadowOffset = CGSizeZero;
-        poppedViewController.view.layer.shadowOpacity = 0.0;
-        poppedViewController.view.layer.shadowRadius = 0.0;
-        poppedViewController.view.layer.shouldRasterize = NO;
+//        poppedViewController.view.layer.shadowColor = nil;
+//        poppedViewController.view.layer.shadowOffset = CGSizeZero;
+//        poppedViewController.view.layer.shadowOpacity = 0.0;
+//        poppedViewController.view.layer.shadowRadius = 0.0;
+//        poppedViewController.view.layer.shouldRasterize = NO;
         
         // Remove gray layer
         [_overlayView removeFromSuperview];
