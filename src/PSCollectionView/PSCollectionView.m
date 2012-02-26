@@ -20,6 +20,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 @implementation PSCollectionView
 
 @synthesize
+headerView = _headerView,
 reuseableViews = _reuseableViews,
 visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
@@ -53,6 +54,7 @@ collectionViewDataSource = _collectionViewDataSource;
     self.collectionViewDelegate = nil;
     
     // release retains
+    self.headerView = nil;
     self.reuseableViews = nil;
     self.visibleViews = nil;
     self.viewKeysToRemove = nil;
@@ -160,10 +162,14 @@ collectionViewDataSource = _collectionViewDataSource;
     [self.viewKeysToRemove removeAllObjects];
     [self.indexToRectMap removeAllObjects];
     
+    // Add headerView if it exists
+    [self addSubview:self.headerView];
+    CGFloat top = (self.headerView) ? self.headerView.height + margin * 2 : margin;
+    
     // This array determines the last height offset on a column
     NSMutableArray *colOffsets = [NSMutableArray arrayWithCapacity:self.numCols];
     for (int i = 0; i < self.numCols; i++) {
-        [colOffsets addObject:[NSNumber numberWithFloat:margin]];
+        [colOffsets addObject:[NSNumber numberWithFloat:top]];
     }
     
     // Calculate index to rect mapping
