@@ -243,9 +243,7 @@ collectionViewDataSource = _collectionViewDataSource;
 }
 
 #pragma mark - Gesture Recognizer
-- (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
-    NSLog(@"view tapped, no index here yet!: %@", gestureRecognizer.view);
-    
+- (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {    
     NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
     
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];

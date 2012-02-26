@@ -183,6 +183,26 @@ loadMoreView = _loadMoreView;
 }
 
 #pragma mark - PSStateMachine
+- (void)loadDataSource {
+    [super loadDataSource];
+    [self beginRefresh];
+}
+
+- (void)reloadDataSource {
+    [super reloadDataSource];
+    [self beginRefresh];
+}
+
+- (void)dataSourceDidLoad {
+    [super dataSourceDidLoad];
+    [self endRefresh];
+}
+
+- (void)dataSourceDidError {
+    [super dataSourceDidError];
+    [self endRefresh];
+}
+
 - (BOOL)dataSourceIsEmpty {
     // Is this a searchResultsTable or just Table?
     NSArray *items = (self.tableView == self.searchDisplayController.searchResultsTableView) ? self.searchItems : self.items;

@@ -8,9 +8,9 @@
 
 #import "PSLocationCenter.h"
 
-static const CLLocationDistance __systemDistanceFilter = 10;
-static const CLLocationDistance __updateDistanceFilter = 100;
-static const CLLocationDistance __thresholdDistanceFilter = 10;
+//  CLLocationDistance __accuracyThreshold = 1500; // For some reason, cell tower triangulation is always = 1414
+static const CLLocationDistance __accuracyThreshold = 1500;
+static const CLLocationDistance __updateDistanceFilter = 1500;
 static const NSTimeInterval __locationAgeThreshold = 5 * 60; // seconds after which an update is considered stale
 static const NSTimeInterval __pollDuration = 30;
 
@@ -38,8 +38,8 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
     if (self) {
         self.locationManager = [[[CLLocationManager alloc] init] autorelease];
         self.locationManager.delegate = self;
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-        self.locationManager.distanceFilter = __systemDistanceFilter;
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        self.locationManager.distanceFilter = __updateDistanceFilter;
         
         self.location = nil;
 //#if TARGET_IPHONE_SIMULATOR
@@ -120,11 +120,11 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
     NSTimeInterval age = fabs([[NSDate date] timeIntervalSinceDate:newLocation.timestamp]);
     CLLocationDistance distanceChanged = [newLocation distanceFromLocation:self.location];
     
-    if (age <= __locationAgeThreshold && accuracy < __updateDistanceFilter && accuracy > 0) {
+    if (age <= __locationAgeThreshold && accuracy < __accuracyThreshold && accuracy > 0) {
         // Good Location Acquired
         DLog(@"Location updated: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, distanceChanged);
         
-        if (distanceChanged > __thresholdDistanceFilter || distanceChanged == -1) {
+        if (distanceChanged > __updateDistanceFilter || distanceChanged == -1) {
             self.location = newLocation;
             
             [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
@@ -177,7 +177,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
 }
 
 - (BOOL)hasAcquiredAccurateLocation {
-    if (self.location && self.location.horizontalAccuracy < __updateDistanceFilter) {
+    if (self.location && self.location.horizontalAccuracy < __accuracyThreshold) {
         return YES;
     } else {
         return NO;
