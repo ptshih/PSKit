@@ -8,7 +8,7 @@
 
 #import "PSNavigationController.h"
 
-@interface PSNavigationController (Private)
+@interface PSNavigationController ()
 
 @end
 
@@ -40,13 +40,13 @@ viewControllers = _viewControllers;
 }
 
 - (void)viewDidUnload {
-    RELEASE_SAFELY(_overlayView);
+    self.overlayView = nil;
     [super viewDidUnload];
 }
 
 - (void)dealloc {  
-    RELEASE_SAFELY(_overlayView);
-    RELEASE_SAFELY(_viewControllers);
+    self.overlayView = nil;
+    self.viewControllers = nil;
     [super dealloc];
 }
 
@@ -62,10 +62,10 @@ viewControllers = _viewControllers;
     self.rootViewController.view.autoresizingMask = ~UIViewAutoresizingNone;
   
     
-    _overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
-    _overlayView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _overlayView.exclusiveTouch = YES;
-    _overlayView.backgroundColor = [UIColor blackColor];
+    self.overlayView = [[[UIView alloc] initWithFrame:self.view.bounds] autorelease];
+    self.overlayView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.overlayView.exclusiveTouch = YES;
+    self.overlayView.backgroundColor = [UIColor blackColor];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -85,6 +85,7 @@ viewControllers = _viewControllers;
 #pragma mark - Push/Pop
 const CGFloat kPushPopScale = 0.95;
 const CGFloat kOverlayViewAlpha = 0.75;
+const CGFloat kAnimationDuration = 0.3;
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     [self pushViewController:viewController direction:PSNavigationControllerDirectionLeft animated:animated];
@@ -122,36 +123,24 @@ const CGFloat kOverlayViewAlpha = 0.75;
     }
     self.topViewController.view.frame = offscreenFrame;
     
-//    self.topViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
-//    self.topViewController.view.layer.shadowOffset = shadowSize;
-//    self.topViewController.view.layer.shadowOpacity = 0.75;
-//    self.topViewController.view.layer.shadowRadius = 5.0;
-//    self.topViewController.view.layer.shouldRasterize = YES;
-    
     // Add Gray Layer
-    _overlayView.frame = disappearingViewController.view.bounds;
-    _overlayView.alpha = 0.0;
-    [disappearingViewController.view addSubview:_overlayView];
+    self.overlayView.frame = disappearingViewController.view.bounds;
+    self.overlayView.alpha = 0.0;
+    [disappearingViewController.view addSubview:self.overlayView];
     
     // Transition
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     UIViewAnimationOptions animationOptions = UIViewAnimationCurveEaseInOut;
-    NSTimeInterval animationDuration = animated ? 0.3 : 0.0;
+    NSTimeInterval animationDuration = animated ? kAnimationDuration : 0.0;
     [self transitionFromViewController:disappearingViewController toViewController:self.topViewController duration:animationDuration options:animationOptions animations:^{
+        self.overlayView.alpha = kOverlayViewAlpha;
         self.topViewController.view.frame = self.view.bounds;
         disappearingViewController.view.transform = CGAffineTransformMakeScale(kPushPopScale, kPushPopScale);
     } completion:^(BOOL finished) {
         [self.topViewController didMoveToParentViewController:self];
         
-        // Remove shadow
-//        self.topViewController.view.layer.shadowColor = nil;
-//        self.topViewController.view.layer.shadowOffset = CGSizeZero;
-//        self.topViewController.view.layer.shadowOpacity = 0.0;
-//        self.topViewController.view.layer.shadowRadius = 0.0;
-//        self.topViewController.view.layer.shouldRasterize = NO;
-        
         // Remove gray layer
-        [_overlayView removeFromSuperview];
+        [self.overlayView removeFromSuperview];
         
         [[UIApplication sharedApplication] endIgnoringInteractionEvents];
     }];
@@ -191,26 +180,20 @@ const CGFloat kOverlayViewAlpha = 0.75;
             break;
     }
 
-//    poppedViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
-//    poppedViewController.view.layer.shadowOffset = shadowSize;
-//    poppedViewController.view.layer.shadowOpacity = 0.8;
-//    poppedViewController.view.layer.shadowRadius = 5.0;
-//    poppedViewController.view.layer.shouldRasterize = YES;
-    
     // In case the previous view controller was reloaded due to memory, restore transform
     if (CGAffineTransformIsIdentity(self.topViewController.view.transform)) {
         self.topViewController.view.transform = CGAffineTransformMakeScale(kPushPopScale, kPushPopScale);
     }
     
     // Add Gray Layer
-    _overlayView.frame = self.topViewController.view.bounds;
-    _overlayView.alpha = kOverlayViewAlpha;
-    [self.topViewController.view addSubview:_overlayView];
+    self.overlayView.frame = self.topViewController.view.bounds;
+    self.overlayView.alpha = kOverlayViewAlpha;
+    [self.topViewController.view addSubview:self.overlayView];
     
     // Transition
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     UIViewAnimationOptions animationOptions = UIViewAnimationCurveEaseInOut;
-    NSTimeInterval animationDuration = animated ? 0.3 : 0.0;
+    NSTimeInterval animationDuration = animated ? kAnimationDuration : 0.0;
     [self transitionFromViewController:poppedViewController toViewController:self.topViewController duration:animationDuration options:animationOptions animations:^{
         [self.view exchangeSubviewAtIndex:[[self.view subviews] count] - 1 withSubviewAtIndex:[[self.view subviews] count] - 2];
         
@@ -237,17 +220,10 @@ const CGFloat kOverlayViewAlpha = 0.75;
         
         self.topViewController.view.transform = CGAffineTransformIdentity;
         
-        _overlayView.alpha = 0.0;
+        self.overlayView.alpha = 0.0;
     } completion:^(BOOL finished) {
-        // Remove shadow
-//        poppedViewController.view.layer.shadowColor = nil;
-//        poppedViewController.view.layer.shadowOffset = CGSizeZero;
-//        poppedViewController.view.layer.shadowOpacity = 0.0;
-//        poppedViewController.view.layer.shadowRadius = 0.0;
-//        poppedViewController.view.layer.shouldRasterize = NO;
-        
         // Remove gray layer
-        [_overlayView removeFromSuperview];
+        [self.overlayView removeFromSuperview];
         
         [poppedViewController removeFromParentViewController];
         [poppedViewController release];

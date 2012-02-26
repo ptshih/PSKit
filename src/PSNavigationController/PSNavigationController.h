@@ -30,7 +30,7 @@ typedef enum {
 @interface PSNavigationController : UIViewController <UIGestureRecognizerDelegate> {
 }
 
-@property (nonatomic, assign) UIView *overlayView;
+@property (nonatomic, retain) UIView *overlayView;
 @property (nonatomic, assign) id <PSNavigationControllerDelegate> delegate;
 @property (nonatomic, assign) UIViewController *disappearingViewController;
 @property (nonatomic, assign) UIViewController *topViewController;
