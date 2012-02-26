@@ -142,14 +142,12 @@ galleryViewDataSource = _galleryViewDataSource;
 #pragma mark - DataSource
 - (void)reloadViews {
     static CGFloat margin = 8.0;
-    
-    BLOCK_SELF;
-    
+
     // Remove all existing views
     [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         NSMutableArray *row = (NSMutableArray *)obj;
         [row enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            [blockSelf enqueueReusableView:obj];
+            [self enqueueReusableView:obj];
         }];
         [row removeAllObjects];
     }];
