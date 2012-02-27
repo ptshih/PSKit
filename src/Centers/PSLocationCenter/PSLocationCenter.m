@@ -10,7 +10,7 @@
 
 //  CLLocationDistance __accuracyThreshold = 1500; // For some reason, cell tower triangulation is always = 1414
 static const CLLocationDistance __accuracyThreshold = 1500;
-static const CLLocationDistance __updateDistanceFilter = 1500;
+static const CLLocationDistance __updateDistanceFilter = 500;
 static const NSTimeInterval __locationAgeThreshold = 5 * 60; // seconds after which an update is considered stale
 static const NSTimeInterval __pollDuration = 30;
 
