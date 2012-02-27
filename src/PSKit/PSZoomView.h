@@ -8,15 +8,19 @@
 
 #import "PSView.h"
 
-@interface PSZoomView : PSView {
-  UIView *_backgroundView;
-  UIImageView *_zoomedView;
-  CGRect _originalRect;
-  BOOL _shouldRotate;
-}
+@interface PSZoomView : PSView
 
+@property (nonatomic, retain) UIView *backgroundView;
+@property (nonatomic, retain) UIView *zoomView;
+@property (nonatomic, assign) UIView *superView;
 @property (nonatomic, assign) CGRect newFrame;
+@property (nonatomic, assign) CGRect originalFrame;
+@property (nonatomic, assign) BOOL shouldRotate;
+@property (nonatomic, assign) BOOL isMapView;
+@property (nonatomic, assign) MKCoordinateRegion oldMapRegion;
 
+- (id)initWithView:(UIView *)view superView:(UIView *)superView;
+- (id)initWithMapView:(MKMapView *)mapView mapRegion:(MKCoordinateRegion)mapRegion superView:(UIView *)superView;
 - (id)initWithImage:(UIImage *)image contentMode:(UIViewContentMode)contentMode;
 - (void)showInRect:(CGRect)rect;
 

@@ -13,85 +13,157 @@
 @implementation PSZoomView
 
 @synthesize
-newFrame = _newFrame;
+backgroundView = _backgroundView,
+zoomView = _zoomView,
+superView = _superView,
+newFrame = _newFrame,
+originalFrame = _originalFrame,
+shouldRotate = _shouldRotate,
+isMapView = _isMapView,
+oldMapRegion = _oldMapRegion;
 
-- (id)initWithImage:(UIImage *)image contentMode:(UIViewContentMode)contentMode {
-    
+- (id)initWithMapView:(MKMapView *)mapView mapRegion:(MKCoordinateRegion)mapRegion superView:(UIView *)superView {
     self = [super initWithFrame:[[UIScreen mainScreen] bounds]];
     if (self) {
+        self.isMapView = YES;
+        self.superView = superView;
+        self.oldMapRegion = mapRegion;
         
-        // TODO: Get rid of status bar when zooming
-        _shouldRotate = [image isLandscape];
+        self.newFrame = CGRectMake(0, 0, self.width, self.height);
         
-        _backgroundView = [[UIView alloc] initWithFrame:self.bounds];
-        _backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        _backgroundView.backgroundColor = [UIColor blackColor];
-        _backgroundView.alpha = 0.0;
-        [self addSubview:_backgroundView];
+        self.backgroundView = [[[UIView alloc] initWithFrame:self.bounds] autorelease];
+        self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.backgroundView.backgroundColor = [UIColor blackColor];
+        self.backgroundView.alpha = 0.0;
+        [self addSubview:self.backgroundView];
         
-        _zoomedView = [[UIImageView alloc] initWithImage:image];
-        // Adjust zoomview based on actual image size
-//        CGFloat iWidth = image.size.width;
-//        CGFloat iHeight = image.size.height;
+        self.zoomView = mapView;
+        self.zoomView.frame = self.newFrame;
+        self.zoomView.alpha = 0.0;
+        self.zoomView.clipsToBounds = YES;
+        self.zoomView.userInteractionEnabled = YES;
+        [(MKMapView *)self.zoomView setScrollEnabled:YES];
+        [(MKMapView *)self.zoomView setZoomEnabled:YES];
+        [self addSubview:self.zoomView];
+        
+        for (UIGestureRecognizer *gr in self.zoomView.gestureRecognizers) {
+            gr.enabled = NO;
+        }
+        
+        UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss)] autorelease];
+        [self addGestureRecognizer:gr];
+    }
+    return self;
+}
+
+- (id)initWithView:(UIView *)view superView:(UIView *)superView {
+    self = [super initWithFrame:[[UIScreen mainScreen] bounds]];
+    if (self) {
+        self.isMapView = NO;
+        self.superView = superView;
+        
+        CGSize withinSize = self.bounds.size;
+        CGFloat widthScale = withinSize.width / view.bounds.size.width;
+        CGFloat heightScale = withinSize.height / view.bounds.size.height;
+        CGFloat scale = MIN(widthScale, heightScale);
+        CGFloat newWidth = floorf(view.bounds.size.width * scale);
+        CGFloat newHeight = floorf(view.bounds.size.height * scale);
+        self.newFrame = CGRectMake(floorf((self.width - newWidth) / 2), floorf((self.height - newHeight) / 2), newWidth, newHeight);
+        
+        self.backgroundView = [[[UIView alloc] initWithFrame:self.bounds] autorelease];
+        self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.backgroundView.backgroundColor = [UIColor blackColor];
+        self.backgroundView.alpha = 0.0;
+        [self addSubview:self.backgroundView];
+        
+        self.zoomView = view;
+        self.zoomView.frame = self.newFrame;
+        self.zoomView.alpha = 0.0;
+        self.zoomView.clipsToBounds = YES;
+        [self addSubview:self.zoomView];
+        
+        for (UIGestureRecognizer *gr in self.zoomView.gestureRecognizers) {
+            gr.enabled = NO;
+        }
+        
+        UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss)] autorelease];
+        [self addGestureRecognizer:gr];
+    }
+    return self;
+}
+
+- (id)initWithImage:(UIImage *)image contentMode:(UIViewContentMode)contentMode {    
+    self = [super initWithFrame:[[UIScreen mainScreen] bounds]];
+    if (self) {
+        self.isMapView = NO;
+        self.shouldRotate = [image isLandscape];
+        
         CGSize withinSize = self.bounds.size;
         CGFloat widthScale = withinSize.width / image.size.width;
         CGFloat heightScale = withinSize.height / image.size.height;
         CGFloat scale = MIN(widthScale, heightScale);
-        self.newFrame = CGRectMake(0, 0, floorf(image.size.width * scale), floorf(image.size.height * scale));
+        CGFloat newWidth = floorf(image.size.width * scale);
+        CGFloat newHeight = floorf(image.size.height * scale);
+        self.newFrame = CGRectMake(floorf((self.width - newWidth) / 2), floorf((self.height - newHeight) / 2), newWidth, newHeight);
         
-        _zoomedView.frame = self.newFrame;
-        _zoomedView.center = self.center;
-        self.newFrame = _zoomedView.frame;
-        _zoomedView.contentMode = contentMode;
-        _zoomedView.clipsToBounds = YES;
-        _zoomedView.userInteractionEnabled = YES;
-        [self addSubview:_zoomedView];
+//        NSLog(@"new frame: %@", NSStringFromCGRect(self.newFrame));
+        
+        self.backgroundView = [[[UIView alloc] initWithFrame:self.bounds] autorelease];
+        self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.backgroundView.backgroundColor = [UIColor blackColor];
+        self.backgroundView.alpha = 0.0;
+        [self addSubview:self.backgroundView];
+        
+        self.zoomView = [[[UIImageView alloc] initWithImage:image] autorelease];
+        self.zoomView.frame = self.newFrame;
+        self.zoomView.alpha = 0.0;
+        self.zoomView.clipsToBounds = YES;
+        self.zoomView.contentMode = contentMode;
+        [self addSubview:self.zoomView];
         
         UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss)] autorelease];
-        [_zoomedView addGestureRecognizer:gr];
-        _zoomedView.alpha = 0.0;
+        [self addGestureRecognizer:gr];
     }
     return self;
 }
 
 - (void)dealloc {
-    RELEASE_SAFELY(_backgroundView);
-    RELEASE_SAFELY(_zoomedView);
+    self.backgroundView = nil;
+    self.zoomView = nil;
+
     [super dealloc];
 }
 
 - (void)showInRect:(CGRect)rect {
+    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     
     self.frame = [[UIScreen mainScreen] bounds];
-    _backgroundView.frame = self.bounds;
+    self.backgroundView.frame = self.bounds;
     
-    _originalRect = rect;
-    _zoomedView.frame = _originalRect;
-    
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+    self.originalFrame = rect;
+    self.zoomView.frame = self.originalFrame;
     
     [[APP_DELEGATE window] addSubview:self];
-    _zoomedView.userInteractionEnabled = NO;
+    
     [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-        _zoomedView.alpha = 1.0;
-        _backgroundView.alpha = 1.0;
+        self.zoomView.alpha = 1.0;
+        self.backgroundView.alpha = 1.0;
     } completion:^(BOOL finished) {
         // Rotate/Zoom image if necessary
         [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-            if (_shouldRotate) {
+            if (self.shouldRotate) {
                 CGSize withinSize = CGSizeMake(self.bounds.size.height, self.bounds.size.width);
                 CGFloat widthScale = withinSize.width / self.newFrame.size.width;
                 CGFloat heightScale = withinSize.height / self.newFrame.size.height;
                 CGFloat scale = MIN(widthScale, heightScale);
                 self.newFrame = CGRectMake(floorf((self.width - self.newFrame.size.width * scale) / 2), floorf((self.height - self.newFrame.size.height * scale) / 2), self.newFrame.size.width * scale, self.newFrame.size.height * scale);
-                _zoomedView.frame = self.newFrame;
-                _zoomedView.transform = CGAffineTransformMakeRotation(0.5 * M_PI);                
+                self.zoomView.frame = self.newFrame;
+                self.zoomView.transform = CGAffineTransformMakeRotation(0.5 * M_PI);                
             } else {
-                _zoomedView.frame = self.newFrame;
+                self.zoomView.frame = self.newFrame;
             }
         } completion:^(BOOL finished){
-            _zoomedView.userInteractionEnabled = YES;
             [[UIApplication sharedApplication] endIgnoringInteractionEvents];
         }];
     }];
@@ -99,16 +171,30 @@ newFrame = _newFrame;
 
 - (void)dismiss {
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
-    
-    _zoomedView.userInteractionEnabled = NO;
+    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
+
     [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-        if (_shouldRotate) _zoomedView.transform = CGAffineTransformIdentity;
-        _zoomedView.frame = _originalRect;
+        if (self.shouldRotate) self.zoomView.transform = CGAffineTransformIdentity;
+        self.zoomView.frame = self.originalFrame;
     } completion:^(BOOL finished){
         [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-            _zoomedView.alpha = 0.0;
-            _backgroundView.alpha = 0.0;
+//            self.zoomView.alpha = 0.0;
+            self.backgroundView.alpha = 0.0;
         } completion:^(BOOL finished){
+            [[UIApplication sharedApplication] endIgnoringInteractionEvents];
+            if (self.superView) {
+                for (UIGestureRecognizer *gr in self.zoomView.gestureRecognizers) {
+                    gr.enabled = YES;
+                }
+                if (self.isMapView) {
+                    [(MKMapView *)self.zoomView setRegion:self.oldMapRegion animated:YES];
+                    [(MKMapView *)self.zoomView setScrollEnabled:NO];
+                    [(MKMapView *)self.zoomView setZoomEnabled:NO];
+                }
+                CGRect convertedRect = [self.superView convertRect:self.originalFrame fromView:nil];
+                self.zoomView.frame = convertedRect;
+                [self.superView addSubview:self.zoomView];
+            }
             [self removeFromSuperview];
         }];
     }];
