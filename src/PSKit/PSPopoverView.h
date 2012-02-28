@@ -12,6 +12,7 @@
 
 @interface PSPopoverView : PSView <UIGestureRecognizerDelegate>
 
+@property (nonatomic, assign) UIView *overlayView;
 @property (nonatomic, assign) id <PSPopoverViewDelegate> delegate;
 
 - (id)initWithTitle:(NSString *)title contentView:(UIView *)contentView;

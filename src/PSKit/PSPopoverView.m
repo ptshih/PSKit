@@ -13,11 +13,21 @@
 @implementation PSPopoverView
 
 @synthesize
+overlayView = _overlayView,
 delegate = _delegate;
 
 - (id)initWithTitle:(NSString *)title contentView:(UIView *)contentView {
     self = [super initWithFrame:[[UIScreen mainScreen] bounds]];
     if (self) {
+        self.overlayView = [[[UIView alloc] initWithFrame:self.bounds] autorelease];
+        self.overlayView.backgroundColor = [UIColor blackColor];
+        self.overlayView.alpha = 0.5;
+        self.overlayView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss)] autorelease];
+        gr.delegate = self;
+        [self.overlayView addGestureRecognizer:gr];
+        [self addSubview:self.overlayView];
+        
         UIImageView *backgroundView = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/PopoverPortrait"] stretchableImageWithLeftCapWidth:0 topCapHeight:170]] autorelease];
         [self addSubview:backgroundView];
         backgroundView.layer.masksToBounds = NO;
@@ -44,11 +54,6 @@ delegate = _delegate;
         contentView.layer.cornerRadius = 4.0;
         contentView.layer.masksToBounds = YES;
         [backgroundView addSubview:contentView];
-        
-        self.userInteractionEnabled = YES;
-        UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss)] autorelease];
-        gr.delegate = self;
-        [self addGestureRecognizer:gr];
     }
     return self;
 }
@@ -88,7 +93,7 @@ delegate = _delegate;
 
 #pragma mark - UIGestureRecognizerDelegate
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-  if ([touch.view isKindOfClass:[self class]]) {
+  if ([touch.view isEqual:self.overlayView]) {
     return YES;
   } else {
     return NO;
