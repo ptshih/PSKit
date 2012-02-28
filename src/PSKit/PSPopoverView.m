@@ -14,6 +14,7 @@
 
 @synthesize
 overlayView = _overlayView,
+contentView = _contentView,
 delegate = _delegate;
 
 - (id)initWithTitle:(NSString *)title contentView:(UIView *)contentView {
@@ -49,11 +50,12 @@ delegate = _delegate;
         titleLabel.frame = CGRectMake(MARGIN, MARGIN, backgroundView.width - MARGIN * 2, 24);
         [backgroundView addSubview:titleLabel];
         
-        contentView.left = MARGIN;
-        contentView.top = titleLabel.bottom + MARGIN;
-        contentView.layer.cornerRadius = 4.0;
-        contentView.layer.masksToBounds = YES;
-        [backgroundView addSubview:contentView];
+        self.contentView = contentView;
+        self.contentView.left = MARGIN;
+        self.contentView.top = titleLabel.bottom + MARGIN;
+        self.contentView.layer.cornerRadius = 4.0;
+        self.contentView.layer.masksToBounds = YES;
+        [backgroundView addSubview:self.contentView];
     }
     return self;
 }
