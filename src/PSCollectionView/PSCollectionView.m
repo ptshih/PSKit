@@ -164,7 +164,7 @@ collectionViewDataSource = _collectionViewDataSource;
     
     // Add headerView if it exists
     [self addSubview:self.headerView];
-    CGFloat top = (self.headerView) ? self.headerView.height + margin * 2 : margin;
+    CGFloat top = (self.headerView) ? self.headerView.height : margin;
     
     // This array determines the last height offset on a column
     NSMutableArray *colOffsets = [NSMutableArray arrayWithCapacity:self.numCols];
