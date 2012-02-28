@@ -29,10 +29,4 @@
     return l;
 }
 
-+ (UILabel *)labelWithStyle:(NSString *)style {
-    UILabel *l = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
-    [PSStyleSheet applyStyle:style forLabel:l];
-    return l;
-}
-
 @end
