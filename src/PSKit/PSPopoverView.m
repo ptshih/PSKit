@@ -8,6 +8,8 @@
 
 #import "PSPopoverView.h"
 
+#define MARGIN 8.0
+
 @implementation PSPopoverView
 
 @synthesize
@@ -28,16 +30,17 @@ delegate = _delegate;
         UIImageView *arrowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/PopoverPortraitArrowUp"]] autorelease];
         [self addSubview:arrowView];
         
-        backgroundView.frame = CGRectMake(8, 20 + 44 + 8, 304, 400);
+        backgroundView.frame = CGRectMake(MARGIN, 20 + 44 + MARGIN, self.width - MARGIN * 2, contentView.height + 24.0 + MARGIN * 3);
         
         arrowView.center = self.center;
         arrowView.top = backgroundView.top - arrowView.height + 3.0;
         
         UILabel *titleLabel = [UILabel labelWithText:title style:@"popoverTitleLabel"];
-        titleLabel.frame = CGRectMake(8, 8, backgroundView.width - 16, 24);
+        titleLabel.frame = CGRectMake(MARGIN, MARGIN, backgroundView.width - MARGIN * 2, 24);
         [backgroundView addSubview:titleLabel];
         
-        contentView.frame = CGRectMake(8, 8 + 8 + 24, backgroundView.width - 16, backgroundView.height - 16 - 8 - 24);
+        contentView.left = MARGIN;
+        contentView.top = titleLabel.bottom + MARGIN;
         contentView.layer.cornerRadius = 4.0;
         contentView.layer.masksToBounds = YES;
         [backgroundView addSubview:contentView];
