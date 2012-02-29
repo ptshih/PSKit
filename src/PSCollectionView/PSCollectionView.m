@@ -77,6 +77,7 @@ collectionViewDataSource = _collectionViewDataSource;
 }
 
 - (void)removeAndAddCellsIfNecessary {
+    static NSInteger bufferViewFactor = 5;
     static NSInteger topIndex = 0;
     static NSInteger bottomIndex = 0;
     
@@ -116,8 +117,8 @@ collectionViewDataSource = _collectionViewDataSource;
         topIndex = [[sortedKeys objectAtIndex:0] integerValue];
         bottomIndex = [[sortedKeys lastObject] integerValue];
         
-        topIndex = MAX(0, topIndex - 20);
-        bottomIndex = MIN(numViews, bottomIndex + 20);
+        topIndex = MAX(0, topIndex - (bufferViewFactor * self.numCols));
+        bottomIndex = MIN(numViews, bottomIndex + (bufferViewFactor * self.numCols));
     }
 //    NSLog(@"topIndex: %d, bottomIndex: %d", topIndex, bottomIndex);
     
