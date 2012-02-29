@@ -8,34 +8,33 @@
 
 #import "NSMutableURLRequest+PSKit.h"
 
-static NSString *const kFSAPIURLBase = @"https://api.foursquare.com/v2";
-static NSString *const kFSBoundary = @"Boundary+0xAbCdEfGbOuNdArY";
+static NSString *const kPSBoundary = @"Boundary+0xAbCdEfGbOuNdArY";
 
-static inline NSString *FSBoundaryStart() {
-    return [NSString stringWithFormat:@"--%@\r\n", kFSBoundary];
+static inline NSString *PSBoundaryStart() {
+    return [NSString stringWithFormat:@"--%@\r\n", kPSBoundary];
 }
 
-static inline NSString *FSBoundarySeparator() {
-    return [NSString stringWithFormat:@"\r\n--%@\r\n", kFSBoundary];
+static inline NSString *PSBoundarySeparator() {
+    return [NSString stringWithFormat:@"\r\n--%@\r\n", kPSBoundary];
 }
 
-static inline NSString *FSBoundaryEnd() {
-    return [NSString stringWithFormat:@"\r\n--%@--\r\n", kFSBoundary];
+static inline NSString *PSBoundaryEnd() {
+    return [NSString stringWithFormat:@"\r\n--%@--\r\n", kPSBoundary];
 }
 
-NSString *FSURLEncodedStringFromStringWithEncoding(NSString *string, NSStringEncoding encoding) {
-    static NSString *const kFSCharactersToEscape = @"?!@#$^&%*+,:;='\"`<>()[]{}/\\|~ ";
+NSString *PSURLEncodedStringFromStringWithEncoding(NSString *string, NSStringEncoding encoding) {
+    static NSString *const kPSCharactersToEscape = @"?!@#$^&%*+,:;='\"`<>()[]{}/\\|~ ";
     
-    return [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)[string stringByReplacingPercentEscapesUsingEncoding:encoding], NULL, (CFStringRef)kFSCharactersToEscape, CFStringConvertNSStringEncodingToEncoding(encoding)) autorelease];
+    return [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)[string stringByReplacingPercentEscapesUsingEncoding:encoding], NULL, (CFStringRef)kPSCharactersToEscape, CFStringConvertNSStringEncodingToEncoding(encoding)) autorelease];
 }
 
-NSString *FSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSStringEncoding encoding) {
+NSString *PSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSStringEncoding encoding) {
     NSMutableArray *parameterPairs = [NSMutableArray array];
     for (id key in [parameters allKeys]) {
         id value = [parameters valueForKey:key];
         // NOTE: Ignore any value that isn't a String for now
         if ([value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]]) {
-            NSString *pair = [NSString stringWithFormat:@"%@=%@", FSURLEncodedStringFromStringWithEncoding([key description], encoding), FSURLEncodedStringFromStringWithEncoding([value description], encoding)];
+            NSString *pair = [NSString stringWithFormat:@"%@=%@", PSURLEncodedStringFromStringWithEncoding([key description], encoding), PSURLEncodedStringFromStringWithEncoding([value description], encoding)];
             [parameterPairs addObject:pair];
         }
     }    
@@ -43,21 +42,7 @@ NSString *FSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
     return [parameterPairs componentsJoinedByString:@"&"];
 }
 
-@implementation NSMutableURLRequest (FS)
-
-+ (NSMutableURLRequest *)requestWithFoursquareEndpoint:(NSString *)endpoint method:(NSString *)method headers:(NSDictionary *)headers parameters:(NSDictionary *)parameters {
-    
-    // Set URL
-    NSURL *endpointURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", kFSAPIURLBase, endpoint]];
-    NSMutableDictionary *newHeaders = [NSMutableDictionary dictionaryWithDictionary:headers];
-    
-    // Add FS headers
-    // Set userAgent (User-Agent)
-    // Set language
-    [newHeaders setObject:[NSString stringWithFormat:@"%@-%@", [[[NSUserDefaults standardUserDefaults] objectForKey:@"AppleLanguages"] objectAtIndex:0], [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode]] forKey:@"Accept-Language"];
-    
-    return [[self class] requestWithURL:endpointURL method:method headers:newHeaders parameters:parameters];
-}
+@implementation NSMutableURLRequest (PSKit)
 
 + (NSMutableURLRequest *)requestWithURL:(NSURL *)URL method:(NSString *)method headers:(NSDictionary *)headers parameters:(NSDictionary *)parameters {
     NSStringEncoding stringEncoding = NSUTF8StringEncoding;
@@ -92,7 +77,7 @@ NSString *FSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
         method = [method uppercaseString];
         if ([method isEqualToString:@"GET"] || [method isEqualToString:@"HEAD"] || [method isEqualToString:@"DELETE"]) {
             // Embedded query string in URL
-            URL = [NSURL URLWithString:[[URL absoluteString] stringByAppendingFormat:@"?%@", FSQueryStringFromParametersWithEncoding(parameters, stringEncoding)]];
+            URL = [NSURL URLWithString:[[URL absoluteString] stringByAppendingFormat:@"?%@", PSQueryStringFromParametersWithEncoding(parameters, stringEncoding)]];
             [request setURL:URL];
         } else {
             // Create POST/PUT body
@@ -107,15 +92,15 @@ NSString *FSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
             
             NSString *charset = (NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
             if (multipart) {
-                [request addValue:[NSString stringWithFormat:@"multipart/form-data; charset=%@; boundary=%@", charset, kFSBoundary] forHTTPHeaderField:@"Content-Type"];
+                [request addValue:[NSString stringWithFormat:@"multipart/form-data; charset=%@; boundary=%@", charset, kPSBoundary] forHTTPHeaderField:@"Content-Type"];
                 NSMutableData *data = [NSMutableData data];
                 [parameters enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
                     if (data.length == 0) {
                         // Append starting boundary
-                        [data appendData:[FSBoundaryStart() dataUsingEncoding:NSUTF8StringEncoding]];
+                        [data appendData:[PSBoundaryStart() dataUsingEncoding:NSUTF8StringEncoding]];
                     } else {
                         // Append separating boundary
-                        [data appendData:[FSBoundarySeparator() dataUsingEncoding:NSUTF8StringEncoding]];
+                        [data appendData:[PSBoundarySeparator() dataUsingEncoding:NSUTF8StringEncoding]];
                     }
                     
                     // Build boundary header
@@ -132,14 +117,14 @@ NSString *FSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
                 
                 if (data.length > 0) {
                     // Append ending boundary
-                    [data appendData:[FSBoundaryEnd() dataUsingEncoding:NSUTF8StringEncoding]];
+                    [data appendData:[PSBoundaryEnd() dataUsingEncoding:NSUTF8StringEncoding]];
                     
                     [request setHTTPBody:data];
                 }
             } else {
                 // URLEncoded
                 [request setValue:[NSString stringWithFormat:@"application/x-www-form-urlencoded; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
-                [request setHTTPBody:[FSQueryStringFromParametersWithEncoding(parameters, stringEncoding) dataUsingEncoding:stringEncoding]];
+                [request setHTTPBody:[PSQueryStringFromParametersWithEncoding(parameters, stringEncoding) dataUsingEncoding:stringEncoding]];
             }
         }
     }

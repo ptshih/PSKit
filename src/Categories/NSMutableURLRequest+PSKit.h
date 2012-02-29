@@ -8,14 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString *FSURLEncodedStringFromStringWithEncoding(NSString *string, NSStringEncoding encoding);
-extern NSString *FSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSStringEncoding encoding);
+extern NSString *PSURLEncodedStringFromStringWithEncoding(NSString *string, NSStringEncoding encoding);
+extern NSString *PSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSStringEncoding encoding);
 
-@interface NSMutableURLRequest (FS)
+@interface NSMutableURLRequest (PS)
 
 + (NSMutableURLRequest *)requestWithURL:(NSURL *)URL method:(NSString *)method headers:(NSDictionary *)headers parameters:(NSDictionary *)parameters;
-
-+ (NSMutableURLRequest *)requestWithFoursquareEndpoint:(NSString *)endpoint method:(NSString *)method headers:(NSDictionary *)headers parameters:(NSDictionary *)parameters;
 
 // Convenience Methods
 - (NSString *)HTTPBodyString;
