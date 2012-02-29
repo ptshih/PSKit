@@ -10,7 +10,6 @@
 #import "Facebook.h"
 
 // Facebook
-#define FB_APP_ID @"145264018857264"
 #define FB_PERMISSIONS_PUBLISH @"publish_stream"
 #define FB_BASIC_PERMISISONS [NSArray arrayWithObjects:@"offline_access", @"user_photos", nil]
 
