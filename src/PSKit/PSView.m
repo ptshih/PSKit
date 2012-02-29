@@ -13,6 +13,8 @@
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
+      self.layer.shouldRasterize = YES;
+      self.layer.rasterizationScale = [UIScreen mainScreen].scale;
 //    VLog(@"#%@", [self class]);
   }
   return self;

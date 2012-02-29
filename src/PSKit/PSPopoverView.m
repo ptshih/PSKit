@@ -36,6 +36,8 @@ delegate = _delegate;
         backgroundView.layer.shadowOffset = CGSizeMake(0, 0);
         backgroundView.layer.shadowRadius = 8.0;
         backgroundView.layer.shadowOpacity = 1.0;
+        backgroundView.layer.shouldRasterize = YES;
+        backgroundView.layer.rasterizationScale = [UIScreen mainScreen].scale;
         backgroundView.userInteractionEnabled = YES;
         
         UIImageView *arrowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/PopoverPortraitArrowUp"]] autorelease];
