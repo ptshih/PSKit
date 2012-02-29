@@ -98,25 +98,20 @@ const CGFloat kAnimationDuration = 0.3;
     [self addChildViewController:viewController];
     [self.viewControllers addObject:viewController];
     
-    // Prepare view frames and add shadows
+    // Prepare view frames
     CGRect offscreenFrame = self.view.bounds;
-    CGSize shadowSize = CGSizeZero;
     switch (direction) {
         case PSNavigationControllerDirectionLeft:
             offscreenFrame.origin.x = CGRectGetMaxX(offscreenFrame);
-            shadowSize = CGSizeMake(-5.0, 0.0);
             break;
         case PSNavigationControllerDirectionRight:
             offscreenFrame.origin.x = -CGRectGetMaxX(offscreenFrame);
-            shadowSize = CGSizeMake(5.0, 0.0);
             break;
         case PSNavigationControllerDirectionUp:
             offscreenFrame.origin.y = CGRectGetMaxY(offscreenFrame);
-            shadowSize = CGSizeMake(0.0, -5.0);
             break;
         case PSNavigationControllerDirectionDown:
             offscreenFrame.origin.y = -CGRectGetMaxY(offscreenFrame);
-            shadowSize = CGSizeMake(0.0, 5.0);
             break;
         default:
             break;
@@ -160,25 +155,6 @@ const CGFloat kAnimationDuration = 0.3;
     [self.viewControllers removeObject:poppedViewController];
     
     [poppedViewController willMoveToParentViewController:nil];
-    
-    // Add Shadow
-    CGSize shadowSize = CGSizeZero;
-    switch (direction) {
-        case PSNavigationControllerDirectionLeft:
-            shadowSize = CGSizeMake(5.0, 0.0);
-            break;
-        case PSNavigationControllerDirectionRight:
-            shadowSize = CGSizeMake(-5.0, 0.0);
-            break;
-        case PSNavigationControllerDirectionUp:
-            shadowSize = CGSizeMake(0.0, 5.0);
-            break;
-        case PSNavigationControllerDirectionDown:
-            shadowSize = CGSizeMake(0.0, -5.0);
-            break;
-        default:
-            break;
-    }
 
     // In case the previous view controller was reloaded due to memory, restore transform
     if (CGAffineTransformIsIdentity(self.topViewController.view.transform)) {
@@ -197,7 +173,7 @@ const CGFloat kAnimationDuration = 0.3;
     [self transitionFromViewController:poppedViewController toViewController:self.topViewController duration:animationDuration options:animationOptions animations:^{
         [self.view exchangeSubviewAtIndex:[[self.view subviews] count] - 1 withSubviewAtIndex:[[self.view subviews] count] - 2];
         
-        // Prepare view frames and add shadows
+        // Prepare view frames
         CGRect offscreenFrame = self.view.bounds;
         switch (direction) {
             case PSNavigationControllerDirectionLeft:
