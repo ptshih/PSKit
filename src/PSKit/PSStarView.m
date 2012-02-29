@@ -1,6 +1,6 @@
 //
 //  PSStarView.m
-//  MealTime
+//  PSKit
 //
 //  Created by Peter Shih on 10/6/11.
 //  Copyright 2011 Peter Shih. All rights reserved.

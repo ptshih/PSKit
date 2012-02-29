@@ -1,6 +1,6 @@
 //
 //  PSFacebookCenter.m
-//  MealTime
+//  PSKit
 //
 //  Created by Peter Shih on 8/29/11.
 //  Copyright 2011 Peter Shih. All rights reserved.

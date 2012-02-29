@@ -1,6 +1,6 @@
 //
 //  PSMailCenter.h
-//  MealTime
+//  PSKit
 //
 //  Created by Peter Shih on 9/20/11.
 //  Copyright 2011 Peter Shih. All rights reserved.
