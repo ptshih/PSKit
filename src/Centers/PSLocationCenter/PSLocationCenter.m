@@ -98,17 +98,31 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
         self.location = nil;
         self.pollStartDate = [NSDate date];
         
+        [self startUpdates];
+        
         [self.pollTimer invalidate];
         self.pollTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(pollLocation:) userInfo:nil repeats:YES];
-        
-        [self startUpdates];
     }
 }
 
 - (void)pollLocation:(NSTimer *)timer {
     NSTimeInterval timeSinceStart = [[NSDate date] timeIntervalSinceDate:self.pollStartDate];
     
-    if ((self.location && (self.location.horizontalAccuracy < __accuracyThreshold)) || timeSinceStart > __pollDuration) {
+    if (![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorized) {
+//        40.7247,-73.9995
+        self.location = [[[CLLocation alloc] initWithLatitude:40.7247 longitude:-73.9995] autorelease];
+        self.locationRequested = NO;
+        [self.pollTimer invalidate];
+        self.pollTimer = nil;
+        
+        if (self.shouldNotifyUpdate) {
+            self.shouldNotifyUpdate = NO;
+            [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
+        }
+        
+        UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Location Services Disabled" message:@"Lunchbox works a lot better when it knows your location. Until then... welcome to NYC!" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] autorelease];
+        [av show];
+    } else if ((self.location && (self.location.horizontalAccuracy < __accuracyThreshold)) || timeSinceStart > __pollDuration) {
         self.locationRequested = NO;
         [self.pollTimer invalidate];
         self.pollTimer = nil;
@@ -168,8 +182,6 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
     
     // 5 min threshold
     if (secondsBackgrounded > kSecondsBackgroundedUntilStale) {
-        self.location = nil; // reset last location
-        self.shouldNotifyUpdate = YES;
         [self updateMyLocation];
     }
     
