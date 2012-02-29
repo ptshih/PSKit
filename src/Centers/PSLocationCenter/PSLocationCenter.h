@@ -23,9 +23,12 @@
 @property (nonatomic, copy) CLLocation *location;
 @property (nonatomic, retain) NSTimer *pollTimer;
 @property (nonatomic, retain) NSDate *pollStartDate;
+@property (nonatomic, retain) NSDate *backgroundDate;
+@property (nonatomic, retain) NSDate *foregroundDate;
 @property (nonatomic, assign) BOOL isActive;
 @property (nonatomic, assign) BOOL locationRequested;
 @property (nonatomic, assign) BOOL shouldDisableAfterLocationFix;
+@property (nonatomic, assign) BOOL shouldNotifyUpdate;
 
 + (id)defaultCenter;
 

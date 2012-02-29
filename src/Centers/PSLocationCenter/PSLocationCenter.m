@@ -21,9 +21,12 @@ locationManager = _locationManager,
 location = _location,
 pollTimer = _pollTimer,
 pollStartDate = _pollStartDate,
+backgroundDate = _backgroundDate,
+foregroundDate = _foregroundDate,
 isActive = _isActive,
 locationRequested = _locationRequested,
-shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
+shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix,
+shouldNotifyUpdate = _shouldNotifyUpdate;
 
 + (id)defaultCenter {
     static id defaultCenter = nil;
@@ -53,6 +56,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
         self.isActive = NO;
         self.locationRequested = NO;
         self.shouldDisableAfterLocationFix = NO;
+        self.shouldNotifyUpdate = YES; // force update on first launch
         
         if ([CLLocationManager significantLocationChangeMonitoringAvailable]) {
             [self.locationManager startMonitoringSignificantLocationChanges];
@@ -104,10 +108,15 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
 - (void)pollLocation:(NSTimer *)timer {
     NSTimeInterval timeSinceStart = [[NSDate date] timeIntervalSinceDate:self.pollStartDate];
     
-    if ((self.location && self.location.horizontalAccuracy < kCLLocationAccuracyNearestTenMeters) || timeSinceStart > __pollDuration) {
+    if ((self.location && (self.location.horizontalAccuracy < __accuracyThreshold)) || timeSinceStart > __pollDuration) {
         self.locationRequested = NO;
         [self.pollTimer invalidate];
         self.pollTimer = nil;
+        
+        if (self.shouldNotifyUpdate) {
+            self.shouldNotifyUpdate = NO;
+            [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
+        }
     }
 }
 
@@ -126,8 +135,6 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
         
         if (distanceChanged > __updateDistanceFilter || distanceChanged == -1) {
             self.location = newLocation;
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
         }
     } else {
         DLog(@"Location discarded: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, distanceChanged);
@@ -141,6 +148,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
 #pragma mark - Start/Stop/Resume/Suspend
 - (void)startUpdates {
     if (!self.isActive) {
+        self.shouldNotifyUpdate = YES;
         self.isActive = YES;
         [self.locationManager startUpdatingLocation];
     }
@@ -148,12 +156,23 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
 
 - (void)stopUpdates {
     if (self.isActive) {
+        self.shouldNotifyUpdate = NO;
         self.isActive = NO;
         [self.locationManager stopUpdatingLocation];
     }
 }
 
 - (void)resumeUpdates {
+    self.foregroundDate = [NSDate date];
+    NSTimeInterval secondsBackgrounded = [self.foregroundDate timeIntervalSinceDate:self.backgroundDate];
+    
+    // 5 min threshold
+    if (secondsBackgrounded > kSecondsBackgroundedUntilStale) {
+        self.location = nil; // reset last location
+        self.shouldNotifyUpdate = YES;
+        [self updateMyLocation];
+    }
+    
     [self startUpdates];
     if ([CLLocationManager significantLocationChangeMonitoringAvailable]) {
         [self.locationManager startMonitoringSignificantLocationChanges];
@@ -161,6 +180,8 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
 }
 
 - (void)suspendUpdates {
+    self.shouldNotifyUpdate = NO;
+    self.backgroundDate = [NSDate date];
     [self stopUpdates];
     if ([CLLocationManager significantLocationChangeMonitoringAvailable]) {
         [self.locationManager stopMonitoringSignificantLocationChanges];
