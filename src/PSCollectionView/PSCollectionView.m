@@ -264,10 +264,15 @@ collectionViewDataSource = _collectionViewDataSource;
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    if ([touch.view isKindOfClass:[UIControl class]]) {
-        return NO;
-    } else {
+    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
+    
+    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
+    
+    NSInteger matchingIndex = PSCollectionIndexForKey([matchingKeys lastObject]);
+    if ([touch.view isMemberOfClass:[[self.collectionViewDataSource collectionView:self viewAtIndex:matchingIndex] class]]) {
         return YES;
+    } else {
+        return NO;
     }
 }
 
