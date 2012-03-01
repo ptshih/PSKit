@@ -16,6 +16,12 @@
 - (BOOL)isLandscape;
 - (BOOL)isSquare;
 
+- (UIImage *)imageWithFixedOrientation;
+
+- (UIImage *)imageScaledAndRotated;
+
+// UNTESTED BELOW
+
 #pragma mark - Strechable
 + (UIImage *)stretchableImageNamed:(NSString *)name withLeftCapWidth:(NSInteger)leftCapWidth topCapWidth:(NSInteger)topCapWidth;
 
