@@ -381,7 +381,7 @@ static SVProgressHUD *sharedView = nil;
 		
 		[UIView animateWithDuration:0.15
 							  delay:0
-							options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationCurveEaseOut | UIViewAnimationOptionBeginFromCurrentState
+							options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionCurveEaseOut | UIViewAnimationOptionBeginFromCurrentState
 						 animations:^{	
 							 self.hudView.transform = CGAffineTransformScale(self.hudView.transform, 1/1.3, 1/1.3);
                              self.alpha = 1;
@@ -431,7 +431,7 @@ static SVProgressHUD *sharedView = nil;
 
 	[UIView animateWithDuration:0.15
 						  delay:0
-						options:UIViewAnimationCurveEaseIn | UIViewAnimationOptionAllowUserInteraction
+						options:UIViewAnimationOptionCurveEaseIn | UIViewAnimationOptionAllowUserInteraction
 					 animations:^{	
 						 sharedView.hudView.transform = CGAffineTransformScale(sharedView.hudView.transform, 0.8, 0.8);
 						 sharedView.alpha = 0;

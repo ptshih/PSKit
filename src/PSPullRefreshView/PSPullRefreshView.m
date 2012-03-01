@@ -96,7 +96,7 @@ statusLabel = _statusLabel;
     
     [UIView animateWithDuration:0.2
                           delay:0.0
-                        options:UIViewAnimationCurveLinear
+                        options:UIViewAnimationOptionCurveEaseInOut
                      animations:^{
                          self.scrollView.contentInset = UIEdgeInsetsMake(y, 0.0, 0.0, 0.0);
                      }
@@ -127,7 +127,7 @@ statusLabel = _statusLabel;
                 self.statusLabel.text = PSPullRefreshTriggeredStatus;
                 [UIView animateWithDuration:0.3
                                       delay:0.0
-                                    options:UIViewAnimationCurveLinear
+                                    options:UIViewAnimationOptionCurveEaseInOut
                                  animations:^{
                                      self.iconView.transform = CGAffineTransformMakeRotation(RADIANS(179.9999));
                                  }
@@ -138,7 +138,7 @@ statusLabel = _statusLabel;
                 self.statusLabel.text = PSPullRefreshIdleStatus;
                 [UIView animateWithDuration:0.3
                                       delay:0.0
-                                    options:UIViewAnimationCurveLinear
+                                    options:UIViewAnimationOptionCurveEaseInOut
                                  animations:^{
                                      self.iconView.transform = CGAffineTransformIdentity;
                                  }

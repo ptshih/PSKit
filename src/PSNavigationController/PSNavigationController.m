@@ -85,7 +85,7 @@ viewControllers = _viewControllers;
 #pragma mark - Push/Pop
 const CGFloat kPushPopScale = 0.95;
 const CGFloat kOverlayViewAlpha = 0.75;
-const CGFloat kAnimationDuration = 0.3;
+const CGFloat kAnimationDuration = 0.35;
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
     [self pushViewController:viewController direction:PSNavigationControllerDirectionLeft animated:animated];
@@ -125,7 +125,7 @@ const CGFloat kAnimationDuration = 0.3;
     
     // Transition
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
-    UIViewAnimationOptions animationOptions = UIViewAnimationCurveEaseInOut;
+    UIViewAnimationOptions animationOptions = UIViewAnimationOptionCurveEaseInOut;
     NSTimeInterval animationDuration = animated ? kAnimationDuration : 0.0;
     [self transitionFromViewController:disappearingViewController toViewController:self.topViewController duration:animationDuration options:animationOptions animations:^{
         self.overlayView.alpha = kOverlayViewAlpha;
@@ -168,7 +168,7 @@ const CGFloat kAnimationDuration = 0.3;
     
     // Transition
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
-    UIViewAnimationOptions animationOptions = UIViewAnimationCurveEaseInOut;
+    UIViewAnimationOptions animationOptions = UIViewAnimationOptionCurveEaseInOut;
     NSTimeInterval animationDuration = animated ? kAnimationDuration : 0.0;
     [self transitionFromViewController:poppedViewController toViewController:self.topViewController duration:animationDuration options:animationOptions animations:^{
         [self.view exchangeSubviewAtIndex:[[self.view subviews] count] - 1 withSubviewAtIndex:[[self.view subviews] count] - 2];
