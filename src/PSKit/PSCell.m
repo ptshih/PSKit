@@ -21,8 +21,8 @@ separatorLine = _separatorLine;
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         //    VLog(@"#%@", [self class]);
-        self.layer.shouldRasterize = YES;
-        self.layer.rasterizationScale = [UIScreen mainScreen].scale;
+//        self.layer.shouldRasterize = YES;
+//        self.layer.rasterizationScale = [UIScreen mainScreen].scale;
         self.isExpanded = NO;
     }
     return self;
