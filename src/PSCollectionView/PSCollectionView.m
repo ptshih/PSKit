@@ -137,6 +137,7 @@ collectionViewDataSource = _collectionViewDataSource;
             // Setup gesture recognizer
             if ([newView.gestureRecognizers count] == 0) {
                 UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
+                gr.delegate = self;
                 [newView addGestureRecognizer:gr];
                 newView.userInteractionEnabled = YES;
             }
@@ -259,6 +260,14 @@ collectionViewDataSource = _collectionViewDataSource;
     
     if (self.collectionViewDelegate && [self.collectionViewDelegate respondsToSelector:@selector(collectionView:didSelectView:atIndex:)]) {
         [self.collectionViewDelegate collectionView:self didSelectView:gestureRecognizer.view atIndex:matchingIndex];
+    }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if ([touch.view isKindOfClass:[UIControl class]]) {
+        return NO;
+    } else {
+        return YES;
     }
 }
 
