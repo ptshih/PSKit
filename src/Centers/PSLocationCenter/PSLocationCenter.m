@@ -107,8 +107,8 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 
 - (void)pollLocation:(NSTimer *)timer {
     NSTimeInterval timeSinceStart = [[NSDate date] timeIntervalSinceDate:self.pollStartDate];
-    
-    if (![CLLocationManager locationServicesEnabled] || [CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorized) {
+    CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
+    if (![CLLocationManager locationServicesEnabled] || (authStatus != kCLAuthorizationStatusAuthorized && authStatus != kCLAuthorizationStatusNotDetermined)) {
 //        40.7247,-73.9995
         self.location = [[[CLLocation alloc] initWithLatitude:40.7247 longitude:-73.9995] autorelease];
         self.locationRequested = NO;
