@@ -17,6 +17,13 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     return [key integerValue];
 }
 
+// This is just so we know that we sent this tap gesture recognizer in the delegate
+@interface PSCollectionViewTapGestureRecognizer : UITapGestureRecognizer
+@end
+
+@implementation PSCollectionViewTapGestureRecognizer
+@end
+
 @implementation PSCollectionView
 
 @synthesize
@@ -136,7 +143,8 @@ collectionViewDataSource = _collectionViewDataSource;
             
             // Setup gesture recognizer
             if ([newView.gestureRecognizers count] == 0) {
-                UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
+                PSCollectionViewTapGestureRecognizer *gr = [[[PSCollectionViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
+                gr.delegate = self;
                 [newView addGestureRecognizer:gr];
                 newView.userInteractionEnabled = YES;
             }
@@ -258,6 +266,19 @@ collectionViewDataSource = _collectionViewDataSource;
         if (self.collectionViewDelegate && [self.collectionViewDelegate respondsToSelector:@selector(collectionView:didSelectView:atIndex:)]) {
             [self.collectionViewDelegate collectionView:self didSelectView:gestureRecognizer.view atIndex:matchingIndex];
         }
+    }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if (![gestureRecognizer isMemberOfClass:[PSCollectionViewTapGestureRecognizer class]]) return YES;
+    
+    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
+    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
+    NSInteger matchingIndex = PSCollectionIndexForKey([matchingKeys lastObject]);
+    if ([touch.view isMemberOfClass:[[self.collectionViewDataSource collectionView:self viewAtIndex:matchingIndex] class]]) {
+        return YES;
+    } else {
+        return NO;
     }
 }
 
