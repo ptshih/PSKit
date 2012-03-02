@@ -137,7 +137,6 @@ collectionViewDataSource = _collectionViewDataSource;
             // Setup gesture recognizer
             if ([newView.gestureRecognizers count] == 0) {
                 UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
-                gr.delegate = self;
                 [newView addGestureRecognizer:gr];
                 newView.userInteractionEnabled = YES;
             }
@@ -253,26 +252,12 @@ collectionViewDataSource = _collectionViewDataSource;
 #pragma mark - Gesture Recognizer
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {    
     NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
-    
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
-    
     NSInteger matchingIndex = PSCollectionIndexForKey([matchingKeys lastObject]);
-    
-    if (self.collectionViewDelegate && [self.collectionViewDelegate respondsToSelector:@selector(collectionView:didSelectView:atIndex:)]) {
-        [self.collectionViewDelegate collectionView:self didSelectView:gestureRecognizer.view atIndex:matchingIndex];
-    }
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
-    
-    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
-    
-    NSInteger matchingIndex = PSCollectionIndexForKey([matchingKeys lastObject]);
-    if ([touch.view isMemberOfClass:[[self.collectionViewDataSource collectionView:self viewAtIndex:matchingIndex] class]]) {
-        return YES;
-    } else {
-        return NO;
+    if ([gestureRecognizer.view isMemberOfClass:[[self.collectionViewDataSource collectionView:self viewAtIndex:matchingIndex] class]]) {
+        if (self.collectionViewDelegate && [self.collectionViewDelegate respondsToSelector:@selector(collectionView:didSelectView:atIndex:)]) {
+            [self.collectionViewDelegate collectionView:self didSelectView:gestureRecognizer.view atIndex:matchingIndex];
+        }
     }
 }
 
