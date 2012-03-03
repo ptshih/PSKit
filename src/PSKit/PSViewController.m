@@ -12,6 +12,7 @@
 
 @synthesize
 headerView = _headerView,
+footerView = _footerView,
 activeScrollView = _activeScrollView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
