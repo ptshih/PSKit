@@ -13,11 +13,11 @@ typedef void (^PSURLCacheNetworkBlock)(void);
 // This encodes a given URL into a file system safe string
 static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
     // NOTE: If the URL is extremely long, the path becomes too long for the file system to handle and it fails
-    return (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
+    return [(NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
                                                                (CFStringRef)[URL absoluteString],
                                                                NULL,
                                                                (CFStringRef)@"!*'();:@&=+$,/?%#[]",
-                                                               kCFStringEncodingUTF8);
+                                                               kCFStringEncodingUTF8) autorelease];
 }
 
 @interface PSURLCache ()
