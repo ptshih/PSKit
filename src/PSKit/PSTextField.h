@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 
 
-@interface PSTextField : UITextField {
-  CGSize _inset;
-}
+@interface PSTextField : UITextField
+
+@property (nonatomic, assign) CGSize inset;
 
 - (id)initWithFrame:(CGRect)frame withInset:(CGSize)inset;
 
