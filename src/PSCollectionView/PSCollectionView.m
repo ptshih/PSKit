@@ -28,6 +28,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @synthesize
 headerView = _headerView,
+emptyView = _emptyView,
 reuseableViews = _reuseableViews,
 visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
@@ -62,6 +63,7 @@ collectionViewDataSource = _collectionViewDataSource;
     
     // release retains
     self.headerView = nil;
+    self.emptyView = nil;
     self.reuseableViews = nil;
     self.visibleViews = nil;
     self.viewKeysToRemove = nil;
@@ -158,6 +160,8 @@ collectionViewDataSource = _collectionViewDataSource;
 - (void)reloadViews {
     static CGFloat margin = 8.0;
     
+    CGFloat totalHeight = 0.0;
+    
     NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
     
     // This is where we should layout the entire grid first
@@ -171,64 +175,77 @@ collectionViewDataSource = _collectionViewDataSource;
     [self.viewKeysToRemove removeAllObjects];
     [self.indexToRectMap removeAllObjects];
     
+    if (self.emptyView) {
+        [self.emptyView removeFromSuperview];
+    }
+    
     // Add headerView if it exists
     [self addSubview:self.headerView];
     CGFloat top = (self.headerView) ? self.headerView.height : margin;
     
-    // This array determines the last height offset on a column
-    NSMutableArray *colOffsets = [NSMutableArray arrayWithCapacity:self.numCols];
-    for (int i = 0; i < self.numCols; i++) {
-        [colOffsets addObject:[NSNumber numberWithFloat:top]];
-    }
-    
-    // Calculate index to rect mapping
-    self.colWidth = floorf((self.width - margin * (self.numCols + 1)) / self.numCols);
-    for (NSInteger i = 0; i < numViews; i++) {
-        NSString *key = PSCollectionKeyForIndex(i);
+    if (numViews > 0) {
+        // This array determines the last height offset on a column
+        NSMutableArray *colOffsets = [NSMutableArray arrayWithCapacity:self.numCols];
+        for (int i = 0; i < self.numCols; i++) {
+            [colOffsets addObject:[NSNumber numberWithFloat:top]];
+        }
         
-        // Find the shortest column
-        __block NSInteger col = 0;
-        __block CGFloat h = 0.0;
-        [colOffsets enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            if (idx == 0) {
-                col = idx;
-                h = [obj floatValue];
-            } else if (h > [obj floatValue]) {
-                col = idx;
+        // Calculate index to rect mapping
+        self.colWidth = floorf((self.width - margin * (self.numCols + 1)) / self.numCols);
+        for (NSInteger i = 0; i < numViews; i++) {
+            NSString *key = PSCollectionKeyForIndex(i);
+            
+            // Find the shortest column
+            __block NSInteger col = 0;
+            __block CGFloat h = 0.0;
+            [colOffsets enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                if (idx == 0) {
+                    col = idx;
+                    h = [obj floatValue];
+                } else if (h > [obj floatValue]) {
+                    col = idx;
+                }
+            }];
+            
+            //        NSInteger col = i % self.numCols;
+            CGFloat left = margin + (col * margin) + (col * self.colWidth);
+            CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
+            CGFloat colHeight = [self.collectionViewDataSource heightForViewAtIndex:i];
+            if (colHeight == 0) {
+                colHeight = self.colWidth;
             }
-        }];
-        
-//        NSInteger col = i % self.numCols;
-        CGFloat left = margin + (col * margin) + (col * self.colWidth);
-        CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
-        CGFloat colHeight = [self.collectionViewDataSource heightForViewAtIndex:i];
-        if (colHeight == 0) {
-            colHeight = self.colWidth;
+            
+            if (top != top) {
+                NSLog(@"nan");
+            }
+            
+            CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
+            
+            // Add to index rect map
+            [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
+            
+            // Update the last height offset for this column
+            CGFloat test = top + colHeight + margin;
+            
+            if (test != test) {
+                NSLog(@"nan");
+            }
+            [colOffsets replaceObjectAtIndex:col withObject:[NSNumber numberWithFloat:test]];
         }
         
-        if (top != top) {
-            NSLog(@"nan");
+        for (NSNumber *colHeight in colOffsets) {
+            totalHeight = (totalHeight < [colHeight floatValue]) ? [colHeight floatValue] : totalHeight;
         }
+    } else {
+        totalHeight = self.height - top;
         
-        CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
-        
-        // Add to index rect map
-        [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
-        
-        // Update the last height offset for this column
-        CGFloat test = top + colHeight + margin;
-        
-        if (test != test) {
-            NSLog(@"nan");
+        // If we have an empty view, show it
+        if (self.emptyView) {
+            self.emptyView.frame = CGRectMake(margin, top, self.width - margin * 2, totalHeight - margin * 2);
+            [self addSubview:self.emptyView];
         }
-        [colOffsets replaceObjectAtIndex:col withObject:[NSNumber numberWithFloat:test]];
     }
-    
-    CGFloat totalHeight = 0.0;
-    for (NSNumber *colHeight in colOffsets) {
-        totalHeight = (totalHeight < [colHeight floatValue]) ? [colHeight floatValue] : totalHeight;
-    }
-    
+        
     self.contentSize = CGSizeMake(self.width, totalHeight);
     self.contentOffset = CGPointZero;
     
