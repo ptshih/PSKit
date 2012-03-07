@@ -46,7 +46,7 @@ delegate = _delegate;
         backgroundView.frame = CGRectMake(MARGIN, 20 + 44 + MARGIN, self.width - MARGIN * 2, contentView.height + 24.0 + MARGIN * 3);
         
         arrowView.center = self.center;
-        arrowView.top = backgroundView.top - arrowView.height + 2.0;
+        arrowView.top = backgroundView.top - arrowView.height + 3.0;
         
         UILabel *titleLabel = [UILabel labelWithText:title style:@"popoverTitleLabel"];
         titleLabel.frame = CGRectMake(MARGIN, MARGIN, backgroundView.width - MARGIN * 2, 24);
