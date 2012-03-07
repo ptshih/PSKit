@@ -247,7 +247,7 @@ collectionViewDataSource = _collectionViewDataSource;
     }
         
     self.contentSize = CGSizeMake(self.width, totalHeight);
-    self.contentOffset = CGPointZero;
+//    self.contentOffset = CGPointZero;
     
     [self setNeedsLayout];
 }

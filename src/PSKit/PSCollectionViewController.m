@@ -29,6 +29,8 @@ pullRefreshView = _pullRefreshView;
 }
 
 - (void)viewDidUnload {
+    self.contentOffset = self.collectionView.contentOffset;
+    
     // Views
     self.pullRefreshView.delegate = nil;
     self.collectionView.delegate = nil;
@@ -72,11 +74,13 @@ pullRefreshView = _pullRefreshView;
 - (void)reloadDataSource {
     [super reloadDataSource];
     [self beginRefresh];
+    self.contentOffset = CGPointZero;
 }
 
 - (void)dataSourceDidLoad {
     [super dataSourceDidLoad];
     [self endRefresh];
+    self.collectionView.contentOffset = self.contentOffset;
 }
 
 - (void)dataSourceDidError {

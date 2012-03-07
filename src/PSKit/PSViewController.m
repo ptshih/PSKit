@@ -13,13 +13,15 @@
 @synthesize
 headerView = _headerView,
 footerView = _footerView,
-activeScrollView = _activeScrollView;
+activeScrollView = _activeScrollView,
+contentOffset = _contentOffset;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
 //  VLog(@"#%@", [self class]);
+      self.contentOffset = CGPointZero;
   }
   return self;
 }
