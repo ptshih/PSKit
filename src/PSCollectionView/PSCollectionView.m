@@ -27,8 +27,6 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @interface PSCollectionView ()
 
-@property (nonatomic, retain) UIView *emptyView;
-
 @end
 
 @implementation PSCollectionView
@@ -55,12 +53,6 @@ collectionViewDataSource = _collectionViewDataSource;
         self.numCols = 0;
         self.colWidth = 0.0;
         self.alwaysBounceVertical = YES;
-        
-        UILabel *emptyLabel = [UILabel labelWithText:@"Loading..." style:@"emptyLabel"];
-        emptyLabel.frame = self.bounds;
-        emptyLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        self.emptyView = emptyLabel;
-        [self addSubview:self.emptyView];
         
 //        [self addObserver:self forKeyPath:@"contentOffset" options:0 context:nil];
     }
@@ -188,7 +180,9 @@ collectionViewDataSource = _collectionViewDataSource;
     [self.viewKeysToRemove removeAllObjects];
     [self.indexToRectMap removeAllObjects];
     
-    self.emptyView.hidden = YES;
+    if (self.emptyView) {
+        [self.emptyView removeFromSuperview];
+    }
     
     // Add headerView if it exists
     [self addSubview:self.headerView];
@@ -252,9 +246,8 @@ collectionViewDataSource = _collectionViewDataSource;
         
         // If we have an empty view, show it
         if (self.emptyView) {
-            self.emptyView.hidden = NO;
             self.emptyView.frame = CGRectMake(margin, top, self.width - margin * 2, totalHeight - margin * 2);
-            [(UILabel *)self.emptyView setText:@"No Results"];
+            [self addSubview:self.emptyView];
         }
     }
         
