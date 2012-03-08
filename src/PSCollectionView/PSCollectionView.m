@@ -27,13 +27,16 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @interface PSCollectionView ()
 
+@property (nonatomic, retain) UIView *loadingView;
+
 @end
 
 @implementation PSCollectionView
 
 @synthesize
-emptyView = _emptyView,
+loadingView = _loadingView,
 headerView = _headerView,
+emptyView = _emptyView,
 reuseableViews = _reuseableViews,
 visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
@@ -55,6 +58,9 @@ collectionViewDataSource = _collectionViewDataSource;
         self.alwaysBounceVertical = YES;
         
 //        [self addObserver:self forKeyPath:@"contentOffset" options:0 context:nil];
+        self.loadingView = [UILabel labelWithText:@"Loading..." style:@"emptyLabel"];
+        self.loadingView.frame = self.bounds;
+        [self addSubview:self.loadingView];
     }
     return self;
 }
@@ -67,6 +73,7 @@ collectionViewDataSource = _collectionViewDataSource;
     self.collectionViewDelegate = nil;
     
     // release retains
+    self.loadingView = nil;
     self.headerView = nil;
     self.emptyView = nil;
     self.reuseableViews = nil;
@@ -183,6 +190,7 @@ collectionViewDataSource = _collectionViewDataSource;
     if (self.emptyView) {
         [self.emptyView removeFromSuperview];
     }
+    [self.loadingView removeFromSuperview];
     
     // Add headerView if it exists
     [self addSubview:self.headerView];
