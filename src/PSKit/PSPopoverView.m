@@ -38,7 +38,7 @@ delegate = _delegate;
 //        backgroundView.layer.shadowOpacity = 1.0;
 //        backgroundView.layer.shouldRasterize = YES;
 //        backgroundView.layer.rasterizationScale = [UIScreen mainScreen].scale;
-        backgroundView.userInteractionEnabled = YES;
+//        backgroundView.userInteractionEnabled = YES;
         
         UIImageView *arrowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/PopoverPortraitArrowUp"]] autorelease];
         [self addSubview:arrowView];
@@ -50,14 +50,16 @@ delegate = _delegate;
         
         UILabel *titleLabel = [UILabel labelWithText:title style:@"popoverTitleLabel"];
         titleLabel.frame = CGRectMake(MARGIN, MARGIN, backgroundView.width - MARGIN * 2, 24);
-        [backgroundView addSubview:titleLabel];
+        titleLabel.frame = [self convertRect:titleLabel.frame fromView:backgroundView];
+        [self addSubview:titleLabel];
         
         self.contentView = contentView;
         self.contentView.left = MARGIN;
-        self.contentView.top = titleLabel.bottom + MARGIN;
+        self.contentView.top = MARGIN + titleLabel.height + MARGIN;
         self.contentView.layer.cornerRadius = 4.0;
         self.contentView.layer.masksToBounds = YES;
-        [backgroundView addSubview:self.contentView];
+        self.contentView.frame = [self convertRect:self.contentView.frame fromView:backgroundView];
+        [self addSubview:self.contentView];
     }
     return self;
 }
