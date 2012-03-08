@@ -13,7 +13,6 @@
 @interface PSCollectionView : UIScrollView <NSCoding, UIGestureRecognizerDelegate>
 
 @property (nonatomic, retain) UIView *headerView;
-@property (nonatomic, retain) UIView *emptyView;
 @property (nonatomic, retain) NSMutableSet *reuseableViews;
 @property (nonatomic, retain) NSMutableDictionary *visibleViews;
 @property (nonatomic, retain) NSMutableArray *viewKeysToRemove;
