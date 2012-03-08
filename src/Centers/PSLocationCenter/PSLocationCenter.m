@@ -149,9 +149,9 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
         
         self.location = newLocation;
         
-//        if (distanceChanged > __updateDistanceFilter || distanceChanged == -1) {
+        if (distanceChanged > __updateDistanceFilter || distanceChanged == -1) {
 //            self.location = newLocation;
-//        }
+        }
     } else {
         DLog(@"Location discarded: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, distanceChanged);
     }
