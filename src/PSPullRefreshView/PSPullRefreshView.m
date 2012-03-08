@@ -11,7 +11,7 @@
 
 static NSString * const PSPullRefreshIdleStatus = @"Pull Down to Refresh";
 static NSString * const PSPullRefreshTriggeredStatus = @"Release to Refresh";
-static NSString * const PSPullRefreshRefreshingStatus = @"Refreshing...";
+static NSString * const PSPullRefreshRefreshingStatus = @"Loading...";
 
 @implementation PSPullRefreshView
 
@@ -78,31 +78,33 @@ statusLabel = _statusLabel;
 - (void)setState:(PSPullRefreshState)state {
     _state = state;
     
-    CGFloat y = 0.0;
+//    CGFloat y = 0.0;
     switch (state) {
         case PSPullRefreshStateIdle:
-            y = 0.0;
+//            y = 0.0;
             self.statusLabel.text = PSPullRefreshIdleStatus;
             [self stopSpinning];
+            
+            if (!self.scrollView) return;
+            
+            [UIView animateWithDuration:0.2
+                                  delay:0.0
+                                options:UIViewAnimationOptionCurveEaseInOut
+                             animations:^{
+                                 self.scrollView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, 0.0);
+                             }
+                             completion:^(BOOL finished){
+                                 
+                             }];
             break;
         case PSPullRefreshStateRefreshing:
-            y = self.height;
+//            y = self.height;
             [self startSpinning];
             self.statusLabel.text = PSPullRefreshRefreshingStatus;
             break;
         default:
             break;
     }
-    
-    [UIView animateWithDuration:0.2
-                          delay:0.0
-                        options:UIViewAnimationOptionCurveEaseInOut
-                     animations:^{
-                         self.scrollView.contentInset = UIEdgeInsetsMake(y, 0.0, 0.0, 0.0);
-                     }
-                     completion:^(BOOL finished){
-                         
-                     }];
 }
 
 #pragma mark - Pass-thru UIScrollViewDelegate methods
@@ -160,6 +162,18 @@ statusLabel = _statusLabel;
     // We detect to see if the user dragged enough to trigger a refresh here
     if (yOffset <= -self.height) {
         self.state = PSPullRefreshStateRefreshing;
+        
+        if (!self.scrollView) return;
+        
+        [UIView animateWithDuration:0.2
+                              delay:0.0
+                            options:UIViewAnimationOptionCurveEaseInOut
+                         animations:^{
+                             self.scrollView.contentInset = UIEdgeInsetsMake(self.height, 0.0, 0.0, 0.0);
+                         }
+                         completion:^(BOOL finished){
+                             
+                         }];
         
         if (self.delegate && [self.delegate respondsToSelector:@selector(pullRefreshViewDidBeginRefreshing:)]) {
             [self.delegate pullRefreshViewDidBeginRefreshing:self];
