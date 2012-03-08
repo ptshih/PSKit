@@ -11,7 +11,7 @@
 
 static NSString * const PSPullRefreshIdleStatus = @"Pull Down to Refresh";
 static NSString * const PSPullRefreshTriggeredStatus = @"Release to Refresh";
-static NSString * const PSPullRefreshRefreshingStatus = @"Refreshing New Data";
+static NSString * const PSPullRefreshRefreshingStatus = @"Refreshing...";
 
 @implementation PSPullRefreshView
 
