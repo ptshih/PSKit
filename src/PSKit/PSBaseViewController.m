@@ -47,7 +47,6 @@ hasLoadedOnce = _hasLoadedOnce;
 }
 
 - (void)reloadDataSource {
-    if (self.reloading) return;
     [self beginRefresh];
 }
 

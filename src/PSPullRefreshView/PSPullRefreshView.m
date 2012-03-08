@@ -160,8 +160,12 @@ statusLabel = _statusLabel;
     CGFloat yOffset = scrollView.contentOffset.y;
     
     // We detect to see if the user dragged enough to trigger a refresh here
-    if (yOffset <= -self.height) {
+    if (yOffset <= -self.height && self.state == PSPullRefreshStateIdle) {
         self.state = PSPullRefreshStateRefreshing;
+        
+        if (self.delegate && [self.delegate respondsToSelector:@selector(pullRefreshViewDidBeginRefreshing:)]) {
+            [self.delegate pullRefreshViewDidBeginRefreshing:self];
+        }
         
         if (!self.scrollView) return;
         
@@ -174,10 +178,6 @@ statusLabel = _statusLabel;
                          completion:^(BOOL finished){
                              
                          }];
-        
-        if (self.delegate && [self.delegate respondsToSelector:@selector(pullRefreshViewDidBeginRefreshing:)]) {
-            [self.delegate pullRefreshViewDidBeginRefreshing:self];
-        }
     }
 }
 
