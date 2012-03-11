@@ -37,4 +37,6 @@
 
 - (CAGradientLayer *)addGradientLayerWithFrame:(CGRect)frame colors:(NSArray *)colors locations:(NSArray *)locations startPoint:(CGPoint)startPoint endPoint:(CGPoint)endPoint;
 
+- (void)flipViewForInterfaceOrientation:(UIInterfaceOrientation)orientation;
+
 @end

@@ -10,17 +10,36 @@
 
 #define MARGIN 8.0
 
+@interface PSPopoverView ()
+
+@property (nonatomic, assign) UIView *containerView;
+@property (nonatomic, assign) UIImageView *arrowView;
+@property (nonatomic, assign) UILabel *titleLabel;
+@property (nonatomic, assign) CGSize popoverSize;
+
+- (void)positionPopover;
+
+@end
+
 @implementation PSPopoverView
 
 @synthesize
+containerView = _containerView,
+arrowView = _arrowView,
+titleLabel = _titleLabel,
+popoverSize = _popoverSize,
 overlayView = _overlayView,
 contentView = _contentView,
 delegate = _delegate;
 
 - (id)initWithTitle:(NSString *)title contentView:(UIView *)contentView {
-    self = [super initWithFrame:[[UIScreen mainScreen] bounds]];
+    self = [super initWithFrame:CGRectZero];
     if (self) {
-        self.overlayView = [[[UIView alloc] initWithFrame:self.bounds] autorelease];
+        self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        
+        self.popoverSize = CGSizeZero;
+        
+        self.overlayView = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
         self.overlayView.backgroundColor = [UIColor blackColor];
         self.overlayView.alpha = 0.5;
         self.overlayView.userInteractionEnabled = YES;
@@ -29,37 +48,28 @@ delegate = _delegate;
         [self.overlayView addGestureRecognizer:gr];
         [self addSubview:self.overlayView];
         
-        UIImageView *backgroundView = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/PopoverPortrait"] stretchableImageWithLeftCapWidth:0 topCapHeight:170]] autorelease];
-        [self addSubview:backgroundView];
-//        backgroundView.layer.masksToBounds = NO;
-//        backgroundView.layer.shadowColor = [[UIColor blackColor] CGColor];
-//        backgroundView.layer.shadowOffset = CGSizeMake(0, 0);
-//        backgroundView.layer.shadowRadius = 8.0;
-//        backgroundView.layer.shadowOpacity = 1.0;
-//        backgroundView.layer.shouldRasterize = YES;
-//        backgroundView.layer.rasterizationScale = [UIScreen mainScreen].scale;
-//        backgroundView.userInteractionEnabled = YES;
+        // Container
+        self.containerView = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
+        [self addSubview:self.containerView];
         
-        UIImageView *arrowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/PopoverPortraitArrowUp"]] autorelease];
-        [self addSubview:arrowView];
+        UIImageView *bgImageView = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/PopoverPortrait"] stretchableImageWithLeftCapWidth:152 topCapHeight:170]] autorelease];
+        bgImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        bgImageView.frame = self.containerView.bounds;
+        [self.containerView addSubview:bgImageView];
         
-        backgroundView.frame = CGRectMake(MARGIN, 20 + 44 + MARGIN, self.width - MARGIN * 2, contentView.height + 24.0 + MARGIN * 3);
-        
-        arrowView.center = self.center;
-        arrowView.top = backgroundView.top - arrowView.height + 3.0;
-        
-        UILabel *titleLabel = [UILabel labelWithText:title style:@"popoverTitleLabel"];
-        titleLabel.frame = CGRectMake(MARGIN, MARGIN, backgroundView.width - MARGIN * 2, 24);
-        titleLabel.frame = [self convertRect:titleLabel.frame fromView:backgroundView];
-        [self addSubview:titleLabel];
-        
+        self.titleLabel = [UILabel labelWithText:title style:@"popoverTitleLabel"];
+        [self.containerView addSubview:self.titleLabel];
+
+        // ContentView
         self.contentView = contentView;
-        self.contentView.left = MARGIN;
-        self.contentView.top = MARGIN + titleLabel.height + MARGIN;
         self.contentView.layer.cornerRadius = 4.0;
         self.contentView.layer.masksToBounds = YES;
-        self.contentView.frame = [self convertRect:self.contentView.frame fromView:backgroundView];
-        [self addSubview:self.contentView];
+        [self.containerView addSubview:self.contentView];
+        
+        
+        // Arrow
+        self.arrowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/PopoverPortraitArrowUp"]] autorelease];
+        [self addSubview:self.arrowView];
     }
     return self;
 }
@@ -68,11 +78,80 @@ delegate = _delegate;
     [super dealloc];
 }
 
-- (void)show {
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    self.overlayView.frame = self.bounds;
+    
+    // Container
+    CGSize containerSize = CGSizeMake(self.popoverSize.width + MARGIN * 2, self.popoverSize.height + MARGIN * 3 + 24);
+    
+    self.containerView.width = containerSize.width;
+    self.containerView.height = containerSize.height;
+    self.containerView.center = self.center;
+    self.containerView.top = 52.0;
+    
+    self.titleLabel.frame = CGRectMake(MARGIN, MARGIN, self.containerView.width - MARGIN * 2, 24.0);
+    
+    self.contentView.frame = CGRectMake(MARGIN, MARGIN, self.popoverSize.width, self.popoverSize.height);
+    self.contentView.top = self.titleLabel.bottom + MARGIN;
+    
+    self.arrowView.center = self.center;
+    self.arrowView.top = self.containerView.top - self.arrowView.height + 3.0;
+}
+
+- (void)positionPopover {
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+
+    CGRect orientationFrame = [UIScreen mainScreen].bounds;
+    CGRect statusBarFrame = [UIApplication sharedApplication].statusBarFrame;
+    
+    if (UIInterfaceOrientationIsLandscape(orientation)) {
+        CGFloat t = orientationFrame.size.width;
+        orientationFrame.size.width = orientationFrame.size.height;
+        orientationFrame.size.height = t;
+        
+        t = statusBarFrame.size.width;
+        statusBarFrame.size.width = statusBarFrame.size.height;
+        statusBarFrame.size.height = t;
+    }
+    
+    CGFloat posY = orientationFrame.size.height / 2;
+    CGFloat posX = orientationFrame.size.width / 2;
+    
+    CGFloat rotateAngle;
+    CGPoint newCenter;
+    
+    switch (orientation) { 
+        case UIInterfaceOrientationPortraitUpsideDown:
+            rotateAngle = M_PI; 
+            newCenter = CGPointMake(posX, orientationFrame.size.height-posY);
+            break;
+        case UIInterfaceOrientationLandscapeLeft:
+            rotateAngle = -M_PI/2.0f;
+            newCenter = CGPointMake(posY, posX);
+            break;
+        case UIInterfaceOrientationLandscapeRight:
+            rotateAngle = M_PI/2.0f;
+            newCenter = CGPointMake(orientationFrame.size.height-posY, posX);
+            break;
+        default: // as UIInterfaceOrientationPortrait
+            rotateAngle = 0.0;
+            newCenter = CGPointMake(posX, posY);
+            break;
+    }
+    
+    self.transform = CGAffineTransformMakeRotation(rotateAngle);
+    self.center = newCenter;
+}
+
+- (void)showWithSize:(CGSize)size inView:(UIView *)view {
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     
-    self.frame = [[UIScreen mainScreen] bounds];
-    [[APP_DELEGATE window] addSubview:self];
+    self.popoverSize = size;
+    
+    self.frame = view.bounds;
+    [view addSubview:self];
     self.alpha = 0.0;
     
     [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{

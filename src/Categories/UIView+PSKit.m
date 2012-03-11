@@ -177,4 +177,36 @@
   return gradient;
 }
 
+- (void)flipViewForInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    CGFloat angle = 0.0;
+    CGPoint origin = CGPointZero;
+    CGRect newFrame = self.window.bounds;
+    CGSize statusBarSize = [[UIApplication sharedApplication] statusBarFrame].size;
+    
+    switch (orientation) { 
+        case UIInterfaceOrientationPortraitUpsideDown:
+            angle = M_PI; 
+            newFrame.size.height -= statusBarSize.height;
+            break;
+        case UIInterfaceOrientationLandscapeLeft:
+            angle = - M_PI / 2.0f;
+            newFrame.origin.x += statusBarSize.width;
+            newFrame.size.width -= statusBarSize.width; 
+            break;
+        case UIInterfaceOrientationLandscapeRight:
+            angle = M_PI / 2.0f;
+            newFrame.size.width -= statusBarSize.width;
+            break;
+        default: // as UIInterfaceOrientationPortrait
+            angle = 0.0;
+            newFrame.origin.y += statusBarSize.height;
+            newFrame.size.height -= statusBarSize.height;
+            break;
+    } 
+    
+    self.transform = CGAffineTransformMakeRotation(angle);
+    self.frame = newFrame;
+    
+}
+
 @end

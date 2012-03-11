@@ -239,4 +239,10 @@ const CGFloat kAnimationDuration = 0.35;
     return [self popToViewController:[self.viewControllers firstObject] animated:animated];
 }
 
+#pragma mark - Rotation
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+//    return YES;
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
 @end

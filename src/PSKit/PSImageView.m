@@ -21,7 +21,6 @@ shouldAnimate = _shouldAnimate;
         self.shouldResize = NO;
         self.shouldAnimate = NO;
         
-        self.backgroundColor = [UIColor clearColor];
         self.contentMode = UIViewContentModeScaleAspectFill;
         self.contentScaleFactor = [UIScreen mainScreen].scale;
     }
@@ -31,6 +30,10 @@ shouldAnimate = _shouldAnimate;
 - (void)dealloc {
     self.placeholderImage = nil;
     [super dealloc];
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
 }
 
 - (void)setImage:(UIImage *)image {

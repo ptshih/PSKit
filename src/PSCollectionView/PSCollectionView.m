@@ -9,6 +9,8 @@
 #import "PSCollectionView.h"
 #import "UIView+PSKit.h"
 
+#define kMargin 8.0
+
 static inline NSString * PSCollectionKeyForIndex(NSInteger index) {
     return [NSString stringWithFormat:@"%d", index];
 }
@@ -28,6 +30,10 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 @interface PSCollectionView ()
 
 @property (nonatomic, retain) UIView *loadingView;
+@property (nonatomic, assign) NSInteger numCols;
+@property (nonatomic, assign) UIInterfaceOrientation orientation;
+
+- (void)relayoutViews;
 
 @end
 
@@ -35,6 +41,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @synthesize
 loadingView = _loadingView,
+orientation = _orientation,
 headerView = _headerView,
 emptyView = _emptyView,
 reuseableViews = _reuseableViews,
@@ -42,6 +49,8 @@ visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
 indexToRectMap = _indexToRectMap,
 numCols = _numCols,
+numColsPortrait = _numColsPortrait,
+numColsLandscape = _numColsLandscape,
 colWidth = _colWidth,
 collectionViewDelegate = _collectionViewDelegate,
 collectionViewDataSource = _collectionViewDataSource;
@@ -54,12 +63,16 @@ collectionViewDataSource = _collectionViewDataSource;
         self.viewKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
         self.numCols = 0;
+        self.numColsPortrait = 0;
+        self.numColsLandscape = 0;
         self.colWidth = 0.0;
         self.alwaysBounceVertical = YES;
+        self.orientation = [UIApplication sharedApplication].statusBarOrientation;
         
 //        [self addObserver:self forKeyPath:@"contentOffset" options:0 context:nil];
         self.loadingView = [UILabel labelWithText:@"Loading..." style:@"emptyLabel"];
         self.loadingView.frame = self.bounds;
+        self.loadingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [self addSubview:self.loadingView];
     }
     return self;
@@ -94,7 +107,13 @@ collectionViewDataSource = _collectionViewDataSource;
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    [self removeAndAddCellsIfNecessary];
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (self.orientation != orientation) {
+        self.orientation = orientation;
+        [self relayoutViews];
+    } else {
+        [self removeAndAddCellsIfNecessary];
+    }
 }
 
 - (void)removeAndAddCellsIfNecessary {
@@ -168,15 +187,8 @@ collectionViewDataSource = _collectionViewDataSource;
     }
 }
 
-#pragma mark - DataSource
-- (void)reloadViews {
-    static CGFloat margin = 8.0;
-    
-    CGFloat totalHeight = 0.0;
-    
-    NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
-    
-    // This is where we should layout the entire grid first
+- (void)relayoutViews {
+    self.numCols = UIInterfaceOrientationIsPortrait(self.orientation) ? self.numColsPortrait : self.numColsLandscape;
     
     // Reset all state
     [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
@@ -192,9 +204,14 @@ collectionViewDataSource = _collectionViewDataSource;
     }
     [self.loadingView removeFromSuperview];
     
+    // This is where we should layout the entire grid first
+    NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
+    
+    CGFloat totalHeight = 0.0;
+    
     // Add headerView if it exists
     [self addSubview:self.headerView];
-    CGFloat top = (self.headerView) ? self.headerView.height : margin;
+    CGFloat top = (self.headerView) ? self.headerView.height : kMargin;
     
     if (numViews > 0) {
         // This array determines the last height offset on a column
@@ -204,7 +221,7 @@ collectionViewDataSource = _collectionViewDataSource;
         }
         
         // Calculate index to rect mapping
-        self.colWidth = floorf((self.width - margin * (self.numCols + 1)) / self.numCols);
+        self.colWidth = floorf((self.width - kMargin * (self.numCols + 1)) / self.numCols);
         for (NSInteger i = 0; i < numViews; i++) {
             NSString *key = PSCollectionKeyForIndex(i);
             
@@ -221,7 +238,7 @@ collectionViewDataSource = _collectionViewDataSource;
             }];
             
             //        NSInteger col = i % self.numCols;
-            CGFloat left = margin + (col * margin) + (col * self.colWidth);
+            CGFloat left = kMargin + (col * kMargin) + (col * self.colWidth);
             CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
             CGFloat colHeight = [self.collectionViewDataSource heightForViewAtIndex:i];
             if (colHeight == 0) {
@@ -238,7 +255,7 @@ collectionViewDataSource = _collectionViewDataSource;
             [self.indexToRectMap setObject:NSStringFromCGRect(viewRect) forKey:key];
             
             // Update the last height offset for this column
-            CGFloat test = top + colHeight + margin;
+            CGFloat test = top + colHeight + kMargin;
             
             if (test != test) {
                 NSLog(@"nan");
@@ -254,15 +271,20 @@ collectionViewDataSource = _collectionViewDataSource;
         
         // If we have an empty view, show it
         if (self.emptyView) {
-            self.emptyView.frame = CGRectMake(margin, top, self.width - margin * 2, totalHeight - margin * 2);
+            self.emptyView.frame = CGRectMake(kMargin, top, self.width - kMargin * 2, totalHeight - kMargin * 2);
             [self addSubview:self.emptyView];
         }
     }
-        
-    self.contentSize = CGSizeMake(self.width, totalHeight);
-//    self.contentOffset = CGPointZero;
     
-    [self setNeedsLayout];
+    self.contentSize = CGSizeMake(self.width, totalHeight);
+    //    self.contentOffset = CGPointZero;
+    
+    [self removeAndAddCellsIfNecessary];
+}
+
+#pragma mark - DataSource
+- (void)reloadViews {    
+    [self relayoutViews];
 }
 
 #pragma mark - Reusing Views
@@ -291,9 +313,10 @@ collectionViewDataSource = _collectionViewDataSource;
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {    
     NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
-    NSInteger matchingIndex = PSCollectionIndexForKey([matchingKeys lastObject]);
-    if ([gestureRecognizer.view isMemberOfClass:[[self.collectionViewDataSource collectionView:self viewAtIndex:matchingIndex] class]]) {
+    NSString *key = [matchingKeys lastObject];
+    if ([gestureRecognizer.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
         if (self.collectionViewDelegate && [self.collectionViewDelegate respondsToSelector:@selector(collectionView:didSelectView:atIndex:)]) {
+            NSInteger matchingIndex = PSCollectionIndexForKey([matchingKeys lastObject]);
             [self.collectionViewDelegate collectionView:self didSelectView:gestureRecognizer.view atIndex:matchingIndex];
         }
     }
@@ -304,8 +327,9 @@ collectionViewDataSource = _collectionViewDataSource;
     
     NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
-    NSInteger matchingIndex = PSCollectionIndexForKey([matchingKeys lastObject]);
-    if ([touch.view isMemberOfClass:[[self.collectionViewDataSource collectionView:self viewAtIndex:matchingIndex] class]]) {
+    NSString *key = [matchingKeys lastObject];
+    
+    if ([touch.view isMemberOfClass:[[self.visibleViews objectForKey:key] class]]) {
         return YES;
     } else {
         return NO;

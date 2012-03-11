@@ -18,7 +18,7 @@
 
 - (id)initWithTitle:(NSString *)title contentView:(UIView *)contentView;
 
-- (void)show;
+- (void)showWithSize:(CGSize)size inView:(UIView *)view;
 - (void)dismiss;
 
 @end
