@@ -179,7 +179,7 @@
 
 - (void)flipViewForInterfaceOrientation:(UIInterfaceOrientation)orientation {
     CGFloat angle = 0.0;
-    CGPoint origin = CGPointZero;
+//    CGPoint origin = CGPointZero;
     CGRect newFrame = self.window.bounds;
     CGSize statusBarSize = [[UIApplication sharedApplication] statusBarFrame].size;
     

@@ -283,7 +283,7 @@ collectionViewDataSource = _collectionViewDataSource;
 }
 
 #pragma mark - DataSource
-- (void)reloadViews {    
+- (void)reloadViews {
     [self relayoutViews];
 }
 
