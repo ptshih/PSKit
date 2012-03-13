@@ -125,7 +125,7 @@ shouldRotate = _shouldRotate;
     }
     
     
-//    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     
     [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
@@ -157,7 +157,7 @@ shouldRotate = _shouldRotate;
 
 
 - (void)dismiss:(UITapGestureRecognizer *)gr {
-//    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
 
     [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
@@ -165,7 +165,6 @@ shouldRotate = _shouldRotate;
         self.zoomedView.frame = self.convertedFrame;
     } completion:^(BOOL finished){
         [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-//            self.zoomView.alpha = 0.0;
             self.backgroundView.alpha = 0.0;
         } completion:^(BOOL finished){
             for (UIGestureRecognizer *gr in self.zoomedView.gestureRecognizers) {
