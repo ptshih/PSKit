@@ -58,6 +58,9 @@ statusLabel = _statusLabel;
         
         [self addSubview:self.iconView];
         [self addSubview:self.statusLabel];
+        
+        // Add gradient
+        [self addGradientLayerWithFrame:CGRectMake(0, self.height - 8.0, self.width, 8.0) colors:[NSArray arrayWithObjects:(id)RGBACOLOR(0, 0, 0, 0).CGColor, (id)RGBACOLOR(0, 0, 0, 0.1).CGColor, (id)RGBACOLOR(0, 0, 0, 0.2).CGColor, (id)RGBACOLOR(0, 0, 0, 0.3).CGColor, nil] locations:[NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.7], [NSNumber numberWithFloat:0.9], [NSNumber numberWithFloat:1.0], nil] startPoint:CGPointMake(0.5, 0.0) endPoint:CGPointMake(0.5, 1.0)];
     }
     return self;
 }
