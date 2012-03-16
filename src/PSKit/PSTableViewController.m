@@ -366,7 +366,7 @@ loadMoreView = _loadMoreView;
     NSString *reuseIdentifier = [cellClass reuseIdentifier];
     
     cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
-    if(cell == nil) { 
+    if (cell == nil) { 
         cell = [[[cellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier] autorelease];
     }
     
