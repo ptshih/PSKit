@@ -19,6 +19,7 @@
 #import "PSTextField.h"
 #import "PSTextView.h"
 #import "PSSearchField.h"
+#import "PSDateFormatter.h"
 #import "CoreGraphics-PSKit.h"
 
 // Import PSKit Categories
