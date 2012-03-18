@@ -204,6 +204,18 @@ collectionViewDataSource = _collectionViewDataSource;
     }
     [self.loadingView removeFromSuperview];
     
+    // Disable animations in all views
+    BOOL viewShouldAnimate = NO;
+    for (id view in [self.reuseableViews allObjects]) {
+        if ([view respondsToSelector:@selector(imageView)]) {
+            id imageView = [view imageView];
+            if (imageView && [imageView isKindOfClass:[PSCachedImageView class]]) {
+                viewShouldAnimate = [(PSCachedImageView *)imageView shouldAnimate];
+                [(PSCachedImageView *)imageView setShouldAnimate:NO];
+            }
+        }
+    }
+    
     // This is where we should layout the entire grid first
     NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
     
@@ -279,6 +291,24 @@ collectionViewDataSource = _collectionViewDataSource;
     //    self.contentOffset = CGPointZero;
     
     [self removeAndAddCellsIfNecessary];
+    
+    // Re-enable animation if necessary
+    for (id view in [self.reuseableViews allObjects]) {
+        if ([view respondsToSelector:@selector(imageView)]) {
+            id imageView = [view imageView];
+            if (imageView && [imageView isKindOfClass:[PSCachedImageView class]]) {
+                [(PSCachedImageView *)imageView setShouldAnimate:viewShouldAnimate];
+            }
+        }
+    }
+    for (id view in [self.visibleViews allValues]) {
+        if ([view respondsToSelector:@selector(imageView)]) {
+            id imageView = [view imageView];
+            if (imageView && [imageView isKindOfClass:[PSCachedImageView class]]) {
+                [(PSCachedImageView *)imageView setShouldAnimate:viewShouldAnimate];
+            }
+        }
+    }
 }
 
 #pragma mark - DataSource
