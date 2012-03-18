@@ -78,7 +78,6 @@
 /**
  Used to configure the view right after it is loaded
  */
-- (UIView *)navigationTitleView;
 - (UIView *)baseBackgroundView;
 - (UIColor *)baseBackgroundColor;
 - (UIView *)rowBackgroundViewForIndexPath:(NSIndexPath *)indexPath selected:(BOOL)selected;
