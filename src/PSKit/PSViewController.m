@@ -82,6 +82,20 @@ contentOffset = _contentOffset;
     VLog(@"#%@", [self class]);
 }
 
+#pragma mark - Post View Config
+- (void)addRoundedCorners {
+    // iPad doesn't need rounded corners
+    if (!isDeviceIPad()) {
+        UIImageView *topCorners = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/MaskCornersTop"] stretchableImageWithLeftCapWidth:160 topCapHeight:0]] autorelease];
+        topCorners.top = self.view.top;
+        [self.view addSubview:topCorners];
+        
+        UIImageView *bottomCorners = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/MaskCornersBottom"] stretchableImageWithLeftCapWidth:160 topCapHeight:0]] autorelease];
+        bottomCorners.top = self.view.height - bottomCorners.height;
+        [self.view addSubview:bottomCorners];
+    }
+}
+
 #pragma mark - Rotation
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);

@@ -29,4 +29,6 @@
  */
 - (void)updateScrollsToTop:(BOOL)isEnabled;
 
+- (void)addRoundedCorners;
+
 @end
