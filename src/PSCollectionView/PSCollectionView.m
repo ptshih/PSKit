@@ -226,18 +226,17 @@ collectionViewDataSource = _collectionViewDataSource;
             NSString *key = PSCollectionKeyForIndex(i);
             
             // Find the shortest column
-            __block NSInteger col = 0;
-            __block CGFloat h = 0.0;
-            [colOffsets enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                if (idx == 0) {
-                    col = idx;
-                    h = [obj floatValue];
-                } else if (h > [obj floatValue]) {
-                    col = idx;
+            NSInteger col = 0;
+            CGFloat minHeight = [[colOffsets objectAtIndex:col] floatValue];
+            for (int i = 1; i < [colOffsets count]; i++) {
+                CGFloat colHeight = [[colOffsets objectAtIndex:i] floatValue];
+                
+                if (colHeight < minHeight) {
+                    col = i;
+                    minHeight = colHeight;
                 }
-            }];
+            }
             
-            //        NSInteger col = i % self.numCols;
             CGFloat left = kMargin + (col * kMargin) + (col * self.colWidth);
             CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
             CGFloat colHeight = [self.collectionViewDataSource heightForViewAtIndex:i];
