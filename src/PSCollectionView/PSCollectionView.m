@@ -53,6 +53,7 @@ numCols = _numCols,
 numColsPortrait = _numColsPortrait,
 numColsLandscape = _numColsLandscape,
 colWidth = _colWidth,
+viewsShouldAnimate = _viewsShouldAnimate,
 collectionViewDelegate = _collectionViewDelegate,
 collectionViewDataSource = _collectionViewDataSource;
 
@@ -69,6 +70,7 @@ collectionViewDataSource = _collectionViewDataSource;
         self.colWidth = 0.0;
         self.alwaysBounceVertical = YES;
         self.orientation = [UIApplication sharedApplication].statusBarOrientation;
+        self.viewsShouldAnimate = YES;
         
 //        [self addObserver:self forKeyPath:@"contentOffset" options:0 context:nil];
         self.loadingView = [UILabel labelWithText:@"Loading..." style:@"emptyLabel"];
@@ -207,12 +209,18 @@ collectionViewDataSource = _collectionViewDataSource;
     [self.loadingView removeFromSuperview];
     
     // Disable animations in all views
-    BOOL viewShouldAnimate = NO;
     for (id view in [self.reuseableViews allObjects]) {
         if ([view respondsToSelector:@selector(imageView)]) {
             id imageView = [view imageView];
             if (imageView && [imageView isKindOfClass:[PSCachedImageView class]]) {
-                viewShouldAnimate = [(PSCachedImageView *)imageView shouldAnimate];
+                [(PSCachedImageView *)imageView setShouldAnimate:NO];
+            }
+        }
+    }
+    for (id view in [self.visibleViews allValues]) {
+        if ([view respondsToSelector:@selector(imageView)]) {
+            id imageView = [view imageView];
+            if (imageView && [imageView isKindOfClass:[PSCachedImageView class]]) {
                 [(PSCachedImageView *)imageView setShouldAnimate:NO];
             }
         }
@@ -309,7 +317,7 @@ collectionViewDataSource = _collectionViewDataSource;
         if ([view respondsToSelector:@selector(imageView)]) {
             id imageView = [view imageView];
             if (imageView && [imageView isKindOfClass:[PSCachedImageView class]]) {
-                [(PSCachedImageView *)imageView setShouldAnimate:viewShouldAnimate];
+                [(PSCachedImageView *)imageView setShouldAnimate:self.viewsShouldAnimate];
             }
         }
     }
@@ -317,7 +325,7 @@ collectionViewDataSource = _collectionViewDataSource;
         if ([view respondsToSelector:@selector(imageView)]) {
             id imageView = [view imageView];
             if (imageView && [imageView isKindOfClass:[PSCachedImageView class]]) {
-                [(PSCachedImageView *)imageView setShouldAnimate:viewShouldAnimate];
+                [(PSCachedImageView *)imageView setShouldAnimate:self.viewsShouldAnimate];
             }
         }
     }
