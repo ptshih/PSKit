@@ -43,6 +43,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 loadingView = _loadingView,
 orientation = _orientation,
 headerView = _headerView,
+footerView = _footerView,
 emptyView = _emptyView,
 reuseableViews = _reuseableViews,
 visibleViews = _visibleViews,
@@ -88,6 +89,7 @@ collectionViewDataSource = _collectionViewDataSource;
     // release retains
     self.loadingView = nil;
     self.headerView = nil;
+    self.footerView = nil;
     self.emptyView = nil;
     self.reuseableViews = nil;
     self.visibleViews = nil;
@@ -220,10 +222,13 @@ collectionViewDataSource = _collectionViewDataSource;
     NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
     
     CGFloat totalHeight = 0.0;
+    CGFloat top = kMargin;
     
     // Add headerView if it exists
-    [self addSubview:self.headerView];
-    CGFloat top = (self.headerView) ? self.headerView.height : kMargin;
+    if (self.headerView) {
+        [self addSubview:self.headerView];
+        top = self.headerView.height;
+    }
     
     if (numViews > 0) {
         // This array determines the last height offset on a column
@@ -285,6 +290,13 @@ collectionViewDataSource = _collectionViewDataSource;
             self.emptyView.frame = CGRectMake(kMargin, top, self.width - kMargin * 2, totalHeight - kMargin * 2);
             [self addSubview:self.emptyView];
         }
+    }
+    
+    // Add footerView if exists
+    if (self.footerView) {
+        self.footerView.top = totalHeight;
+        [self addSubview:self.footerView];
+        totalHeight += self.footerView.height;
     }
     
     self.contentSize = CGSizeMake(self.width, totalHeight);
