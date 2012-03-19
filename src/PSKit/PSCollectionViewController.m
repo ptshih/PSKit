@@ -110,7 +110,9 @@ pullRefreshView = _pullRefreshView;
 }
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
-    //    [[PSURLCache sharedCache] suspend];
+    if (![[PSReachabilityCenter defaultCenter] isNetworkReachableViaWiFi]) {
+        [[PSURLCache sharedCache] suspend];
+    }
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
