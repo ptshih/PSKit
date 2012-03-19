@@ -22,6 +22,7 @@
 @property (nonatomic, assign) NSInteger numColsLandscape;
 @property (nonatomic, assign) NSInteger numColsPortrait;
 @property (nonatomic, assign) CGFloat colWidth;
+@property (nonatomic, assign) BOOL viewsShouldAnimate;
 @property (nonatomic, assign) id <PSCollectionViewDelegate> collectionViewDelegate;
 @property (nonatomic, assign) id <PSCollectionViewDataSource> collectionViewDataSource;
 
