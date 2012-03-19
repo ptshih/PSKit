@@ -51,5 +51,16 @@ inset = _inset;
     return UIEdgeInsetsInsetRect(bounds, UIEdgeInsetsMake(self.inset.height, self.inset.width + leftMargin, self.inset.height, self.inset.width + rightMargin));
 }
 
+- (CGRect)leftViewRectForBounds:(CGRect)bounds {
+    return CGRectMake(8, floorf((bounds.size.height - 16) / 2), 24, 16);
+}
+
+// This overrides the default image for a clear button
+- (UIButton *)clearButton {
+    UIButton *clearButton = [super clearButton];
+    [clearButton setImage:[UIImage imageNamed:@"PSKit.bundle/IconClear.png"] forState:UIControlStateNormal];
+    return clearButton;
+}
+
 
 @end
