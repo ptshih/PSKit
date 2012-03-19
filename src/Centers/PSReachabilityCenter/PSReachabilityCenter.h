@@ -14,5 +14,6 @@
 
 - (BOOL)isNetworkReachable;
 - (BOOL)isNetworkReachableViaWWAN;
+- (BOOL)isNetworkReachableViaWiFi;
 
 @end

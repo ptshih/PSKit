@@ -20,45 +20,49 @@
 @implementation PSReachabilityCenter
 
 + (id)defaultCenter {
-  static id defaultCenter = nil;
-  if (!defaultCenter) {
-    defaultCenter = [[self alloc] init];
-  }
-  return defaultCenter;
+    static id defaultCenter = nil;
+    if (!defaultCenter) {
+        defaultCenter = [[self alloc] init];
+    }
+    return defaultCenter;
 }
 
 - (id)init {
-  self = [super init];
-  if (self) {
-    [self registerForNetworkReachabilityNotifications];
-  }
-  return self;
+    self = [super init];
+    if (self) {
+        [self registerForNetworkReachabilityNotifications];
+    }
+    return self;
 }
 
 - (void)dealloc {
-  [self unsubscribeFromNetworkReachabilityNotifications];
-  [super dealloc];
+    [self unsubscribeFromNetworkReachabilityNotifications];
+    [super dealloc];
 }
 
 - (void)registerForNetworkReachabilityNotifications {
-  [[Reachability reachabilityForInternetConnection] startNotifier];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    [[Reachability reachabilityForInternetConnection] startNotifier];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
 }
 
 - (void)unsubscribeFromNetworkReachabilityNotifications {
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:kReachabilityChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kReachabilityChangedNotification object:nil];
 }
 
 - (void)reachabilityChanged:(NSNotification *)note {
-  // NOT IMPLEMENTED YET
+    // NOT IMPLEMENTED YET
 }
 
 - (BOOL)isNetworkReachable {
-  return ([[Reachability reachabilityForInternetConnection] currentReachabilityStatus] != NotReachable);	
+    return ([[Reachability reachabilityForInternetConnection] currentReachabilityStatus] != NotReachable);	
 }
 
 - (BOOL)isNetworkReachableViaWWAN {
-	return ([[Reachability reachabilityForInternetConnection] currentReachabilityStatus] == ReachableViaWWAN);	
+    return ([[Reachability reachabilityForInternetConnection] currentReachabilityStatus] == ReachableViaWWAN);	
+}
+
+- (BOOL)isNetworkReachableViaWiFi {
+    return ([[Reachability reachabilityForInternetConnection] currentReachabilityStatus] == ReachableViaWiFi);
 }
 
 @end
