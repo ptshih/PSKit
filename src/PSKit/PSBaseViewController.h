@@ -11,7 +11,13 @@
 
 @interface PSBaseViewController : PSViewController <PSErrorViewDelegate>
 
+/**
+ requestQueue is a serial queue for loading a view controller's data source.
+ Any remote requests should be added to this queue
+ */
+@property (nonatomic, retain) NSOperationQueue *requestQueue;
 @property (nonatomic, assign) BOOL reloading;
 @property (nonatomic, assign) BOOL hasLoadedOnce;
+@property (nonatomic, assign) BOOL isReload;
 
 @end

@@ -8,21 +8,26 @@
 
 #import "PSBaseViewController.h"
 
-@interface PSBaseViewController (Private)
+@interface PSBaseViewController ()
 
 @end
 
 @implementation PSBaseViewController
 
 @synthesize
+requestQueue = _requestQueue,
 reloading = _reloading,
-hasLoadedOnce = _hasLoadedOnce;
+hasLoadedOnce = _hasLoadedOnce,
+isReload = _isReload;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        self.requestQueue = [[[NSOperationQueue alloc] init] autorelease];
+        self.requestQueue.maxConcurrentOperationCount = 1;
         self.reloading = NO;
         self.hasLoadedOnce = NO;
+        self.isReload = NO;
     }
     return self;
 }
@@ -32,6 +37,7 @@ hasLoadedOnce = _hasLoadedOnce;
 }
 
 - (void)dealloc {
+    self.requestQueue = nil;
     [super dealloc];
 }
 
@@ -44,10 +50,12 @@ hasLoadedOnce = _hasLoadedOnce;
 // Data Source
 - (void)loadDataSource {
     [self beginRefresh];
+    self.isReload = NO;
 }
 
 - (void)reloadDataSource {
     [self beginRefresh];
+    self.isReload = YES;
 }
 
 - (void)dataSourceDidLoad {
