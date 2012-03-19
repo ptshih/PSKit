@@ -8,15 +8,16 @@
 
 #import "PSCachedImageView.h"
 
-@interface PSCachedImageView (Private)
+@interface PSCachedImageView ()
 
-- (void)setImageWithCachedImageData:(NSData *)imageData;
+@property (nonatomic, retain) NSOperationQueue *imageQueue;
 
 @end
 
 @implementation PSCachedImageView
 
 @synthesize
+imageQueue = _imageQueue,
 URL = _URL,
 originalURL = _originalURL,
 thumbnailURL = _thumbnailURL,
@@ -25,6 +26,9 @@ loadingIndicator = _loadingIndicator;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.imageQueue = [[[NSOperationQueue alloc] init] autorelease];
+        self.imageQueue.maxConcurrentOperationCount = 1;
+        
         self.loadingIndicator = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray] autorelease];
         self.loadingIndicator.hidesWhenStopped = YES;
         self.loadingIndicator.frame = self.bounds;
@@ -36,6 +40,7 @@ loadingIndicator = _loadingIndicator;
 }
 
 - (void)dealloc {
+    self.imageQueue = nil;
     self.URL = nil;
     self.originalURL = nil;
     self.thumbnailURL = nil;
@@ -70,7 +75,17 @@ loadingIndicator = _loadingIndicator;
         } else {
             if ([self.URL isEqual:cachedURL]) {
                 [self.loadingIndicator stopAnimating];
-                self.image = [UIImage imageWithData:cachedData];
+                [self.imageQueue addOperationWithBlock:^{
+                    UIImage *image = [UIImage imageWithData:cachedData];
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        self.image = image;
+                    }];
+                }];
+//                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        
+//                    });
+//                });
             }
         }
     }];

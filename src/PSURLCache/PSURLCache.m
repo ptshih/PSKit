@@ -23,6 +23,10 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
 
 @interface PSURLCache ()
 
+@property (nonatomic, retain) NSOperationQueue *networkQueue;
+@property (nonatomic, retain) NSOperationQueue *responseQueue;
+@property (nonatomic, retain) NSMutableArray *pendingOperations;
+
 // Retrieves the corresponding directory for a cache type
 - (NSString *)cacheDirectoryPathForCacheType:(PSURLCacheType)cacheType;
 
@@ -36,6 +40,7 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
 
 @synthesize
 networkQueue = _networkQueue,
+responseQueue = _responseQueue,
 pendingOperations = _pendingOperations;
 
 + (id)sharedCache {
@@ -52,6 +57,9 @@ pendingOperations = _pendingOperations;
         self.networkQueue = [[[NSOperationQueue alloc] init] autorelease];
         self.networkQueue.maxConcurrentOperationCount = 4;
         
+        self.responseQueue = [[[NSOperationQueue alloc] init] autorelease];
+        self.responseQueue.maxConcurrentOperationCount = 4;
+        
         self.pendingOperations = [NSMutableArray array];
         
         [[NSNotificationCenter defaultCenter] addObserver:self 
@@ -65,6 +73,7 @@ pendingOperations = _pendingOperations;
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kPSURLCacheDidIdle object:self];
     self.networkQueue = nil;
+    self.responseQueue = nil;
     self.pendingOperations = nil;
     [super dealloc];
 }
@@ -124,11 +133,14 @@ pendingOperations = _pendingOperations;
         PSURLCacheNetworkBlock networkBlock = ^(void){
             [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:self];
             [NSURLConnection sendAsynchronousRequest:request 
-                                               queue:[NSOperationQueue mainQueue] 
+                                               queue:self.responseQueue 
                                    completionHandler:^(NSURLResponse *response, NSData *cachedData, NSError *error) {
-                                       [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:self];
-                                       [self cacheData:cachedData URL:cachedURL cacheType:cacheType];
-                                       completionBlock(cachedData, cachedURL, NO, error);
+                                       // This is in the background
+                                      [self cacheData:cachedData URL:cachedURL cacheType:cacheType];
+                                       [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                           [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:self];
+                                           completionBlock(cachedData, cachedURL, NO, error);
+                                       }];
                                    }];
         };
              

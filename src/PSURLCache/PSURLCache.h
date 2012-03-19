@@ -17,9 +17,6 @@ typedef enum {
 
 @interface PSURLCache : NSObject
 
-@property (nonatomic, retain) NSOperationQueue *networkQueue;
-@property (nonatomic, retain) NSMutableArray *pendingOperations;
-
 // Singleton access
 + (id)sharedCache;
 
