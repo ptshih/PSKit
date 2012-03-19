@@ -291,11 +291,11 @@ collectionViewDataSource = _collectionViewDataSource;
             totalHeight = (totalHeight < [colHeight floatValue]) ? [colHeight floatValue] : totalHeight;
         }
     } else {
-        totalHeight = self.height - top;
+        totalHeight = self.height;
         
         // If we have an empty view, show it
         if (self.emptyView) {
-            self.emptyView.frame = CGRectMake(kMargin, top, self.width - kMargin * 2, totalHeight - kMargin * 2);
+            self.emptyView.frame = CGRectMake(kMargin, top, self.width - kMargin * 2, self.height - kMargin * 2);
             [self addSubview:self.emptyView];
         }
     }
