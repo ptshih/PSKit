@@ -32,6 +32,11 @@ typedef enum {
     TTTAttributedLabelVerticalAlignmentBottom   = 2,
 } TTTAttributedLabelVerticalAlignment;
 
+/**
+ Determines whether the text to which this attribute applies has a strikeout drawn through itself.
+ */
+extern NSString * const kTTTStrikeOutAttributeName;
+
 @protocol TTTAttributedLabelDelegate;
 
 // Override UILabel @property to accept both NSString and NSAttributedString
@@ -49,8 +54,10 @@ typedef enum {
  - `text` - This property now takes an `id` type argument, which can either be a kind of `NSString` or `NSAttributedString` (mutable or immutable in both cases)
  - `lineBreakMode` - This property displays only the first line when the value is `UILineBreakModeHeadTruncation`, `UILineBreakModeTailTruncation`, or `UILineBreakModeMiddleTruncation`
  - `adjustsFontsizeToFitWidth` - This property is effective for any value of `numberOfLines` greater than zero
+ 
+ @warning Any properties changed on the label after setting the text will not be reflected until a subsequent call to `setText:` or `setText:afterInheritingLabelAttributesAndConfiguringWithBlock:`. This is to say, order of operations matters in this case. For example, if the label text color is originally black when the text is set, changing the text color to red will have no effect on the display of the label until the text is set once again. 
  */
-@interface TTTAttributedLabel : UILabel <TTTAttributedLabel> {
+@interface TTTAttributedLabel : UILabel <TTTAttributedLabel, UIGestureRecognizerDelegate> {
 @private
     NSAttributedString *_attributedText;
     CTFramesetterRef _framesetter;
@@ -58,6 +65,7 @@ typedef enum {
     
     id _delegate;
     UIDataDetectorTypes _dataDetectorTypes;
+    NSDataDetector *_dataDetector;
     NSArray *_links;
     NSDictionary *_linkAttributes;
     
@@ -69,7 +77,7 @@ typedef enum {
     UIEdgeInsets _textInsets;
     TTTAttributedLabelVerticalAlignment _verticalAlignment;
     
-    BOOL _userInteractionDisabled;
+    UITapGestureRecognizer *_tapGestureRecognizer;
 }
 
 ///-----------------------------
@@ -154,7 +162,6 @@ typedef enum {
  */
 @property (nonatomic, assign) TTTAttributedLabelVerticalAlignment verticalAlignment;
 
-
 ///----------------------------------
 /// @name Setting the Text Attributes
 ///----------------------------------
@@ -181,6 +188,14 @@ typedef enum {
 ///-------------------
 /// @name Adding Links
 ///-------------------
+
+/**
+ Adds a link to an `NSTextCheckingResult`.
+ 
+ @param result An `NSTextCheckingResult` representing the link's location and type.
+ @param attributes The attributes to be added to the text in the range of the specified link. If `nil`, no attributes are added.
+ */
+- (void)addLinkWithTextCheckingResult:(NSTextCheckingResult *)result attributes:(NSDictionary *)attributes;
 
 /**
  Adds a link to a URL for a specified range in the label text.
@@ -280,4 +295,3 @@ typedef enum {
  */
 - (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithDate:(NSDate *)date timeZone:(NSTimeZone *)timeZone duration:(NSTimeInterval)duration;
 @end
-
