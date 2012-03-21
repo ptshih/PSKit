@@ -29,6 +29,8 @@ pullRefreshView = _pullRefreshView;
 }
 
 - (void)viewDidUnload {
+    [super viewDidUnload];
+    
     self.contentOffset = self.collectionView.contentOffset;
     
     // Views
@@ -38,7 +40,6 @@ pullRefreshView = _pullRefreshView;
     self.collectionView.collectionViewDataSource = nil;
     self.pullRefreshView = nil;
     self.collectionView = nil;
-    [super viewDidUnload];
 }
 
 - (void)dealloc {
@@ -104,8 +105,7 @@ pullRefreshView = _pullRefreshView;
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if (self.pullRefreshView) {
-        [self.pullRefreshView pullRefreshScrollViewDidEndDragging:scrollView
-                                                   willDecelerate:decelerate];
+        [self.pullRefreshView pullRefreshScrollViewDidEndDragging:scrollView willDecelerate:decelerate];
     }
 }
 

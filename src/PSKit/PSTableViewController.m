@@ -26,8 +26,7 @@ pullRefreshView = _pullRefreshView,
 searchBar = _searchBar,
 loadMoreView = _loadMoreView;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.items = [NSMutableArray array];
@@ -37,10 +36,6 @@ loadMoreView = _loadMoreView;
         
         // View State
         self.contentOffset = CGPointZero;
-        
-        _pagingStart = 0;
-        _pagingCount = 0;
-        _pagingTotal = 0;
     }
     return self;
 }
@@ -51,14 +46,22 @@ loadMoreView = _loadMoreView;
     // Save view state
     self.contentOffset = self.tableView.contentOffset;
     
-    if (self.searchBar) self.searchBar.delegate = nil;
-    if (self.tableView) self.tableView.delegate = nil, self.tableView.dataSource = nil;
-    if (self.pullRefreshView) self.pullRefreshView.delegate = nil;
+    if (self.searchBar) {
+        self.searchBar.delegate = nil;
+        self.searchBar = nil;
+    }
+    if (self.tableView) {
+        self.tableView.delegate = nil, self.tableView.dataSource = nil;
+        self.tableView = nil;
+    }
+    if (self.pullRefreshView) {
+        self.pullRefreshView.delegate = nil;
+        self.pullRefreshView = nil;
+    }
     
-    RELEASE_SAFELY(_tableView);
-    RELEASE_SAFELY(_searchBar);
-    RELEASE_SAFELY(_pullRefreshView);
-    RELEASE_SAFELY(_loadMoreView);
+    if (self.loadMoreView) {
+        self.loadMoreView = nil;
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -66,22 +69,28 @@ loadMoreView = _loadMoreView;
 }
 
 - (void)dealloc {    
-    // Delegates
-    if (self.searchBar) self.searchBar.delegate = nil;
-    if (self.tableView) self.tableView.delegate = nil, self.tableView.dataSource = nil;
-    if (self.pullRefreshView) self.pullRefreshView.delegate = nil;
+    if (self.searchBar) {
+        self.searchBar.delegate = nil;
+        self.searchBar = nil;
+    }
+    if (self.tableView) {
+        self.tableView.delegate = nil, self.tableView.dataSource = nil;
+        self.tableView = nil;
+    }
+    if (self.pullRefreshView) {
+        self.pullRefreshView.delegate = nil;
+        self.pullRefreshView = nil;
+    }
     
-    // Views
-    RELEASE_SAFELY(_tableView);
-    RELEASE_SAFELY(_searchBar);
-    RELEASE_SAFELY(_pullRefreshView);
-    RELEASE_SAFELY(_loadMoreView);
+    if (self.loadMoreView) {
+        self.loadMoreView = nil;
+    }
     
     // Non-Views
-    RELEASE_SAFELY(_sectionTitles);
-    RELEASE_SAFELY(_selectedIndexes);
-    RELEASE_SAFELY(_items);
-    RELEASE_SAFELY(_searchItems);
+    self.items = nil;
+    self.searchItems = nil;
+    self.sectionTitles = nil;
+    self.selectedIndexes = nil;
     
     [super dealloc];
 }
@@ -175,12 +184,6 @@ loadMoreView = _loadMoreView;
 //    [_loadMoreView addSubview:l];
 //    [_loadMoreView addSubview:av];
 //}
-
-#pragma mark - Utility Methods
-- (void)resetPaging {
-    _pagingStart = 0;
-    _pagingTotal = _pagingCount;
-}
 
 #pragma mark - PSStateMachine
 - (void)loadDataSource {
@@ -356,39 +359,46 @@ loadMoreView = _loadMoreView;
 }
 
 #pragma mark - UITableView
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    if (tableView == self.searchDisplayController.searchResultsTableView) {
+        return [self.searchItems count];
+    } else {
+        return [self.items count];
+    }
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (tableView == self.searchDisplayController.searchResultsTableView) {
+        return [[self.searchItems objectAtIndex:section] count];
+    } else {
+        return [[self.items objectAtIndex:section] count];
+    }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    // subclass must override
+    return 0.0;
+}
+
 - (void)tableView:(UITableView *)tableView configureCell:(id)cell atIndexPath:(NSIndexPath *)indexPath {
-    
+    // subclass must override
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Class cellClass = [self cellClassAtIndexPath:indexPath];
-    id cell = nil;
-    NSString *reuseIdentifier = [cellClass reuseIdentifier];
+    if (![cellClass isSubclassOfClass:[UITableViewCell class]]) {
+        cellClass = [UITableViewCell class];
+    }
+    NSString *reuseIdentifier = NSStringFromClass(cellClass);
     
-    cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
-    if (cell == nil) { 
+    id cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
+    if (!cell) { 
         cell = [[[cellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier] autorelease];
     }
     
     [self tableView:tableView configureCell:cell atIndexPath:indexPath];
     
     return cell;
-}
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if (tableView == self.searchDisplayController.searchResultsTableView) {
-        return [_searchItems count];
-    } else {
-        return [_items count];
-    }
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (tableView == self.searchDisplayController.searchResultsTableView) {
-        return [[_searchItems objectAtIndex:section] count];
-    } else {
-        return [[_items objectAtIndex:section] count];
-    }
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -440,16 +450,18 @@ loadMoreView = _loadMoreView;
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if (self.pullRefreshView) {
-        [self.pullRefreshView pullRefreshScrollViewDidEndDragging:scrollView
-                                                   willDecelerate:decelerate];
+        [self.pullRefreshView pullRefreshScrollViewDidEndDragging:scrollView willDecelerate:decelerate];
     }
 }
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
-    [[PSURLCache sharedCache] suspend];
+    if (![[PSReachabilityCenter defaultCenter] isNetworkReachableViaWiFi]) {
+        [[PSURLCache sharedCache] suspend];
+    }
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    // no-op
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {

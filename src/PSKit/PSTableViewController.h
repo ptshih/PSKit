@@ -10,13 +10,7 @@
 #import "PSBaseViewController.h"
 #import "PSPullRefreshView.h"
 
-@interface PSTableViewController : PSBaseViewController <UITableViewDelegate, UITableViewDataSource, UISearchDisplayDelegate, UISearchBarDelegate, PSPullRefreshViewDelegate> {
-  
-  // Paging
-  NSInteger _pagingStart;
-  NSInteger _pagingCount;
-  NSInteger _pagingTotal;
-}
+@interface PSTableViewController : PSBaseViewController <UITableViewDelegate, UITableViewDataSource, UISearchDisplayDelegate, UISearchBarDelegate, PSPullRefreshViewDelegate>
 
 @property (nonatomic, retain) NSMutableArray *items;
 @property (nonatomic, retain) NSMutableArray *searchItems;
@@ -34,9 +28,6 @@
 - (void)setupPullRefresh;
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles;
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles andPlaceholder:(NSString *)placeholder;
-
-// Utility Methods
-- (void)resetPaging;
 
 // Cell Selection State
 - (BOOL)cellIsSelected:(NSIndexPath *)indexPath;
