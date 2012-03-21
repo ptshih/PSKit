@@ -28,6 +28,7 @@
 @implementation PSZoomView
 
 @synthesize
+delegate = _delegate,
 superView = _superView,
 zoomedView = _zoomedView,
 backgroundView = _backgroundView,
@@ -159,6 +160,10 @@ shouldRotate = _shouldRotate;
 - (void)dismiss:(UITapGestureRecognizer *)gr {
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
+    
+    if ([self.zoomedView isKindOfClass:[MKMapView class]]) {
+        [(MKMapView *)self.zoomedView deselectAnnotation:[[(MKMapView *)self.zoomedView annotations] lastObject] animated:NO];
+    }
 
     [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
         if (self.shouldRotate) self.zoomedView.transform = CGAffineTransformIdentity;
@@ -183,6 +188,10 @@ shouldRotate = _shouldRotate;
                 [self.superView addSubview:self.zoomedView];
             }
             [self removeFromSuperview];
+            
+            if (self.delegate && [self.delegate respondsToSelector:@selector(zoomViewDidDismiss:)]) {
+                [self.delegate zoomViewDidDismiss:self];
+            }
             
             [[UIApplication sharedApplication] endIgnoringInteractionEvents];
         }];
