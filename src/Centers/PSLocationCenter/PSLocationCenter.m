@@ -45,13 +45,13 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
         self.locationManager.distanceFilter = __updateDistanceFilter;
         
         self.location = nil;
-//#if TARGET_IPHONE_SIMULATOR
-//        self.location = [[[CLLocation alloc]initWithCoordinate:CLLocationCoordinate2DMake(40.724250, -73.997394)
-//                                                    altitude:77
-//                                          horizontalAccuracy:88
-//                                            verticalAccuracy:99
-//                                                   timestamp:[NSDate date]] autorelease];
-//#endif
+        //#if TARGET_IPHONE_SIMULATOR
+        //        self.location = [[[CLLocation alloc]initWithCoordinate:CLLocationCoordinate2DMake(40.724250, -73.997394)
+        //                                                    altitude:77
+        //                                          horizontalAccuracy:88
+        //                                            verticalAccuracy:99
+        //                                                   timestamp:[NSDate date]] autorelease];
+        //#endif
         
         self.isActive = NO;
         self.locationRequested = NO;
@@ -109,7 +109,7 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
     NSTimeInterval timeSinceStart = [[NSDate date] timeIntervalSinceDate:self.pollStartDate];
     CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
     if (![CLLocationManager locationServicesEnabled] || (authStatus != kCLAuthorizationStatusAuthorized && authStatus != kCLAuthorizationStatusNotDetermined)) {
-//        40.7247,-73.9995
+        //        40.7247,-73.9995
         self.location = [[[CLLocation alloc] initWithLatitude:40.7247 longitude:-73.9995] autorelease];
         self.locationRequested = NO;
         [self.pollTimer invalidate];
@@ -150,7 +150,7 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
         self.location = newLocation;
         
         if (distanceChanged > __updateDistanceFilter || distanceChanged == -1) {
-//            self.location = newLocation;
+            //            self.location = newLocation;
         }
     } else {
         DLog(@"Location discarded: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, distanceChanged);

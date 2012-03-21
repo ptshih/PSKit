@@ -48,20 +48,18 @@ loadMoreView = _loadMoreView;
     
     if (self.searchBar) {
         self.searchBar.delegate = nil;
-        self.searchBar = nil;
     }
     if (self.tableView) {
         self.tableView.delegate = nil, self.tableView.dataSource = nil;
-        self.tableView = nil;
     }
     if (self.pullRefreshView) {
         self.pullRefreshView.delegate = nil;
-        self.pullRefreshView = nil;
     }
     
-    if (self.loadMoreView) {
-        self.loadMoreView = nil;
-    }
+    self.tableView = nil;
+    self.searchBar = nil;
+    self.pullRefreshView = nil;
+    self.loadMoreView = nil;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -71,20 +69,18 @@ loadMoreView = _loadMoreView;
 - (void)dealloc {    
     if (self.searchBar) {
         self.searchBar.delegate = nil;
-        self.searchBar = nil;
     }
     if (self.tableView) {
         self.tableView.delegate = nil, self.tableView.dataSource = nil;
-        self.tableView = nil;
     }
     if (self.pullRefreshView) {
         self.pullRefreshView.delegate = nil;
-        self.pullRefreshView = nil;
     }
     
-    if (self.loadMoreView) {
-        self.loadMoreView = nil;
-    }
+    self.tableView = nil;
+    self.searchBar = nil;
+    self.pullRefreshView = nil;
+    self.loadMoreView = nil;
     
     // Non-Views
     self.items = nil;
@@ -128,8 +124,8 @@ loadMoreView = _loadMoreView;
     self.tableView.dataSource = self;
     self.tableView.separatorStyle = separatorStyle;
     self.tableView.separatorColor = separatorColor;
-//    self.tableView.backgroundColor = [UIColor clearColor];
-//    self.tableView.backgroundView = nil;
+    //    self.tableView.backgroundColor = [UIColor clearColor];
+    //    self.tableView.backgroundView = nil;
     
     [self.view addSubview:self.tableView];
     

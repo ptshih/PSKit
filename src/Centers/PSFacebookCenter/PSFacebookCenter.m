@@ -8,7 +8,18 @@
 
 #import "PSFacebookCenter.h"
 
+@interface PSFacebookCenter ()
+
+@property (nonatomic, retain) Facebook *facebook;
+@property (nonatomic, retain) NSArray *extendedPermissions;
+
+@end
+
 @implementation PSFacebookCenter
+
+@synthesize
+facebook = _facebook,
+extendedPermissions = _extendedPermissions;
 
 + (id)defaultCenter {
     static id defaultCenter = nil;
@@ -21,36 +32,37 @@
 - (id)init {
     self = [super init];
     if (self) {
-        _facebook = [[Facebook alloc] initWithAppId:FB_APP_ID andDelegate:self];
+        self.facebook = [[[Facebook alloc] initWithAppId:FB_APP_ID andDelegate:self] autorelease];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         if ([defaults objectForKey:@"fbAccessToken"] && [defaults objectForKey:@"fbExpirationDate"]) {
-            _facebook.accessToken = [[NSUserDefaults standardUserDefaults] valueForKey:@"fbAccessToken"];
-            _facebook.expirationDate = [[NSUserDefaults standardUserDefaults] valueForKey:@"fbExpirationDate"];
-            NSLog(@"FB Token: %@", _facebook.accessToken);
+            self.facebook.accessToken = [[NSUserDefaults standardUserDefaults] valueForKey:@"fbAccessToken"];
+            self.facebook.expirationDate = [[NSUserDefaults standardUserDefaults] valueForKey:@"fbExpirationDate"];
+            NSLog(@"FB Token: %@", self.facebook.accessToken);
         }
     }
     return self;
 }
 
 - (void)dealloc {
-    RELEASE_SAFELY(_facebook);
+    self.extendedPermissions = nil;
+    self.facebook = nil;
     [super dealloc];
 }
 
 - (BOOL)handleOpenURL:(NSURL *)url {
-    return [_facebook handleOpenURL:url];
+    return [self.facebook handleOpenURL:url];
 }
 
 - (BOOL)isLoggedIn {
-    return ([_facebook isSessionValid] && [self me] && [self accessToken]);
+    return ([self.facebook isSessionValid] && [self me] && [self accessToken]);
 }
 
 - (NSString *)accessToken {
-    return [_facebook accessToken];
+    return [self.facebook accessToken];
 }
 
 - (NSDate *)expirationDate {
-    return [_facebook expirationDate];
+    return [self.facebook expirationDate];
 }
 
 - (NSDictionary *)me {
@@ -58,14 +70,14 @@
 }
 
 - (void)logout {
-    [_facebook logout];
+    [self.facebook logout];
 }
 
 #pragma mark - Permissions
 - (void)authorizeBasicPermissions {
     // Check if already authorized
-    if (![_facebook isSessionValid]) {
-        [_facebook authorize:FB_BASIC_PERMISISONS];
+    if (![self.facebook isSessionValid]) {
+        [self.facebook authorize:FB_BASIC_PERMISISONS];
     }
 }
 
@@ -78,10 +90,10 @@
 }
 
 - (void)addExtendedPermission:(NSString *)permission {
-    _newPermissions = [[[self availableExtendedPermissions] arrayByAddingObject:permission] retain];
+    self.extendedPermissions = [[self availableExtendedPermissions] arrayByAddingObject:permission];
     
     // Authorize with FB
-    [_facebook authorize:_newPermissions];
+    [self.facebook authorize:self.extendedPermissions];
 }
 
 - (void)requestPublishStream {
@@ -91,7 +103,7 @@
 }
 
 - (void)showDialog:(NSString *)dialog andParams:(NSMutableDictionary *)params {
-    [_facebook dialog:dialog andParams:params andDelegate:self];
+    [self.facebook dialog:dialog andParams:params andDelegate:self];
 }
 
 #pragma mark - FBDialogDelegate
@@ -123,19 +135,19 @@
 - (void)fbDidLogin {
     [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidBegin object:nil];
     
-    if (_newPermissions) {
-        [[NSUserDefaults standardUserDefaults] setObject:_newPermissions forKey:@"fbExtendedPermissions"];
-        [_newPermissions release], _newPermissions = nil;
+    if (self.extendedPermissions) {
+        [[NSUserDefaults standardUserDefaults] setObject:self.extendedPermissions forKey:@"fbExtendedPermissions"];
+        self.extendedPermissions = nil;
     }
-    [[NSUserDefaults standardUserDefaults] setObject:_facebook.accessToken forKey:@"fbAccessToken"];
-    [[NSUserDefaults standardUserDefaults] setObject:_facebook.expirationDate forKey:@"fbExpirationDate"];
+    [[NSUserDefaults standardUserDefaults] setObject:self.facebook.accessToken forKey:@"fbAccessToken"];
+    [[NSUserDefaults standardUserDefaults] setObject:self.facebook.expirationDate forKey:@"fbExpirationDate"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    NSLog(@"Got FB Token: %@", _facebook.accessToken);
+    NSLog(@"Got FB Token: %@", self.facebook.accessToken);
     
     // Get Me
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
-    [parameters setObject:_facebook.accessToken forKey:@"access_token"];
+    [parameters setObject:self.facebook.accessToken forKey:@"access_token"];
     [parameters setObject:@"id,name,first_name,last_name,middle_name,username,gender,locale,friends" forKey:@"fields"];
     [parameters setObject:@"5000" forKey:@"limit"];
     
@@ -166,7 +178,7 @@
 }
 
 - (void)fbDidNotLogin:(BOOL)cancelled {
-    [_newPermissions release], _newPermissions = nil;
+    self.extendedPermissions = nil;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidFail object:nil];
 }

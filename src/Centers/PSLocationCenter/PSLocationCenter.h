@@ -14,9 +14,9 @@
 #define kPSLocationCenterDidFail @"kPSLocationCenterDidFail"
 
 @interface PSLocationCenter : NSObject <CLLocationManagerDelegate> {
-  
-  NSDate *_startDate;
-
+    
+    NSDate *_startDate;
+    
 }
 
 @property (nonatomic, retain) CLLocationManager *locationManager;
