@@ -35,7 +35,7 @@ object = _object;
 }
 
 - (void)prepareForReuse {
-    self.object = nil;
+//    self.object = nil;
 }
 
 - (void)fillViewWithObject:(id)object {
