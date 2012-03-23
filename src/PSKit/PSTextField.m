@@ -8,6 +8,11 @@
 
 #import "PSTextField.h"
 
+@interface PSTextField ()
+
+- (CGRect)rectWithInset:(CGSize)inset;
+
+@end
 
 @implementation PSTextField
 
@@ -19,36 +24,28 @@ inset = _inset;
     return [self initWithFrame:frame];
 }
 
-// placeholder position
-- (CGRect)textRectForBounds:(CGRect)bounds {
-    CGRect clearViewRect = [self clearButtonRectForBounds:bounds];
-    CGRect rightViewRect = [self rightViewRectForBounds:bounds];
-    CGRect leftViewRect = [self leftViewRectForBounds:bounds];
+- (CGRect)rectWithInset:(CGSize)inset {
+    CGRect clearViewRect = [self clearButtonRectForBounds:self.bounds];
+    CGRect rightViewRect = [self rightViewRectForBounds:self.bounds];
+    CGRect leftViewRect = [self leftViewRectForBounds:self.bounds];
     CGFloat rightMargin = MAX(clearViewRect.size.width, rightViewRect.size.width);
     CGFloat leftMargin = leftViewRect.size.width;
     
-    return UIEdgeInsetsInsetRect(bounds, UIEdgeInsetsMake(self.inset.height, self.inset.width + leftMargin, self.inset.height, self.inset.width + rightMargin));
+    return UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsMake(self.inset.height, self.inset.width + leftMargin, self.inset.height, self.inset.width + rightMargin));
+}
+
+// placeholder position
+- (CGRect)textRectForBounds:(CGRect)bounds {
+    return [self rectWithInset:self.inset];
 }
 
 - (CGRect)placeholderRectForBounds:(CGRect)bounds {
-    CGRect clearViewRect = [self clearButtonRectForBounds:bounds];
-    CGRect rightViewRect = [self rightViewRectForBounds:bounds];
-    CGRect leftViewRect = [self leftViewRectForBounds:bounds];
-    CGFloat rightMargin = MAX(clearViewRect.size.width, rightViewRect.size.width);
-    CGFloat leftMargin = leftViewRect.size.width;
-    
-    return UIEdgeInsetsInsetRect(bounds, UIEdgeInsetsMake(self.inset.height, self.inset.width + leftMargin, self.inset.height, self.inset.width + rightMargin));
+    return [self rectWithInset:self.inset];
 }
 
 // text position
 - (CGRect)editingRectForBounds:(CGRect)bounds {
-    CGRect clearViewRect = [self clearButtonRectForBounds:bounds];
-    CGRect rightViewRect = [self rightViewRectForBounds:bounds];
-    CGRect leftViewRect = [self leftViewRectForBounds:bounds];
-    CGFloat rightMargin = MAX(clearViewRect.size.width, rightViewRect.size.width);
-    CGFloat leftMargin = leftViewRect.size.width;
-    
-    return UIEdgeInsetsInsetRect(bounds, UIEdgeInsetsMake(self.inset.height, self.inset.width + leftMargin, self.inset.height, self.inset.width + rightMargin));
+    return [self rectWithInset:self.inset];
 }
 
 - (CGRect)leftViewRectForBounds:(CGRect)bounds {
