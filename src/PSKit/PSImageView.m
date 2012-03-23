@@ -24,7 +24,7 @@ shouldAnimate = _shouldAnimate;
         self.contentMode = UIViewContentModeScaleAspectFill;
         self.contentScaleFactor = [UIScreen mainScreen].scale;
         
-        self.backgroundColor = RGBACOLOR(200, 200, 200, 1.0);
+        self.backgroundColor = RGBACOLOR(230, 230, 230, 1.0);
     }
     return self;
 }
