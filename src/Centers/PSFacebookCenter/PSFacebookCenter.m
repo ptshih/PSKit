@@ -32,7 +32,7 @@ extendedPermissions = _extendedPermissions;
 - (id)init {
     self = [super init];
     if (self) {
-        self.facebook = [[[Facebook alloc] initWithAppId:FB_APP_ID andDelegate:self] autorelease];
+        self.facebook = [[[Facebook alloc] initWithAppId:FB_APP_ID urlSchemeSuffix:FB_APP_SUFFIX andDelegate:self] autorelease];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         if ([defaults objectForKey:@"fbAccessToken"] && [defaults objectForKey:@"fbExpirationDate"]) {
             self.facebook.accessToken = [[NSUserDefaults standardUserDefaults] valueForKey:@"fbAccessToken"];

@@ -10,12 +10,6 @@
 #import "SVProgressHUD.h"
 #import <QuartzCore/QuartzCore.h>
 
-#ifdef SVPROGRESSHUD_DISABLE_NETWORK_INDICATOR
-#define SVProgressHUDShowNetworkIndicator 0
-#else
-#define SVProgressHUDShowNetworkIndicator 1
-#endif
-
 @interface SVProgressHUD ()
 
 @property (nonatomic, readwrite) SVProgressHUDMaskType maskType;
@@ -79,27 +73,27 @@ static SVProgressHUD *sharedView = nil;
 #pragma mark - Show Methods
 
 + (void)show {
-	[SVProgressHUD showWithStatus:nil networkIndicator:SVProgressHUDShowNetworkIndicator];
+    [[SVProgressHUD sharedView] showWithStatus:nil maskType:SVProgressHUDMaskTypeNone networkIndicator:NO];
 }
 
 + (void)showWithStatus:(NSString *)status {
-    [SVProgressHUD showWithStatus:status networkIndicator:SVProgressHUDShowNetworkIndicator];
+    [[SVProgressHUD sharedView] showWithStatus:status maskType:SVProgressHUDMaskTypeNone networkIndicator:NO];
 }
 
 + (void)showWithMaskType:(SVProgressHUDMaskType)maskType {
-    [SVProgressHUD showWithStatus:nil maskType:maskType networkIndicator:SVProgressHUDShowNetworkIndicator];
+    [[SVProgressHUD sharedView] showWithStatus:nil maskType:maskType networkIndicator:NO];
 }
 
 + (void)showWithStatus:(NSString*)status maskType:(SVProgressHUDMaskType)maskType {
-    [SVProgressHUD showWithStatus:status maskType:maskType networkIndicator:SVProgressHUDShowNetworkIndicator];
+    [[SVProgressHUD sharedView] showWithStatus:status maskType:maskType networkIndicator:NO];
 }
 
 + (void)showWithStatus:(NSString *)status networkIndicator:(BOOL)show {
-    [SVProgressHUD showWithStatus:status maskType:SVProgressHUDMaskTypeNone networkIndicator:show];
+    [[SVProgressHUD sharedView] showWithStatus:status maskType:SVProgressHUDMaskTypeNone networkIndicator:show];
 }
 
 + (void)showWithMaskType:(SVProgressHUDMaskType)maskType networkIndicator:(BOOL)show {
-    [SVProgressHUD showWithStatus:nil maskType:maskType networkIndicator:show];
+    [[SVProgressHUD sharedView] showWithStatus:nil maskType:maskType networkIndicator:show];
 }
 
 + (void)showWithStatus:(NSString*)status maskType:(SVProgressHUDMaskType)maskType networkIndicator:(BOOL)show {
@@ -107,8 +101,21 @@ static SVProgressHUD *sharedView = nil;
 }
 
 + (void)showSuccessWithStatus:(NSString *)string {
+    [SVProgressHUD showSuccessWithStatus:string duration:1];
+}
+
++ (void)showSuccessWithStatus:(NSString *)string duration:(NSTimeInterval)duration {
     [SVProgressHUD show];
-    [SVProgressHUD dismissWithSuccess:string afterDelay:1];
+    [SVProgressHUD dismissWithSuccess:string afterDelay:duration];
+}
+
++ (void)showErrorWithStatus:(NSString *)string {
+    [SVProgressHUD showErrorWithStatus:string duration:1];
+}
+
++ (void)showErrorWithStatus:(NSString *)string duration:(NSTimeInterval)duration {
+    [SVProgressHUD show];
+    [SVProgressHUD dismissWithError:string afterDelay:duration];
 }
 
 
@@ -209,7 +216,10 @@ static SVProgressHUD *sharedView = nil;
 	
 	self.hudView.bounds = CGRectMake(0, 0, hudWidth, hudHeight);
 	
-	self.imageView.center = CGPointMake(CGRectGetWidth(self.hudView.bounds)/2, 36);
+    if(string)
+        self.imageView.center = CGPointMake(CGRectGetWidth(self.hudView.bounds)/2, 36);
+	else
+       	self.imageView.center = CGPointMake(CGRectGetWidth(self.hudView.bounds)/2, CGRectGetHeight(self.hudView.bounds)/2);
 	
 	self.stringLabel.hidden = NO;
 	self.stringLabel.text = string;
@@ -381,7 +391,7 @@ static SVProgressHUD *sharedView = nil;
 		
 		[UIView animateWithDuration:0.15
 							  delay:0
-							options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionCurveEaseOut | UIViewAnimationOptionBeginFromCurrentState
+							options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationCurveEaseOut | UIViewAnimationOptionBeginFromCurrentState
 						 animations:^{	
 							 self.hudView.transform = CGAffineTransformScale(self.hudView.transform, 1/1.3, 1/1.3);
                              self.alpha = 1;
@@ -431,7 +441,7 @@ static SVProgressHUD *sharedView = nil;
 
 	[UIView animateWithDuration:0.15
 						  delay:0
-						options:UIViewAnimationOptionCurveEaseIn | UIViewAnimationOptionAllowUserInteraction
+						options:UIViewAnimationCurveEaseIn | UIViewAnimationOptionAllowUserInteraction
 					 animations:^{	
 						 sharedView.hudView.transform = CGAffineTransformScale(sharedView.hudView.transform, 0.8, 0.8);
 						 sharedView.alpha = 0;
@@ -456,6 +466,13 @@ static SVProgressHUD *sharedView = nil;
                          }
                      }];
 }
+
+#pragma mark - Utilities
+
++ (BOOL)isVisible {
+    return (sharedView.alpha == 1);
+}
+
 
 #pragma mark - Getters
 

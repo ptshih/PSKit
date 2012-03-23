@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Facebook.h"
+#import "FBConnect.h"
 
 // Facebook
 #define FB_PERMISSIONS_PUBLISH @"publish_stream"
