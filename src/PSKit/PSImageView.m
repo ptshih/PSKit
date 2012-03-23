@@ -23,6 +23,8 @@ shouldAnimate = _shouldAnimate;
         
         self.contentMode = UIViewContentModeScaleAspectFill;
         self.contentScaleFactor = [UIScreen mainScreen].scale;
+        
+        self.backgroundColor = RGBACOLOR(200, 200, 200, 1.0);
     }
     return self;
 }
@@ -30,6 +32,10 @@ shouldAnimate = _shouldAnimate;
 - (void)dealloc {
     self.placeholderImage = nil;
     [super dealloc];
+}
+
+- (void)prepareForReuse {
+    self.image = nil;
 }
 
 - (void)layoutSubviews {

@@ -54,11 +54,11 @@ loadingIndicator = _loadingIndicator;
 }
 
 - (void)prepareForReuse {
+    [super prepareForReuse];
     [self.loadingIndicator startAnimating];
     self.thumbnailURL = nil;
     self.originalURL = nil;
     self.URL = nil;
-    self.image = nil;
 }
 
 - (void)loadImageWithURL:(NSURL *)URL {

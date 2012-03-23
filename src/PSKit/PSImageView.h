@@ -11,10 +11,11 @@
 
 @interface PSImageView : UIImageView
 
-- (void)animateImageFade:(UIImage *)image;
-
 @property (nonatomic, retain) UIImage *placeholderImage;
 @property (nonatomic, assign) BOOL shouldResize;
 @property (nonatomic, assign) BOOL shouldAnimate;
+
+- (void)prepareForReuse;
+- (void)animateImageFade:(UIImage *)image;
 
 @end

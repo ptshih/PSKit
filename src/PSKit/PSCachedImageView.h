@@ -18,6 +18,5 @@
 
 - (void)loadImageWithURL:(NSURL *)URL;
 - (void)loadImageWithURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType;
-- (void)prepareForReuse;
 
 @end
