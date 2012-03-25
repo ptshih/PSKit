@@ -31,13 +31,13 @@ contentOffset = _contentOffset;
 }
 
 - (void)viewDidUnload {
-    VLog(@"#%@", [self class]);
     [super viewDidUnload];
+    VLog(@"#%@", [self class]);
 }
 
 - (void)didReceiveMemoryWarning {
-    VLog(@"#%@", [self class]);
     [super didReceiveMemoryWarning];
+    VLog(@"#%@", [self class]);
 }
 
 #pragma mark - View
