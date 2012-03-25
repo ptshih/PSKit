@@ -19,11 +19,10 @@
 @property (nonatomic, assign) CGRect originalFrame;
 @property (nonatomic, assign) MKCoordinateRegion oldMapRegion;
 @property (nonatomic, assign) BOOL shouldRotate;
-@property (nonatomic, assign) BOOL preparingtoZoom;
+@property (nonatomic, assign) BOOL isZooming;
 
 - (void)showView:(UIView *)view withFrame:(CGRect)frame inView:(UIView *)inView fullscreen:(BOOL)fullscreen;
 - (void)dismiss:(UITapGestureRecognizer *)gr;
-- (void)dismissWithanimation:(BOOL)animated;
 
 @end
 
@@ -38,7 +37,7 @@ convertedFrame = _convertedFrame,
 originalFrame = _originalFrame,
 oldMapRegion = _oldMapRegion,
 shouldRotate = _shouldRotate,
-preparingtoZoom = _preparingtoZoom;
+isZooming = _isZooming;
 
 + (id)sharedView {
     static id sharedView = nil;
@@ -53,7 +52,7 @@ preparingtoZoom = _preparingtoZoom;
     if (self) {
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
-        self.preparingtoZoom = NO;
+        self.isZooming = NO;
         
         self.backgroundView = [[[UIView alloc] initWithFrame:self.bounds] autorelease];
         self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -65,8 +64,6 @@ preparingtoZoom = _preparingtoZoom;
         [self addGestureRecognizer:gr];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationDidChange:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationBackgrounded:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     }
     return self;
 }
@@ -79,10 +76,10 @@ preparingtoZoom = _preparingtoZoom;
 }
 
 + (BOOL)prepareToZoom {
-    if ([[[self class] sharedView] preparingtoZoom]) {
+    if ([[[self class] sharedView] isZooming]) {
         return NO;
     } else {
-        [[[self class] sharedView] setPreparingtoZoom:YES];
+        [[[self class] sharedView] setIsZooming:YES];
         return YES;
     }
 }
@@ -173,11 +170,11 @@ preparingtoZoom = _preparingtoZoom;
 }
 
 - (void)dismiss:(UITapGestureRecognizer *)gestureRecognizer {
-    [self dismissWithanimation:YES];
+    [self dismissWithAnimation:YES];
     
 }
 
-- (void)dismissWithanimation:(BOOL)animated {
+- (void)dismissWithAnimation:(BOOL)animated {
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
@@ -216,19 +213,21 @@ preparingtoZoom = _preparingtoZoom;
                 [self.delegate zoomViewDidDismiss:self];
             }
             
-            self.preparingtoZoom = NO;
+            self.isZooming = NO;
             [[UIApplication sharedApplication] endIgnoringInteractionEvents];
         }];
     }];
 }
 
+- (void)reset {
+    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
+    [self removeFromSuperview];
+    self.isZooming = NO;
+}
+
 #pragma mark - Orientation
 - (void)orientationDidChange:(NSNotification *)notification {
     
-}
-
-- (void)applicationBackgrounded:(NSNotification *)notification {
-    [self dismissWithanimation:NO];
 }
 
 

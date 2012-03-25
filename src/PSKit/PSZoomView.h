@@ -21,6 +21,8 @@
 + (void)showImage:(UIImage *)image withFrame:(CGRect)frame inView:(UIView *)inView;
 
 + (BOOL)prepareToZoom;
+- (void)dismissWithAnimation:(BOOL)animated;
+- (void)reset;
 
 @end
 
