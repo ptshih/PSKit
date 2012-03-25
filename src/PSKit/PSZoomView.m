@@ -60,6 +60,8 @@ shouldRotate = _shouldRotate;
         [self addGestureRecognizer:gr];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationDidChange:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationBackgrounded:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     }
     return self;
 }
@@ -157,7 +159,7 @@ shouldRotate = _shouldRotate;
 }
 
 
-- (void)dismiss:(UITapGestureRecognizer *)gr {
+- (void)dismiss:(UITapGestureRecognizer *)gestureRecognizer {
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     
@@ -201,6 +203,10 @@ shouldRotate = _shouldRotate;
 #pragma mark - Orientation
 - (void)orientationDidChange:(NSNotification *)notification {
     
+}
+
+- (void)applicationBackgrounded:(NSNotification *)notification {
+    [self dismiss:nil];
 }
 
 
