@@ -19,9 +19,11 @@
 @property (nonatomic, assign) CGRect originalFrame;
 @property (nonatomic, assign) MKCoordinateRegion oldMapRegion;
 @property (nonatomic, assign) BOOL shouldRotate;
+@property (nonatomic, assign) BOOL preparingtoZoom;
 
 - (void)showView:(UIView *)view withFrame:(CGRect)frame inView:(UIView *)inView fullscreen:(BOOL)fullscreen;
 - (void)dismiss:(UITapGestureRecognizer *)gr;
+- (void)dismissWithanimation:(BOOL)animated;
 
 @end
 
@@ -35,7 +37,8 @@ backgroundView = _backgroundView,
 convertedFrame = _convertedFrame,
 originalFrame = _originalFrame,
 oldMapRegion = _oldMapRegion,
-shouldRotate = _shouldRotate;
+shouldRotate = _shouldRotate,
+preparingtoZoom = _preparingtoZoom;
 
 + (id)sharedView {
     static id sharedView = nil;
@@ -49,6 +52,8 @@ shouldRotate = _shouldRotate;
     self = [super initWithFrame:frame];
     if (self) {
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        
+        self.preparingtoZoom = NO;
         
         self.backgroundView = [[[UIView alloc] initWithFrame:self.bounds] autorelease];
         self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -71,6 +76,15 @@ shouldRotate = _shouldRotate;
     self.backgroundView = nil;
 
     [super dealloc];
+}
+
++ (BOOL)prepareToZoom {
+    if ([[[self class] sharedView] preparingtoZoom]) {
+        return NO;
+    } else {
+        [[[self class] sharedView] setPreparingtoZoom:YES];
+        return YES;
+    }
 }
 
 + (void)showMapView:(MKMapView *)mapView withFrame:(CGRect)frame inView:(UIView *)inView fullscreen:(BOOL)fullscreen {
@@ -158,20 +172,27 @@ shouldRotate = _shouldRotate;
     }];
 }
 
-
 - (void)dismiss:(UITapGestureRecognizer *)gestureRecognizer {
-    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+    [self dismissWithanimation:YES];
+    
+}
+
+- (void)dismissWithanimation:(BOOL)animated {
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
+    
+    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+    
+    CGFloat animationDuration = animated ? ZOOM_DURATION : 0.0;
     
     if ([self.zoomedView isKindOfClass:[MKMapView class]]) {
         [(MKMapView *)self.zoomedView deselectAnnotation:[[(MKMapView *)self.zoomedView annotations] lastObject] animated:NO];
     }
 
-    [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+    [UIView animateWithDuration:animationDuration delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
         if (self.shouldRotate) self.zoomedView.transform = CGAffineTransformIdentity;
         self.zoomedView.frame = self.convertedFrame;
     } completion:^(BOOL finished){
-        [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+        [UIView animateWithDuration:animationDuration delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
             self.backgroundView.alpha = 0.0;
         } completion:^(BOOL finished){
             for (UIGestureRecognizer *gr in self.zoomedView.gestureRecognizers) {
@@ -195,6 +216,7 @@ shouldRotate = _shouldRotate;
                 [self.delegate zoomViewDidDismiss:self];
             }
             
+            self.preparingtoZoom = NO;
             [[UIApplication sharedApplication] endIgnoringInteractionEvents];
         }];
     }];
@@ -206,7 +228,7 @@ shouldRotate = _shouldRotate;
 }
 
 - (void)applicationBackgrounded:(NSNotification *)notification {
-    [self dismiss:nil];
+    [self dismissWithanimation:NO];
 }
 
 

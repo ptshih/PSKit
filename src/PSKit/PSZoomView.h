@@ -20,6 +20,8 @@
 + (void)showView:(UIView *)view withFrame:(CGRect)frame inView:(UIView *)inView fullscreen:(BOOL)fullscreen;
 + (void)showImage:(UIImage *)image withFrame:(CGRect)frame inView:(UIView *)inView;
 
++ (BOOL)prepareToZoom;
+
 @end
 
 @protocol PSZoomViewDelegate <NSObject>
