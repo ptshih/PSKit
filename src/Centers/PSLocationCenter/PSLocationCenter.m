@@ -17,6 +17,7 @@ static const NSTimeInterval __pollDuration = 30;
 @implementation PSLocationCenter
 
 @synthesize
+geocoder = _geocoder,
 locationManager = _locationManager,
 location = _location,
 pollTimer = _pollTimer,
@@ -39,6 +40,8 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 - (id)init {
     self = [super init];
     if (self) {
+        self.geocoder = [[[CLGeocoder alloc] init] autorelease];
+        
         self.locationManager = [[[CLLocationManager alloc] init] autorelease];
         self.locationManager.delegate = self;
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -71,6 +74,8 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidEnterBackgroundNotification object:nil];
+    
+    self.geocoder = nil;
     
     self.locationManager.delegate = nil;
     self.locationManager = nil;

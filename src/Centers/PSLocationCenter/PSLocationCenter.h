@@ -19,6 +19,7 @@
     
 }
 
+@property (nonatomic, retain) CLGeocoder *geocoder;
 @property (nonatomic, retain) CLLocationManager *locationManager;
 @property (nonatomic, copy) CLLocation *location;
 @property (nonatomic, retain) NSTimer *pollTimer;
