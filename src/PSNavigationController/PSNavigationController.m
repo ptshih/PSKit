@@ -142,7 +142,7 @@ const CGFloat kAnimationDuration = 0.35;
 }
 
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated {
-    return [self popViewControllerWithDirection:PSNavigationControllerDirectionRight animated:YES];
+    return [self popViewControllerWithDirection:PSNavigationControllerDirectionRight animated:animated];
 }
 
 - (UIViewController *)popViewControllerWithDirection:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
