@@ -54,6 +54,9 @@ isZooming = _isZooming;
         
         self.isZooming = NO;
         
+        self.superView = nil;
+        self.zoomedView = nil;
+        
         self.backgroundView = [[[UIView alloc] initWithFrame:self.bounds] autorelease];
         self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.backgroundView.backgroundColor = [UIColor blackColor];
@@ -64,6 +67,8 @@ isZooming = _isZooming;
         [self addGestureRecognizer:gr];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationDidChange:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+        
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reset) name:UIApplicationDidEnterBackgroundNotification object:nil];
     }
     return self;
 }
@@ -213,6 +218,8 @@ isZooming = _isZooming;
                 [self.delegate zoomViewDidDismiss:self];
             }
             
+            self.superView = nil;
+            self.zoomedView = nil;
             self.isZooming = NO;
             [[UIApplication sharedApplication] endIgnoringInteractionEvents];
         }];
@@ -220,7 +227,11 @@ isZooming = _isZooming;
 }
 
 - (void)reset {
+    // This causes a crash with setFrame:
+//    [self dismissWithAnimation:NO];
+    
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
+    [self.zoomedView removeFromSuperview];
     [self removeFromSuperview];
     self.isZooming = NO;
 }
