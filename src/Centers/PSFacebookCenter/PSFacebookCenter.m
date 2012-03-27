@@ -54,6 +54,8 @@ extendedPermissions = _extendedPermissions;
 }
 
 - (BOOL)isLoggedIn {
+    return ([self.facebook isSessionValid] && [self accessToken]);
+#warning IGNORING ME
     return ([self.facebook isSessionValid] && [self me] && [self accessToken]);
 }
 
@@ -74,10 +76,10 @@ extendedPermissions = _extendedPermissions;
 }
 
 #pragma mark - Permissions
-- (void)authorizeBasicPermissions {
+- (void)authorizeWithPermissions:(NSArray *)permissions {
     // Check if already authorized
     if (![self.facebook isSessionValid]) {
-        [self.facebook authorize:FB_BASIC_PERMISISONS];
+        [self.facebook authorize:permissions];
     }
 }
 
@@ -145,36 +147,7 @@ extendedPermissions = _extendedPermissions;
     
     NSLog(@"Got FB Token: %@", self.facebook.accessToken);
     
-    // Get Me
-    NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
-    [parameters setObject:self.facebook.accessToken forKey:@"access_token"];
-    [parameters setObject:@"id,name,first_name,last_name,middle_name,username,gender,locale,friends" forKey:@"fields"];
-    [parameters setObject:@"5000" forKey:@"limit"];
-    
-    NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/me", @"https://graph.facebook.com"]];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL method:@"GET" headers:nil parameters:parameters];
-    
-    AFJSONRequestOperation *op = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON){
-        if ([response statusCode] != 200) {
-            // Handle server status codes?
-            [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidFail object:nil];
-        } else {
-            NSDictionary *me = (NSDictionary *)JSON;
-            NSString *fbId = [me objectForKey:@"id"];
-            if (me) {
-                [[NSUserDefaults standardUserDefaults] setObject:fbId forKey:@"fbId"];
-                [[NSUserDefaults standardUserDefaults] setObject:me forKey:@"fbMe"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-                
-                [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidSucceed object:nil];
-            } else {
-                [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidFail object:nil];
-            }
-        }
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidFail object:nil];
-    }];
-    [op start];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPSFacebookCenterDialogDidSucceed object:nil];
 }
 
 - (void)fbDidNotLogin:(BOOL)cancelled {

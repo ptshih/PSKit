@@ -9,10 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "FBConnect.h"
 
-// Facebook
-#define FB_PERMISSIONS_PUBLISH @"publish_stream"
-#define FB_BASIC_PERMISISONS [NSArray arrayWithObjects:@"offline_access", @"user_photos", @"publish_stream", nil]
-
 #define kPSFacebookCenterDialogDidBegin @"kPSFacebookCenterDialogDidBegin"
 #define kPSFacebookCenterDialogDidSucceed @"PSFacebookCenterDialogDidSucceed"
 #define kPSFacebookCenterDialogDidFail @"PSFacebookCenterDialogDidFail"
@@ -30,7 +26,7 @@
 - (void)logout;
 
 // Permissions
-- (void)authorizeBasicPermissions;
+- (void)authorizeWithPermissions:(NSArray *)permissions;
 - (BOOL)hasPublishStreamPermission;
 - (void)requestPublishStream;
 - (NSArray *)availableExtendedPermissions;
