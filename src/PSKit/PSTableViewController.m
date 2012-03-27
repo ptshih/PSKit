@@ -147,7 +147,7 @@ loadMoreView = _loadMoreView;
 // SUBCLASS CAN OPTIONALLY CALL
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
-        self.pullRefreshView = [[[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.view.frame.size.width, 48.0)] autorelease];
+        self.pullRefreshView = [[[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.view.frame.size.width, 48.0) style:PSPullRefreshStyleBlack] autorelease];
         self.pullRefreshView.scrollView = self.tableView;
         self.pullRefreshView.delegate = self;
         [self.tableView addSubview:self.pullRefreshView];		
