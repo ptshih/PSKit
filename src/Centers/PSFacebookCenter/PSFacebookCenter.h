@@ -39,6 +39,4 @@
 - (NSString *)accessToken;
 - (NSDate *)expirationDate;
 
-- (NSDictionary *)me;
-
 @end

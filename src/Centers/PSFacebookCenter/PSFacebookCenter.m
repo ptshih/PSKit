@@ -55,8 +55,6 @@ extendedPermissions = _extendedPermissions;
 
 - (BOOL)isLoggedIn {
     return ([self.facebook isSessionValid] && [self accessToken]);
-#warning IGNORING ME
-    return ([self.facebook isSessionValid] && [self me] && [self accessToken]);
 }
 
 - (NSString *)accessToken {
@@ -65,10 +63,6 @@ extendedPermissions = _extendedPermissions;
 
 - (NSDate *)expirationDate {
     return [self.facebook expirationDate];
-}
-
-- (NSDictionary *)me {
-    return [[NSUserDefaults standardUserDefaults] objectForKey:@"fbMe"];
 }
 
 - (void)logout {
