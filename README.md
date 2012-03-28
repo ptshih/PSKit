@@ -26,21 +26,22 @@ External Modules
 * SVProgressHUD
 * Reachability (optional)
 * egodatabase (optional)
-* Facebook (optional, modified to use JSONKit)
+* Facebook (optional)
+
+Cool Stuff
+---
+* PSCollectionView (think Pinterest style table views)
 
 Shared Centers (Singletons)
 ---
 * PSDatabaseCenter (requires egodatabase module, requires libsqlite3.framework, requires a #define SQLITE_DB @"db_file_name" in Constants.h)
-* PSDataCenter (requires AFNetworking)
 * PSFacebookCenter (requires Facebook module)
-* PSImageCache (requires AFNetworking)
+* PSURLCache
 * PSLocationCenter (requires CoreLocation.framework)
 * PSMailCenter (requires MessageUI.framework)
 * PSReachabilityCenter (requires Reachability module)
 * PSSearchCenter
-* PSStyleSheet
 * PSToastCenter
-* PSURLCache
 * PSCoreDataStack (requires CoreData.framework)
 
 Categories
@@ -59,6 +60,7 @@ Categories
 * UILabel
 * UIScreen
 * UIView
+* Others
 
 PSKit Core
 ---
@@ -69,6 +71,7 @@ PSKit Core
 * PSViewController
 * PSBaseViewController
 * PSTableViewController
+* PSCollectionViewController
 
 Usage
 ---
