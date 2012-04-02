@@ -31,7 +31,7 @@ inset = _inset;
     CGFloat rightMargin = MAX(clearViewRect.size.width, rightViewRect.size.width);
     CGFloat leftMargin = leftViewRect.size.width;
     
-    return UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsMake(self.inset.height, self.inset.width + leftMargin, self.inset.height, self.inset.width + rightMargin));
+    return UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsMake(inset.height, inset.width + leftMargin, inset.height, inset.width + rightMargin));
 }
 
 // placeholder position
