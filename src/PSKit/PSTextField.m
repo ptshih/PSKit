@@ -10,7 +10,7 @@
 
 @interface PSTextField ()
 
-- (CGRect)rectWithInset:(CGSize)inset;
+- (CGRect)rectWithInset:(UIEdgeInsets)inset;
 
 @end
 
@@ -19,19 +19,19 @@
 @synthesize
 inset = _inset;
 
-- (id)initWithFrame:(CGRect)frame withInset:(CGSize)inset {
+- (id)initWithFrame:(CGRect)frame withInset:(UIEdgeInsets)inset {
     self.inset = inset;
     return [self initWithFrame:frame];
 }
 
-- (CGRect)rectWithInset:(CGSize)inset {
+- (CGRect)rectWithInset:(UIEdgeInsets)inset {
     CGRect clearViewRect = [self clearButtonRectForBounds:self.bounds];
     CGRect rightViewRect = [self rightViewRectForBounds:self.bounds];
     CGRect leftViewRect = [self leftViewRectForBounds:self.bounds];
-    CGFloat rightMargin = MAX(clearViewRect.size.width, rightViewRect.size.width);
+    CGFloat rightMargin = MAX(clearViewRect.size.width, rightViewRect.size.width) + self.inset.right;
     CGFloat leftMargin = leftViewRect.size.width;
     
-    return UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsMake(inset.height, inset.width + leftMargin, inset.height, inset.width + rightMargin));
+    return UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsMake(inset.top, inset.left + leftMargin, inset.bottom, inset.right + rightMargin));
 }
 
 // placeholder position
@@ -49,7 +49,11 @@ inset = _inset;
 }
 
 - (CGRect)leftViewRectForBounds:(CGRect)bounds {
-    return CGRectMake(8, floorf((bounds.size.height - 16) / 2), 24, 16);
+    return CGRectMake(self.inset.left, floorf((bounds.size.height - 16) / 2), 24, 16);
+}
+
+- (CGRect)rightViewRectForBounds:(CGRect)bounds {
+    return CGRectMake(self.width - self.inset.right, floorf((bounds.size.height - 16) / 2), 24, 16);
 }
 
 // This overrides the default image for a clear button
