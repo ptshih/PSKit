@@ -214,8 +214,11 @@ collectionViewDataSource = _collectionViewDataSource;
     
     // Add headerView if it exists
     if (self.headerView) {
+        self.headerView.top = kMargin;
+        top = self.headerView.top;
         [self addSubview:self.headerView];
-        top = self.headerView.height;
+        top += self.headerView.height;
+        top += kMargin;
     }
     
     if (numViews > 0) {
@@ -275,7 +278,7 @@ collectionViewDataSource = _collectionViewDataSource;
         
         // If we have an empty view, show it
         if (self.emptyView) {
-            self.emptyView.frame = CGRectMake(kMargin, top, self.width - kMargin * 2, self.height - kMargin * 2);
+            self.emptyView.frame = CGRectMake(kMargin, top, self.width - kMargin * 2, self.height - top - kMargin);
             [self addSubview:self.emptyView];
         }
     }
@@ -285,6 +288,7 @@ collectionViewDataSource = _collectionViewDataSource;
         self.footerView.top = totalHeight;
         [self addSubview:self.footerView];
         totalHeight += self.footerView.height;
+        totalHeight += kMargin;
     }
     
     self.contentSize = CGSizeMake(self.width, totalHeight);
