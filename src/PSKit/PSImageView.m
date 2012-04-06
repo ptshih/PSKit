@@ -44,6 +44,7 @@ shouldAnimate = _shouldAnimate;
 
 - (void)setImage:(UIImage *)image {
     if (image && ![image isEqual:self.placeholderImage]) {
+        self.backgroundColor = [UIColor clearColor];
         if (self.shouldAnimate) {
             [super setImage:image];
             [self animateImageFade:image];
@@ -51,7 +52,8 @@ shouldAnimate = _shouldAnimate;
             [super setImage:image];
         }
     } else {
-        [super setImage:image];
+        self.backgroundColor = RGBACOLOR(230, 230, 230, 1.0);
+        [super setImage:self.placeholderImage];
     }
 }
 
