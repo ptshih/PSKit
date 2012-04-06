@@ -132,6 +132,7 @@ pendingOperations = _pendingOperations;
     } else {
         PSURLCacheNetworkBlock networkBlock = ^(void){
             [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:self];
+            NSLog(@"### NSURLConnection: %@", request.URL.absoluteString);
             [NSURLConnection sendAsynchronousRequest:request 
                                                queue:self.responseQueue 
                                    completionHandler:^(NSURLResponse *response, NSData *cachedData, NSError *error) {
