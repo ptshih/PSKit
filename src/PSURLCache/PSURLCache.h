@@ -34,6 +34,7 @@ typedef enum {
 - (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock;
 
 // Purge Cache
+- (void)removeCacheForURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType;
 - (void)purgeCacheWithCacheType:(PSURLCacheType)cacheType;
 
 

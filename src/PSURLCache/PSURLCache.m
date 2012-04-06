@@ -185,6 +185,12 @@ pendingOperations = _pendingOperations;
 }
 
 #pragma mark - Purge Cache
+- (void)removeCacheForURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType {
+    NSURL *cachedURL = [[URL copy] autorelease];
+    NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
+    [[NSFileManager defaultManager] removeItemAtPath:cachePath error:nil];
+}
+
 - (void)purgeCacheWithCacheType:(PSURLCacheType)cacheType {
     NSString *cacheDirectoryPath = [self cacheDirectoryPathForCacheType:cacheType];
     
