@@ -10,9 +10,14 @@
 
 @interface PSNavigationController ()
 
+@property (nonatomic, assign) BOOL isTransitioning;
+
 @end
 
 @implementation PSNavigationController
+
+@synthesize
+isTransitioning = _isTransitioning;
 
 @synthesize
 overlayView = _overlayView,
@@ -26,6 +31,8 @@ viewControllers = _viewControllers;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        self.isTransitioning = NO;
+        
         self.viewControllers = [NSMutableArray arrayWithCapacity:1];
     }
     return self;
@@ -82,7 +89,7 @@ viewControllers = _viewControllers;
     return rootViewController;
 }
 
-#pragma mark - Push/Pop
+#pragma mark - Push
 const CGFloat kPushPopScale = 0.95;
 const CGFloat kOverlayViewAlpha = 0.75;
 const CGFloat kAnimationDuration = 0.35;
@@ -92,6 +99,13 @@ const CGFloat kAnimationDuration = 0.35;
 }
 
 - (void)pushViewController:(UIViewController *)viewController direction:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
+    
+    if (!self.isTransitioning) {
+        self.isTransitioning = YES;
+    } else {
+        return;
+    }
+    
     UIViewController *disappearingViewController = nil;
     
     disappearingViewController = self.topViewController;
@@ -137,15 +151,25 @@ const CGFloat kAnimationDuration = 0.35;
         // Remove gray layer
         [self.overlayView removeFromSuperview];
         
+        self.isTransitioning = NO;
+        
         [[UIApplication sharedApplication] endIgnoringInteractionEvents];
     }];
 }
 
+#pragma mark - Pop
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated {
     return [self popViewControllerWithDirection:PSNavigationControllerDirectionRight animated:animated];
 }
 
 - (UIViewController *)popViewControllerWithDirection:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
+    
+    if (!self.isTransitioning) {
+        self.isTransitioning = YES;
+    } else {
+        return nil;
+    }
+    
     UIViewController *poppedViewController = nil;
     
     // Don't pop if at root
@@ -203,6 +227,8 @@ const CGFloat kAnimationDuration = 0.35;
         
         [poppedViewController removeFromParentViewController];
         [poppedViewController release];
+        
+        self.isTransitioning = NO;
         
         [[UIApplication sharedApplication] endIgnoringInteractionEvents];
     }];
