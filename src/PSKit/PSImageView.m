@@ -47,7 +47,11 @@ shouldAnimate = _shouldAnimate;
         self.backgroundColor = [UIColor clearColor];
         if (self.shouldAnimate) {
             [super setImage:image];
-            [self animateImageFade:image];
+            self.alpha = 0.0;
+            [UIView animateWithDuration:0.2 animations:^{
+                self.alpha = 1.0; 
+            }];
+//            [self animateImageFade:image];
         } else {
             [super setImage:image];
         }

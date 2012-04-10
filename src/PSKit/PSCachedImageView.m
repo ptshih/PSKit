@@ -75,6 +75,7 @@ loadingIndicator = _loadingIndicator;
         } else {
             if ([self.URL isEqual:cachedURL]) {
                 [self.loadingIndicator stopAnimating];
+                [self.imageQueue cancelAllOperations];
                 [self.imageQueue addOperationWithBlock:^{
                     UIImage *image = [UIImage imageWithData:cachedData];
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
