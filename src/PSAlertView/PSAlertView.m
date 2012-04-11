@@ -427,7 +427,7 @@ buttons = _buttons;
     NSUInteger buttonIndex = [self.buttons indexOfObjectIdenticalTo:button];
     
     NSString *textFieldValue = nil;
-    if (self.textField && self.textField.text.length > 0) {
+    if (self.textField) {
         textFieldValue = self.textField.text;
     }
     

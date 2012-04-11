@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+/**
+ If there is a textField, we always return a string for textFieldValue (it can be empty)
+ */
 typedef void (^PSAlertViewCompletionBlock)(NSUInteger buttonIndex, NSString *textFieldValue);
 
 @interface PSAlertView : UIView
