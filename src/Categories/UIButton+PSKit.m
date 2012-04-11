@@ -15,10 +15,7 @@
   btn.frame = frame;
   
   if (style) {
-    [btn.titleLabel setFont:[PSStyleSheet fontForStyle:style]];
-    [btn setTitleColor:[PSStyleSheet textColorForStyle:style] forState:UIControlStateNormal];
-    [btn.titleLabel setShadowColor:[PSStyleSheet shadowColorForStyle:style]];
-    [btn.titleLabel setShadowOffset:[PSStyleSheet shadowOffsetForStyle:style]];
+      [PSStyleSheet applyStyle:style forButton:btn];
   }
   
   if (target && action) {
