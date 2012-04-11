@@ -24,8 +24,6 @@ pollTimer = _pollTimer,
 pollStartDate = _pollStartDate,
 backgroundDate = _backgroundDate,
 foregroundDate = _foregroundDate,
-isActive = _isActive,
-locationRequested = _locationRequested,
 shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix,
 shouldNotifyUpdate = _shouldNotifyUpdate;
 
@@ -56,8 +54,6 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
         //                                                   timestamp:[NSDate date]] autorelease];
         //#endif
         
-        self.isActive = NO;
-        self.locationRequested = NO;
         self.shouldDisableAfterLocationFix = NO;
         self.shouldNotifyUpdate = YES; // force update on first launch
         
@@ -91,32 +87,21 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 
 #pragma mark - Location Methods
 - (void)updateMyLocation {
+    // Reset last found location
+    self.location = nil;
+    self.pollStartDate = [NSDate date];
     
+    [self startUpdates];
     
-    // If a location has been requested and a previous request isn't being fulfilled
-    // Check to see if we already have a lock, if so notify
-    // If we have no lock, start location updates
-    if (!self.locationRequested) {
-        self.locationRequested = YES;
-        
-        // Reset last found location
-        self.location = nil;
-        self.pollStartDate = [NSDate date];
-        
-        [self startUpdates];
-        
-        [self.pollTimer invalidate];
-        self.pollTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(pollLocation:) userInfo:nil repeats:YES];
-    }
+    [self.pollTimer invalidate];
+    self.pollTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(pollLocation:) userInfo:nil repeats:YES];
 }
 
 - (void)pollLocation:(NSTimer *)timer {
     NSTimeInterval timeSinceStart = [[NSDate date] timeIntervalSinceDate:self.pollStartDate];
-    CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
-    if (![CLLocationManager locationServicesEnabled] || (authStatus != kCLAuthorizationStatusAuthorized && authStatus != kCLAuthorizationStatusNotDetermined)) {
+    if (![self locationServicesEnabled]) {
         //        40.7247,-73.9995
         self.location = [[[CLLocation alloc] initWithLatitude:40.7247 longitude:-73.9995] autorelease];
-        self.locationRequested = NO;
         [self.pollTimer invalidate];
         self.pollTimer = nil;
         
@@ -128,7 +113,6 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
         UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Location Services Disabled" message:@"Lunchbox works a lot better when it knows your location. Until then... welcome to NYC!" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] autorelease];
         [av show];
     } else if ((self.location && (self.location.horizontalAccuracy < __accuracyThreshold)) || timeSinceStart > __pollDuration) {
-        self.locationRequested = NO;
         [self.pollTimer invalidate];
         self.pollTimer = nil;
         
@@ -168,23 +152,19 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 
 #pragma mark - Start/Stop/Resume/Suspend
 - (void)startUpdates {
-    if (!self.isActive) {
-        self.shouldNotifyUpdate = YES;
-        self.isActive = YES;
-        [self.locationManager startUpdatingLocation];
-    }
+    self.shouldNotifyUpdate = YES;
+    [self.locationManager startUpdatingLocation];
 }
 
 - (void)stopUpdates {
-    if (self.isActive) {
-        self.shouldNotifyUpdate = NO;
-        self.isActive = NO;
-        [self.locationManager stopUpdatingLocation];
-    }
+    self.shouldNotifyUpdate = NO;
+    [self.locationManager stopUpdatingLocation];
 }
 
 - (void)resumeUpdates {
     self.foregroundDate = [NSDate date];
+    [self startUpdates];
+    
     NSTimeInterval secondsBackgrounded = [self.foregroundDate timeIntervalSinceDate:self.backgroundDate];
     
     // 5 min threshold
@@ -192,7 +172,6 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
         [self updateMyLocation];
     }
     
-    [self startUpdates];
     if ([CLLocationManager significantLocationChangeMonitoringAvailable]) {
         [self.locationManager startMonitoringSignificantLocationChanges];
     }
@@ -208,6 +187,23 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 }
 
 #pragma mark - Public Accessors
+- (BOOL)locationServicesEnabled {
+    CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
+    if (![CLLocationManager locationServicesEnabled]) {
+        // If location services is off
+        return NO;
+    } else if (authStatus == kCLAuthorizationStatusNotDetermined) {
+        // If location request hasn't been asked
+        return NO;
+    } else if (authStatus == kCLAuthorizationStatusAuthorized) {
+        // If location has been authorized
+        return YES;
+    } else {
+        // All other situations
+        return NO;
+    }
+}
+
 - (BOOL)hasAcquiredLocation {
     if (self.location) {
         return YES;

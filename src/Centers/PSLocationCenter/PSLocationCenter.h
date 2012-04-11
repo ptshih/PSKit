@@ -26,8 +26,6 @@
 @property (nonatomic, retain) NSDate *pollStartDate;
 @property (nonatomic, retain) NSDate *backgroundDate;
 @property (nonatomic, retain) NSDate *foregroundDate;
-@property (nonatomic, assign) BOOL isActive;
-@property (nonatomic, assign) BOOL locationRequested;
 @property (nonatomic, assign) BOOL shouldDisableAfterLocationFix;
 @property (nonatomic, assign) BOOL shouldNotifyUpdate;
 
@@ -37,6 +35,7 @@
 - (void)updateMyLocation;
 - (BOOL)hasAcquiredLocation;
 - (BOOL)hasAcquiredAccurateLocation;
+- (BOOL)locationServicesEnabled;
 - (CLLocation *)location;
 - (CLLocationCoordinate2D)locationCoordinate;
 - (CLLocationDegrees)latitude;
