@@ -31,6 +31,9 @@ typedef enum {
 // Blocks are called on the main thread
 - (void)loadURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock;
 
+/**
+ completionBlock is always called on the mainQueue
+ */
 - (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock;
 
 // Purge Cache

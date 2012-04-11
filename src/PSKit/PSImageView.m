@@ -51,7 +51,7 @@ shouldAnimate = _shouldAnimate;
         if (self.shouldAnimate && [UIScreen mainScreen].scale > 1.0) {
             self.alpha = 0.0;
             [super setImage:image];
-            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
                 self.alpha = 1.0; 
             } completion:NULL];
         } else {

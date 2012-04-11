@@ -128,7 +128,10 @@ pendingOperations = _pendingOperations;
     NSData *data = [NSData dataWithContentsOfFile:cachePath];
     
     if (data && usingCache) {
-        completionBlock(data, cachedURL, YES, nil);
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:self];
+            completionBlock(data, cachedURL, YES, nil);
+        }];
     } else {
         PSURLCacheNetworkBlock networkBlock = ^(void){
             [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:self];

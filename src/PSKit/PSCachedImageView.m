@@ -68,27 +68,24 @@ loadingIndicator = _loadingIndicator;
 - (void)loadImageWithURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType {
     self.URL = URL;
     
-    [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error) {
-        if (error) {
-            [self.loadingIndicator stopAnimating];
-            self.image = self.placeholderImage;
-        } else {
-            if ([self.URL isEqual:cachedURL]) {
+    [self.imageQueue cancelAllOperations];
+    [self.imageQueue addOperationWithBlock:^{
+        [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error) {
+            if (error) {
                 [self.loadingIndicator stopAnimating];
-                [self.imageQueue cancelAllOperations];
-                [self.imageQueue addOperationWithBlock:^{
-                    UIImage *image = [UIImage imageWithData:cachedData];
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        self.image = image;
-                    }];
-                }];
-//                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-//                    dispatch_async(dispatch_get_main_queue(), ^{
-//                        
-//                    });
-//                });
+                self.image = self.placeholderImage;
+            } else {
+                if ([self.URL isEqual:cachedURL]) {
+                    [self.loadingIndicator stopAnimating];
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+                        UIImage *image = [UIImage imageWithData:cachedData];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            self.image = image;
+                        });
+                    });
+                }
             }
-        }
+        }];
     }];
 }
 
