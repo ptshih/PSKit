@@ -104,6 +104,9 @@
 @end
 
 // PSAlertView
+
+static PSAlertViewWindow *__alertWindow = nil;
+
 @interface PSAlertView () <UITextFieldDelegate>
 
 /**
@@ -138,7 +141,6 @@
 - (void)relayoutViews;
 
 @property (nonatomic, copy) PSAlertViewCompletionBlock completionBlock;
-@property (nonatomic, retain) UIWindow *alertWindow;
 @property (nonatomic, retain) UIImageView *backgroundView;
 @property (nonatomic, retain) UILabel *titleLabel;
 @property (nonatomic, retain) UILabel *messageLabel;
@@ -146,19 +148,29 @@
 @property (nonatomic, retain) UIButton *emailButton;
 @property (nonatomic, retain) NSMutableArray *buttons;
 
+@property (nonatomic, assign) UIWindow *oldKeyWindow;
+
 @end
 
 @implementation PSAlertView
 
 @synthesize
 completionBlock = _completionBlock,
-alertWindow = _alertWindow,
 backgroundView = _backgroundView,
 titleLabel = _titleLabel,
 messageLabel = _messageLabel,
 textField = _textField,
 emailButton = _emailButton,
 buttons = _buttons;
+
+@synthesize
+oldKeyWindow = _oldKeyWindow;
+
++ (void)initialize {
+    __alertWindow = [[PSAlertViewWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    __alertWindow.windowLevel = UIWindowLevelAlert;
+    __alertWindow.backgroundColor = [UIColor clearColor];
+}
 
 #pragma mark - Show with block
 + (void)showWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles textFieldPlaceholder:(NSString *)textFieldPlaceholder completionBlock:(PSAlertViewCompletionBlock)completionBlock {
@@ -187,12 +199,6 @@ buttons = _buttons;
         
         // Completion Block
         self.completionBlock = completionBlock; // copy
-        
-        // Window
-        self.alertWindow = [[[PSAlertViewWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
-        self.alertWindow.windowLevel = UIWindowLevelAlert;
-        self.alertWindow.backgroundColor = [UIColor clearColor];
-        [self.alertWindow addSubview:self];
         
         // Background Image
         self.backgroundView = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSAlertView.bundle/Background.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:40]] autorelease];
@@ -270,7 +276,6 @@ buttons = _buttons;
     self.titleLabel = nil;
     self.messageLabel = nil;
     self.buttons = nil;
-    self.alertWindow = nil;
     [super dealloc];
 }
 
@@ -390,20 +395,23 @@ buttons = _buttons;
 - (void)show:(BOOL)animated {
     [[NSRunLoop currentRunLoop] runMode: NSDefaultRunLoopMode beforeDate:[NSDate date]];
     
-    self.alertWindow.alpha = 0.0;
-    [self.alertWindow makeKeyAndVisible];
+    // Window
+    self.oldKeyWindow = [[UIApplication sharedApplication] keyWindow];
+    [__alertWindow addSubview:self];
+    __alertWindow.alpha = 0.0;
+    [__alertWindow makeKeyAndVisible];
     
     self.transform = CGAffineTransformMakeScale(0.6, 0.6);
     [UIView animateWithDuration:0.2 animations:^{
-        self.alertWindow.alpha = 0.8;
+        __alertWindow.alpha = 0.8;
         self.transform = CGAffineTransformMakeScale(1.05, 1.05);
     } completion:^(BOOL finished) {
         [UIView animateWithDuration:1.0/15.0 animations:^{
-            self.alertWindow.alpha = 0.9;
+            __alertWindow.alpha = 0.9;
             self.transform = CGAffineTransformMakeScale(0.9, 0.9);
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:1.0/7.5 animations:^{
-                self.alertWindow.alpha = 1.0;
+                __alertWindow.alpha = 1.0;
                 self.transform =CGAffineTransformIdentity;
             }];
         }];
@@ -416,9 +424,11 @@ buttons = _buttons;
     }
     
     [UIView animateWithDuration:0.2 animations:^{
-        self.alertWindow.alpha = 0.0;
+        __alertWindow.alpha = 0.0;
     } completion:^(BOOL finished) {
-        self.alertWindow = nil;
+        [self.oldKeyWindow makeKeyAndVisible];
+        [self removeFromSuperview];
+        self.oldKeyWindow = nil;
     }];
 }
 
