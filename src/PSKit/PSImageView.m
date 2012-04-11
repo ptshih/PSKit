@@ -18,6 +18,8 @@ shouldAnimate = _shouldAnimate;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.placeholderImage = nil;
+        
         self.shouldResize = NO;
         self.shouldAnimate = NO;
         
@@ -35,7 +37,7 @@ shouldAnimate = _shouldAnimate;
 }
 
 - (void)prepareForReuse {
-    self.image = nil;
+    self.image = self.placeholderImage;
 }
 
 - (void)layoutSubviews {

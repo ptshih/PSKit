@@ -28,6 +28,10 @@ pullRefreshView = _pullRefreshView;
     return self;
 }
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+}
+
 - (void)viewDidUnload {
     [super viewDidUnload];
     
@@ -81,13 +85,14 @@ pullRefreshView = _pullRefreshView;
 - (void)dataSourceDidLoad {
     [super dataSourceDidLoad];
     [self.collectionView reloadViews];
-    [self endRefresh];
     self.collectionView.contentOffset = self.contentOffset;
+    [self endRefresh];
 }
 
 - (void)dataSourceDidError {
     [super dataSourceDidError];
     [self.collectionView reloadViews];
+    self.collectionView.contentOffset = CGPointZero;
     [self endRefresh];
 }
 

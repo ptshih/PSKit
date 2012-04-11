@@ -7,6 +7,8 @@
 //
 
 // Global Imports
+#import "PSNavigationController.h"
+#import "PSReachabilityCenter.h"
 #import "PSURLCache.h"
 #import "PSStyleSheet.h"
 #import "PSObject.h"
