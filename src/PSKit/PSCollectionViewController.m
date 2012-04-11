@@ -80,12 +80,14 @@ pullRefreshView = _pullRefreshView;
 
 - (void)dataSourceDidLoad {
     [super dataSourceDidLoad];
+    [self.collectionView reloadViews];
     [self endRefresh];
     self.collectionView.contentOffset = self.contentOffset;
 }
 
 - (void)dataSourceDidError {
     [super dataSourceDidError];
+    [self.collectionView reloadViews];
     [self endRefresh];
 }
 
