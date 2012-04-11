@@ -99,7 +99,9 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 
 - (void)pollLocation:(NSTimer *)timer {
     NSTimeInterval timeSinceStart = [[NSDate date] timeIntervalSinceDate:self.pollStartDate];
-    if (![self locationServicesEnabled]) {
+    
+    CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
+    if (![CLLocationManager locationServicesEnabled] || (authStatus != kCLAuthorizationStatusAuthorized && authStatus != kCLAuthorizationStatusNotDetermined)) {
         //        40.7247,-73.9995
         self.location = [[[CLLocation alloc] initWithLatitude:40.7247 longitude:-73.9995] autorelease];
         [self.pollTimer invalidate];
@@ -187,21 +189,9 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 }
 
 #pragma mark - Public Accessors
-- (BOOL)locationServicesEnabled {
+- (BOOL)locationServicesAuthorized {
     CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
-    if (![CLLocationManager locationServicesEnabled]) {
-        // If location services is off
-        return NO;
-    } else if (authStatus == kCLAuthorizationStatusNotDetermined) {
-        // If location request hasn't been asked
-        return NO;
-    } else if (authStatus == kCLAuthorizationStatusAuthorized) {
-        // If location has been authorized
-        return YES;
-    } else {
-        // All other situations
-        return NO;
-    }
+    return (authStatus == kCLAuthorizationStatusAuthorized);
 }
 
 - (BOOL)hasAcquiredLocation {

@@ -35,7 +35,7 @@
 - (void)updateMyLocation;
 - (BOOL)hasAcquiredLocation;
 - (BOOL)hasAcquiredAccurateLocation;
-- (BOOL)locationServicesEnabled;
+- (BOOL)locationServicesAuthorized;
 - (CLLocation *)location;
 - (CLLocationCoordinate2D)locationCoordinate;
 - (CLLocationDegrees)latitude;
