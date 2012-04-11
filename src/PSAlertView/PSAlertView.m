@@ -105,8 +105,6 @@
 
 // PSAlertView
 
-static PSAlertViewWindow *__alertWindow = nil;
-
 @interface PSAlertView () <UITextFieldDelegate>
 
 /**
@@ -148,7 +146,8 @@ static PSAlertViewWindow *__alertWindow = nil;
 @property (nonatomic, retain) UIButton *emailButton;
 @property (nonatomic, retain) NSMutableArray *buttons;
 
-@property (nonatomic, assign) UIWindow *oldKeyWindow;
+@property (nonatomic, retain) UIWindow *alertWindow;
+@property (nonatomic, retain) UIWindow *oldKeyWindow;
 
 @end
 
@@ -164,13 +163,8 @@ emailButton = _emailButton,
 buttons = _buttons;
 
 @synthesize
+alertWindow = _alertWindow,
 oldKeyWindow = _oldKeyWindow;
-
-+ (void)initialize {
-    __alertWindow = [[PSAlertViewWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    __alertWindow.windowLevel = UIWindowLevelAlert;
-    __alertWindow.backgroundColor = [UIColor clearColor];
-}
 
 #pragma mark - Show with block
 + (void)showWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles textFieldPlaceholder:(NSString *)textFieldPlaceholder completionBlock:(PSAlertViewCompletionBlock)completionBlock {
@@ -199,6 +193,11 @@ oldKeyWindow = _oldKeyWindow;
         
         // Completion Block
         self.completionBlock = completionBlock; // copy
+        
+        // Window
+        self.alertWindow = [[[PSAlertViewWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
+        self.alertWindow.windowLevel = UIWindowLevelAlert;
+        self.alertWindow.backgroundColor = [UIColor clearColor];
         
         // Background Image
         self.backgroundView = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSAlertView.bundle/Background.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:40]] autorelease];
@@ -276,6 +275,8 @@ oldKeyWindow = _oldKeyWindow;
     self.titleLabel = nil;
     self.messageLabel = nil;
     self.buttons = nil;
+    
+    self.oldKeyWindow = nil;
     [super dealloc];
 }
 
@@ -397,25 +398,39 @@ oldKeyWindow = _oldKeyWindow;
     
     // Window
     self.oldKeyWindow = [[UIApplication sharedApplication] keyWindow];
-    [__alertWindow addSubview:self];
-    __alertWindow.alpha = 0.0;
-    [__alertWindow makeKeyAndVisible];
+    self.alertWindow.alpha = 0.0;
+    [self.alertWindow addSubview:self];
+    [self.alertWindow makeKeyAndVisible];
     
-    self.transform = CGAffineTransformMakeScale(0.6, 0.6);
-    [UIView animateWithDuration:0.2 animations:^{
-        __alertWindow.alpha = 0.8;
-        self.transform = CGAffineTransformMakeScale(1.05, 1.05);
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:1.0/15.0 animations:^{
-            __alertWindow.alpha = 0.9;
-            self.transform = CGAffineTransformMakeScale(0.9, 0.9);
-        } completion:^(BOOL finished) {
-            [UIView animateWithDuration:1.0/7.5 animations:^{
-                __alertWindow.alpha = 1.0;
-                self.transform =CGAffineTransformIdentity;
-            }];
-        }];
-    }];
+    // Airwomp style
+    self.transform = CGAffineTransformMakeScale(0.01, 0.01);
+    [UIView animateWithDuration:0.3
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.alertWindow.alpha = 1.0;
+                         self.transform = CGAffineTransformIdentity;
+                     }
+                     completion:^(BOOL finished) {
+                         
+                     }];
+    
+    // Apple style
+//    self.transform = CGAffineTransformMakeScale(0.6, 0.6);
+//    [UIView animateWithDuration:0.2 animations:^{
+//        __alertWindow.alpha = 0.8;
+//        self.transform = CGAffineTransformMakeScale(1.05, 1.05);
+//    } completion:^(BOOL finished) {
+//        [UIView animateWithDuration:1.0/15.0 animations:^{
+//            __alertWindow.alpha = 0.9;
+//            self.transform = CGAffineTransformMakeScale(0.9, 0.9);
+//        } completion:^(BOOL finished) {
+//            [UIView animateWithDuration:1.0/7.5 animations:^{
+//                __alertWindow.alpha = 1.0;
+//                self.transform =CGAffineTransformIdentity;
+//            }];
+//        }];
+//    }];
 }
 
 - (void)dismiss:(BOOL)animated {
@@ -423,13 +438,30 @@ oldKeyWindow = _oldKeyWindow;
         [self.textField resignFirstResponder];
     }
     
-    [UIView animateWithDuration:0.2 animations:^{
-        __alertWindow.alpha = 0.0;
-    } completion:^(BOOL finished) {
-        [self.oldKeyWindow makeKeyAndVisible];
-        [self removeFromSuperview];
-        self.oldKeyWindow = nil;
-    }];
+    // Airwomp style
+    [UIView animateWithDuration:0.3
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.alertWindow.alpha = 0.0;
+                         self.transform = CGAffineTransformMakeScale(0.01, 0.01);
+                     }
+                     completion:^(BOOL finished) {
+                         [self.oldKeyWindow makeKeyAndVisible];
+                         [self removeFromSuperview];
+                         self.oldKeyWindow = nil;
+                         self.alertWindow = nil;
+                     }];
+    
+    // Apple style
+//    [UIView animateWithDuration:0.2 animations:^{
+////        __alertWindow.alpha = 0.0;
+//    } completion:^(BOOL finished) {
+//        [self.oldKeyWindow makeKeyAndVisible];
+//        [self removeFromSuperview];
+//        self.oldKeyWindow = nil;
+//        self.alertWindow = nil;
+//    }];
 }
 
 #pragma mark - Button Actions
