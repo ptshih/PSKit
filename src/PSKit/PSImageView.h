@@ -16,6 +16,5 @@
 @property (nonatomic, assign) BOOL shouldAnimate;
 
 - (void)prepareForReuse;
-- (void)animateImageFade:(UIImage *)image;
 
 @end

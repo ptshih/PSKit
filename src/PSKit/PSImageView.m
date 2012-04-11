@@ -46,12 +46,11 @@ shouldAnimate = _shouldAnimate;
     if (image && ![image isEqual:self.placeholderImage]) {
         self.backgroundColor = [UIColor clearColor];
         if (self.shouldAnimate) {
-            [super setImage:image];
             self.alpha = 0.0;
-            [UIView animateWithDuration:0.2 animations:^{
+            [super setImage:image];
+            [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
                 self.alpha = 1.0; 
-            }];
-//            [self animateImageFade:image];
+            } completion:NULL];
         } else {
             [super setImage:image];
         }
@@ -59,15 +58,6 @@ shouldAnimate = _shouldAnimate;
         self.backgroundColor = RGBACOLOR(230, 230, 230, 1.0);
         [super setImage:self.placeholderImage];
     }
-}
-
-- (void)animateImageFade:(UIImage *)image {  
-    CABasicAnimation *fade = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    fade.removedOnCompletion = YES;
-    fade.duration = 0.2;
-    fade.fromValue = [NSNumber numberWithFloat:0.0];
-    fade.toValue = [NSNumber numberWithFloat:1.0];
-    [self.layer addAnimation:fade forKey:@"opacity"];
 }
 
 @end
