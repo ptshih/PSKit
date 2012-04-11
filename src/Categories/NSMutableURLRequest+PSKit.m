@@ -49,6 +49,9 @@ NSString *PSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
     // Create the base request
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
     
+    // Default timeout 30 seconds
+    [request setTimeoutInterval:30];
+    
     // Configure the Method
     if (!method) {
         [request setHTTPMethod:@"GET"];
