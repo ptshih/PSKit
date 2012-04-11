@@ -32,8 +32,8 @@ paddedInsets = _paddedInsets;
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textChanged:) name:UITextViewTextDidChangeNotification object:self];
         
-        self.insets = UIEdgeInsetsMake(-4, -8, 0, 0);
-        self.paddedInsets = UIEdgeInsetsMake(-4, -8, 8, 0);
+        self.insets = UIEdgeInsetsMake(0, 0, 0, 0);
+        self.paddedInsets = UIEdgeInsetsMake(0, 0, 8, 0);
         self.contentInset = self.insets;
         
         self.placeholderColor = [UIColor lightGrayColor];
@@ -50,7 +50,7 @@ paddedInsets = _paddedInsets;
     
     if (_shouldDrawPlaceholder) {
         [_placeholderColor set];
-        [_placeholder drawInRect:CGRectMake(8.0, 0.0, self.frame.size.width - 16.0, self.frame.size.height) withFont:self.font];
+        [_placeholder drawInRect:CGRectMake(8.0, 8.0, self.frame.size.width - 16.0, self.frame.size.height) withFont:self.font];
     }
 }
 
