@@ -78,6 +78,9 @@ NSAssert1(![NSThread isMainThread], @"%@: must be called from a background threa
 #define OBJ_OR_NIL(obj) \
 ({ id _obj = (obj); _obj ? _obj : nil; })
 
+#define OBJ_NOT_NULL(obj) \
+({ id _obj = (obj); (_obj && !IS_KIND(_obj, NSNull)) ? _obj : nil; })
+
 /**
  Device
  */
