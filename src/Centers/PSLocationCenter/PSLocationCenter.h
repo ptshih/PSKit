@@ -13,30 +13,17 @@
 #define kPSLocationCenterDidUpdate @"kPSLocationCenterDidUpdate"
 #define kPSLocationCenterDidFail @"kPSLocationCenterDidFail"
 
-@interface PSLocationCenter : NSObject <CLLocationManagerDelegate> {
-    
-    NSDate *_startDate;
-    
-}
+@interface PSLocationCenter : NSObject <CLLocationManagerDelegate>
 
-@property (nonatomic, retain) CLGeocoder *geocoder;
-@property (nonatomic, retain) CLLocationManager *locationManager;
-@property (nonatomic, copy) CLLocation *location;
-@property (nonatomic, retain) NSTimer *pollTimer;
-@property (nonatomic, retain) NSDate *pollStartDate;
-@property (nonatomic, retain) NSDate *backgroundDate;
-@property (nonatomic, retain) NSDate *foregroundDate;
-@property (nonatomic, assign) BOOL shouldDisableAfterLocationFix;
-@property (nonatomic, assign) BOOL shouldNotifyUpdate;
+@property (nonatomic, copy, readonly) CLLocation *location;
+@property (nonatomic, retain, readonly) CLGeocoder *geocoder;
 
 + (id)defaultCenter;
 
 // Public Methods
-- (void)updateMyLocation;
 - (BOOL)hasAcquiredLocation;
 - (BOOL)hasAcquiredAccurateLocation;
 - (BOOL)locationServicesAuthorized;
-- (CLLocation *)location;
 - (CLLocationCoordinate2D)locationCoordinate;
 - (CLLocationDegrees)latitude;
 - (CLLocationDegrees)longitude;
@@ -45,11 +32,7 @@
 - (NSString *)locationString;
 - (NSMutableDictionary *)exifLocation;
 
-// Private Methods
-- (void)startUpdates;
-- (void)stopUpdates;
 - (void)resumeUpdates;
 - (void)suspendUpdates;
-- (void)pollLocation:(NSTimer *)timer;
 
 @end
