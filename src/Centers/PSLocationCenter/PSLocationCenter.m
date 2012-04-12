@@ -120,8 +120,6 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
         
         UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Location Services Disabled" message:@"Lunchbox works a lot better when it knows your location. Until then... welcome to NYC!" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] autorelease];
         [av show];
-        
-        return;
     } else {
         self.foregroundDate = [NSDate date];
         NSTimeInterval secondsBackgrounded = [self.foregroundDate timeIntervalSinceDate:self.backgroundDate];
@@ -164,7 +162,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
 }
 
 - (BOOL)hasAcquiredAccurateLocation {
-    if (self.location && self.location.horizontalAccuracy < __accuracyThreshold) {
+    if (self.location) {
         return YES;
     } else {
         return NO;
@@ -191,7 +189,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
     if ([self hasAcquiredLocation]) {
         return [NSString stringWithFormat:@"%f,%f", [self latitude], [self longitude]];
     } else {
-        return @"";
+        return nil;
     }
 }
 
