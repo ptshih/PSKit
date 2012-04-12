@@ -74,6 +74,7 @@ loadingIndicator = _loadingIndicator;
             ASSERT_MAIN_THREAD;
             if (error) {
                 [self.loadingIndicator stopAnimating];
+                DLog(@"eror loading image: %@", cachedURL);
                 self.image = self.placeholderImage;
             } else {
                 if ([self.URL isEqual:cachedURL]) {
