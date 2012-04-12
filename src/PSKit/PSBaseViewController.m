@@ -49,20 +49,24 @@ isReload = _isReload;
 #pragma mark - PSStateMachine
 // Data Source
 - (void)loadDataSource {
+    ASSERT_MAIN_THREAD;
     [self beginRefresh];
     self.isReload = NO;
 }
 
 - (void)reloadDataSource {
+    ASSERT_MAIN_THREAD;
     [self beginRefresh];
     self.isReload = YES;
 }
 
 - (void)dataSourceDidLoad {
+    ASSERT_MAIN_THREAD;
     [self endRefresh];
 }
 
 - (void)dataSourceDidError {
+    ASSERT_MAIN_THREAD;
     [self endRefresh];
 }
 
@@ -71,10 +75,12 @@ isReload = _isReload;
 }
 
 - (void)beginRefresh {
+    ASSERT_MAIN_THREAD;
     self.reloading = YES;
 }
 
 - (void)endRefresh {
+    ASSERT_MAIN_THREAD;
     self.reloading = NO;
 }
 

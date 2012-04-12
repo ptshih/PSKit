@@ -45,6 +45,7 @@ shouldAnimate = _shouldAnimate;
 }
 
 - (void)setImage:(UIImage *)image {
+    ASSERT_MAIN_THREAD;
     if (image && ![image isEqual:self.placeholderImage]) {
         self.backgroundColor = [UIColor clearColor];
         // Only animate on Retina screens

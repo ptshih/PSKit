@@ -71,6 +71,7 @@ loadingIndicator = _loadingIndicator;
     [self.imageQueue cancelAllOperations];
     [self.imageQueue addOperationWithBlock:^{
         [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error) {
+            ASSERT_MAIN_THREAD;
             if (error) {
                 [self.loadingIndicator stopAnimating];
                 self.image = self.placeholderImage;
@@ -80,6 +81,7 @@ loadingIndicator = _loadingIndicator;
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
                         UIImage *image = [UIImage imageWithData:cachedData];
                         dispatch_async(dispatch_get_main_queue(), ^{
+                            ASSERT_MAIN_THREAD;
                             self.image = image;
                         });
                     });
