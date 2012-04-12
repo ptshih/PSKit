@@ -33,13 +33,37 @@
 #endif
 
 /**
+ Assertions
+ */
+
+#define ASSERT_MAIN_THREAD \
+NSAssert1([NSThread isMainThread], @"%@: must be called from the main thread", __FUNCTION__)
+
+#define ASSERT_NOT_MAIN_THREAD \
+NSAssert1(![NSThread isMainThread], @"%@: must be called from a background thread", __FUNCTION__)
+
+/**
  Macros
  */
+
 // declare a temporary block version of a variable; use to prevent retain cycles
 #define BLOCK_VAR(block_var, original_var) __block __typeof__(original_var) block_var = original_var
 
 // declare a temporary block version of self called blockSelf; use to prevent retain cycles
 #define BLOCK_SELF BLOCK_VAR(blockSelf, self)
+
+// shorthand for checking class membership
+#define IS_KIND(obj, class_name) ([(obj) isKindOfClass:[class_name class]])
+
+// return the object if it is of the specified class, or else nil
+#define KIND_OR_NIL(obj, class_name) \
+({ class_name *_obj = (id)(obj); (IS_KIND((_obj), class_name) ? (_obj) : nil); })
+
+
+// return the object if it is of the specified class, or else NSNull
+// this is useful for specifying values for dictionaryWithObjectsForKeys:
+#define KIND_OR_NULL(obj, class_name) \
+({ id _obj = (obj); (IS_KIND((_obj), class_name) ? (_obj) : [NSNull null]); })
 
 // check if an object is not nil and not NSNull
 #define NOT_NULL(obj) \
