@@ -14,18 +14,26 @@ static const CLLocationDistance __updateDistanceFilter = 500;
 static const NSTimeInterval __locationAgeThreshold = 5 * 60; // seconds after which an update is considered stale
 static const NSTimeInterval __pollDuration = 30;
 
+@interface PSLocationCenter ()
+
+@property (nonatomic, retain) CLLocationManager *locationManager;
+@property (nonatomic, copy) CLLocation *location;
+@property (nonatomic, retain) CLGeocoder *geocoder;
+@property (nonatomic, retain) NSDate *backgroundDate;
+@property (nonatomic, retain) NSDate *foregroundDate;
+@property (nonatomic, assign) BOOL shouldDisableAfterLocationFix;
+
+@end
+
 @implementation PSLocationCenter
 
 @synthesize
-geocoder = _geocoder,
 locationManager = _locationManager,
 location = _location,
-pollTimer = _pollTimer,
-pollStartDate = _pollStartDate,
+geocoder = _geocoder,
 backgroundDate = _backgroundDate,
 foregroundDate = _foregroundDate,
-shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix,
-shouldNotifyUpdate = _shouldNotifyUpdate;
+shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
 
 + (id)defaultCenter {
     static id defaultCenter = nil;
@@ -38,28 +46,19 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 - (id)init {
     self = [super init];
     if (self) {
-        self.geocoder = [[[CLGeocoder alloc] init] autorelease];
-        
         self.locationManager = [[[CLLocationManager alloc] init] autorelease];
         self.locationManager.delegate = self;
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
         self.locationManager.distanceFilter = __updateDistanceFilter;
         
         self.location = nil;
-        //#if TARGET_IPHONE_SIMULATOR
-        //        self.location = [[[CLLocation alloc]initWithCoordinate:CLLocationCoordinate2DMake(40.724250, -73.997394)
-        //                                                    altitude:77
-        //                                          horizontalAccuracy:88
-        //                                            verticalAccuracy:99
-        //                                                   timestamp:[NSDate date]] autorelease];
-        //#endif
+        
+        self.geocoder = [[[CLGeocoder alloc] init] autorelease];
+        
+        self.foregroundDate = [NSDate date];
+        self.backgroundDate = [NSDate date];
         
         self.shouldDisableAfterLocationFix = NO;
-        self.shouldNotifyUpdate = YES; // force update on first launch
-        
-        if ([CLLocationManager significantLocationChangeMonitoringAvailable]) {
-            [self.locationManager startMonitoringSignificantLocationChanges];
-        }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resumeUpdates) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(suspendUpdates) name:UIApplicationDidEnterBackgroundNotification object:nil];
@@ -71,58 +70,16 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidEnterBackgroundNotification object:nil];
     
-    self.geocoder = nil;
+    self.backgroundDate = nil;
+    self.foregroundDate = nil;
     
     self.locationManager.delegate = nil;
     self.locationManager = nil;
+    
     self.location = nil;
-    
-    [self.pollTimer invalidate];
-    self.pollTimer = nil;
-    
-    self.pollStartDate = nil;
+    self.geocoder = nil;
     
     [super dealloc];
-}
-
-#pragma mark - Location Methods
-- (void)updateMyLocation {
-    // Reset last found location
-    self.location = nil;
-    self.pollStartDate = [NSDate date];
-    
-    [self startUpdates];
-    
-    [self.pollTimer invalidate];
-    self.pollTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(pollLocation:) userInfo:nil repeats:YES];
-}
-
-- (void)pollLocation:(NSTimer *)timer {
-    NSTimeInterval timeSinceStart = [[NSDate date] timeIntervalSinceDate:self.pollStartDate];
-    
-    CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
-    if (![CLLocationManager locationServicesEnabled] || (authStatus != kCLAuthorizationStatusAuthorized && authStatus != kCLAuthorizationStatusNotDetermined)) {
-        //        40.7247,-73.9995
-        self.location = [[[CLLocation alloc] initWithLatitude:40.7247 longitude:-73.9995] autorelease];
-        [self.pollTimer invalidate];
-        self.pollTimer = nil;
-        
-        if (self.shouldNotifyUpdate) {
-            self.shouldNotifyUpdate = NO;
-            [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
-        }
-        
-        UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Location Services Disabled" message:@"Lunchbox works a lot better when it knows your location. Until then... welcome to NYC!" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] autorelease];
-        [av show];
-    } else if ((self.location && (self.location.horizontalAccuracy < __accuracyThreshold)) || timeSinceStart > __pollDuration) {
-        [self.pollTimer invalidate];
-        self.pollTimer = nil;
-        
-        if (self.shouldNotifyUpdate) {
-            self.shouldNotifyUpdate = NO;
-            [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
-        }
-    }
 }
 
 #pragma mark CLLocationManagerDelegate
@@ -138,11 +95,11 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
         // Good Location Acquired
         DLog(@"Location updated: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, distanceChanged);
         
+        // Set current Location
         self.location = newLocation;
         
-        if (distanceChanged > __updateDistanceFilter || distanceChanged == -1) {
-            //            self.location = newLocation;
-        }
+        // Notify
+        [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
     } else {
         DLog(@"Location discarded: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, distanceChanged);
     }
@@ -153,36 +110,38 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 }
 
 #pragma mark - Start/Stop/Resume/Suspend
-- (void)startUpdates {
-    self.shouldNotifyUpdate = YES;
-    [self.locationManager startUpdatingLocation];
-}
-
-- (void)stopUpdates {
-    self.shouldNotifyUpdate = NO;
-    [self.locationManager stopUpdatingLocation];
-}
-
 - (void)resumeUpdates {
-    self.foregroundDate = [NSDate date];
-    [self startUpdates];
-    
-    NSTimeInterval secondsBackgrounded = [self.foregroundDate timeIntervalSinceDate:self.backgroundDate];
-    
-    // 5 min threshold
-    if (secondsBackgrounded > kSecondsBackgroundedUntilStale) {
-        [self updateMyLocation];
-    }
-    
-    if ([CLLocationManager significantLocationChangeMonitoringAvailable]) {
-        [self.locationManager startMonitoringSignificantLocationChanges];
+    CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
+    if (![CLLocationManager locationServicesEnabled] || (authStatus != kCLAuthorizationStatusAuthorized && authStatus != kCLAuthorizationStatusNotDetermined)) {
+        // The user did not enable location services or denied it
+        self.location = [[[CLLocation alloc] initWithLatitude:40.7247 longitude:-73.9995] autorelease];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
+        
+        UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Location Services Disabled" message:@"Lunchbox works a lot better when it knows your location. Until then... welcome to NYC!" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] autorelease];
+        [av show];
+    } else {
+        self.foregroundDate = [NSDate date];
+        NSTimeInterval secondsBackgrounded = [self.foregroundDate timeIntervalSinceDate:self.backgroundDate];
+        
+        // If we don't have a location yet, get one
+        // If our app session expired, get a new location
+        if (![self hasAcquiredLocation] || secondsBackgrounded > kSecondsBackgroundedUntilStale) {
+            self.location = nil;
+            [self.locationManager startUpdatingLocation];
+        }
+        
+        if ([CLLocationManager significantLocationChangeMonitoringAvailable]) {
+            [self.locationManager startMonitoringSignificantLocationChanges];
+        }
     }
 }
 
 - (void)suspendUpdates {
-    self.shouldNotifyUpdate = NO;
     self.backgroundDate = [NSDate date];
-    [self stopUpdates];
+    
+    [self.locationManager stopUpdatingLocation];
+    
     if ([CLLocationManager significantLocationChangeMonitoringAvailable]) {
         [self.locationManager stopMonitoringSignificantLocationChanges];
     }
@@ -203,7 +162,7 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
 }
 
 - (BOOL)hasAcquiredAccurateLocation {
-    if (self.location && self.location.horizontalAccuracy < __accuracyThreshold) {
+    if (self.location) {
         return YES;
     } else {
         return NO;
@@ -230,7 +189,7 @@ shouldNotifyUpdate = _shouldNotifyUpdate;
     if ([self hasAcquiredLocation]) {
         return [NSString stringWithFormat:@"%f,%f", [self latitude], [self longitude]];
     } else {
-        return @"";
+        return nil;
     }
 }
 
