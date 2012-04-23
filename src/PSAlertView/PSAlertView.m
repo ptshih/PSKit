@@ -1,6 +1,6 @@
 //
 //  PSAlertView.m
-//  Airwomp
+//  PSKit
 //
 //  Created by Peter Shih on 3/29/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
@@ -402,7 +402,6 @@ oldKeyWindow = _oldKeyWindow;
     [self.alertWindow addSubview:self];
     [self.alertWindow makeKeyAndVisible];
     
-    // Airwomp style
     self.transform = CGAffineTransformMakeScale(0.01, 0.01);
     [UIView animateWithDuration:0.3
                           delay:0.0
@@ -438,7 +437,6 @@ oldKeyWindow = _oldKeyWindow;
         [self.textField resignFirstResponder];
     }
     
-    // Airwomp style
     [UIView animateWithDuration:0.3
                           delay:0.0
                         options:UIViewAnimationOptionCurveEaseInOut
