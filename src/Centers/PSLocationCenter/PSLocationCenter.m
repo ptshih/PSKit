@@ -89,11 +89,10 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
     //  CLLocationDistance distanceThreshold = 1500; // For some reason, cell tower triangulation is always = 1414
     CLLocationAccuracy accuracy = newLocation.horizontalAccuracy;
     NSTimeInterval age = fabs([[NSDate date] timeIntervalSinceDate:newLocation.timestamp]);
-    CLLocationDistance distanceChanged = [newLocation distanceFromLocation:self.location];
     
     if (age <= __locationAgeThreshold && accuracy < __accuracyThreshold && accuracy > 0) {
         // Good Location Acquired
-        DLog(@"Location updated: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, distanceChanged);
+        DLog(@"Location updated: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, [newLocation distanceFromLocation:self.location]);
         
         // Set current Location
         self.location = newLocation;
@@ -101,7 +100,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
         // Notify
         [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
     } else {
-        DLog(@"Location discarded: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, distanceChanged);
+        DLog(@"Location discarded: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, [newLocation distanceFromLocation:self.location]);
     }
 }
 
