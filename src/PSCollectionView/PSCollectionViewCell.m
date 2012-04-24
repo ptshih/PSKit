@@ -8,6 +8,12 @@
 
 #import "PSCollectionViewCell.h"
 
+@interface PSCollectionViewCell ()
+
+@property (nonatomic, retain) id object;
+
+@end
+
 @implementation PSCollectionViewCell
 
 @synthesize
@@ -16,9 +22,6 @@ object = _object;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-//        self.layer.shouldRasterize = YES;
-//        self.layer.rasterizationScale = [UIScreen mainScreen].scale;
-        self.backgroundColor = [UIColor whiteColor];
     }
     return self;
 }
@@ -29,7 +32,6 @@ object = _object;
 }
 
 - (void)prepareForReuse {
-//    self.object = nil;
 }
 
 - (void)fillViewWithObject:(id)object {

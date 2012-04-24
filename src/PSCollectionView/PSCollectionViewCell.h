@@ -8,9 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PSCollectionViewCell : PSView
-
-@property (nonatomic, retain) id object;
+@interface PSCollectionViewCell : UIView
 
 - (void)prepareForReuse;
 - (void)fillViewWithObject:(id)object;

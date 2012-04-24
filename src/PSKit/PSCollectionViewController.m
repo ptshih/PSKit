@@ -61,6 +61,32 @@ pullRefreshView = _pullRefreshView;
     [super dealloc];
 }
 
+- (void)setupSubviews {
+    [super setupSubviews];
+    
+    [self setupHeader];
+    
+    self.collectionView = [[[PSCollectionView alloc] initWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height)] autorelease];
+    self.collectionView.delegate = self;
+    self.collectionView.collectionViewDelegate = self;
+    self.collectionView.collectionViewDataSource = self;
+    self.collectionView.backgroundColor = [UIColor clearColor];
+    self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    if (isDeviceIPad()) {
+        self.collectionView.numColsPortrait = 4;
+        self.collectionView.numColsLandscape = 5;
+    } else {
+        self.collectionView.numColsPortrait = 2;
+        self.collectionView.numColsLandscape = 3;
+    }
+    
+    UILabel *loadingLabel = [[[UILabel alloc] initWithFrame:self.collectionView.bounds] autorelease];
+    [PSStyleSheet applyStyle:@"emptyLabel" forLabel:loadingLabel];
+    loadingLabel.text = @"Loading...";
+    self.collectionView.loadingView = loadingLabel;
+}
+
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
         self.pullRefreshView = [[[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.view.frame.size.width, 48.0) style:PSPullRefreshStyleBlack] autorelease];
@@ -84,14 +110,14 @@ pullRefreshView = _pullRefreshView;
 
 - (void)dataSourceDidLoad {
     [super dataSourceDidLoad];
-    [self.collectionView reloadViews];
+    [self.collectionView reloadData];
     self.collectionView.contentOffset = self.contentOffset;
     [self endRefresh];
 }
 
 - (void)dataSourceDidError {
     [super dataSourceDidError];
-    [self.collectionView reloadViews];
+    [self.collectionView reloadData];
     self.collectionView.contentOffset = CGPointZero;
     [self endRefresh];
 }

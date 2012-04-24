@@ -27,70 +27,95 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 @end
 
 
-@interface PSCollectionView ()
+@interface PSCollectionView () <UIGestureRecognizerDelegate>
 
-@property (nonatomic, retain) UIView *loadingView;
-@property (nonatomic, assign) NSInteger numCols;
+@property (nonatomic, assign, readwrite) CGFloat colWidth;
+@property (nonatomic, assign, readwrite) NSInteger numCols;
 @property (nonatomic, assign) UIInterfaceOrientation orientation;
 
+@property (nonatomic, retain) NSMutableSet *reuseableViews;
+@property (nonatomic, retain) NSMutableDictionary *visibleViews;
+@property (nonatomic, retain) NSMutableArray *viewKeysToRemove;
+@property (nonatomic, retain) NSMutableDictionary *indexToRectMap;
+
+
+/**
+ Forces a relayout of the collection grid
+ */
 - (void)relayoutViews;
+
+/**
+ Stores a view for later reuse
+ TODO: add an identifier like UITableView
+ */
+- (void)enqueueReusableView:(UIView *)view;
+
+/**
+ Magic!
+ */
+- (void)removeAndAddCellsIfNecessary;
 
 @end
 
 @implementation PSCollectionView
 
+// Public Views
 @synthesize
-loadingView = _loadingView,
-orientation = _orientation,
 headerView = _headerView,
 footerView = _footerView,
 emptyView = _emptyView,
+loadingView = _loadingView;
+
+// Public
+@synthesize
+colWidth = _colWidth,
+numCols = _numCols,
+numColsLandscape = _numColsLandscape,
+numColsPortrait = _numColsPortrait,
+collectionViewDelegate = _collectionViewDelegate,
+collectionViewDataSource = _collectionViewDataSource;
+
+// Private
+@synthesize
+orientation = _orientation,
 reuseableViews = _reuseableViews,
 visibleViews = _visibleViews,
 viewKeysToRemove = _viewKeysToRemove,
-indexToRectMap = _indexToRectMap,
-numCols = _numCols,
-numColsPortrait = _numColsPortrait,
-numColsLandscape = _numColsLandscape,
-colWidth = _colWidth,
-collectionViewDelegate = _collectionViewDelegate,
-collectionViewDataSource = _collectionViewDataSource;
+indexToRectMap = _indexToRectMap;
+
+#pragma mark - Init/Memory
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.alwaysBounceVertical = YES;
+        
+        self.colWidth = 0.0;
+        self.numCols = 0;
+        self.numColsPortrait = 0;
+        self.numColsLandscape = 0;
+        self.orientation = [UIApplication sharedApplication].statusBarOrientation;
+        
         self.reuseableViews = [NSMutableSet set];
         self.visibleViews = [NSMutableDictionary dictionary];
         self.viewKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
-        self.numCols = 0;
-        self.numColsPortrait = 0;
-        self.numColsLandscape = 0;
-        self.colWidth = 0.0;
-        self.alwaysBounceVertical = YES;
-        self.orientation = [UIApplication sharedApplication].statusBarOrientation;
-        
-//        [self addObserver:self forKeyPath:@"contentOffset" options:0 context:nil];
-        self.loadingView = [UILabel labelWithText:@"Loading..." style:@"emptyLabel"];
-        self.loadingView.frame = self.bounds;
-        self.loadingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        [self addSubview:self.loadingView];
     }
     return self;
 }
 
 - (void)dealloc {
-//    [self removeObserver:self forKeyPath:@"contentOffset"];
-    
     // clear delegates
+    self.delegate = nil;
     self.collectionViewDataSource = nil;
     self.collectionViewDelegate = nil;
     
     // release retains
-    self.loadingView = nil;
     self.headerView = nil;
     self.footerView = nil;
     self.emptyView = nil;
+    self.loadingView = nil;
+    
     self.reuseableViews = nil;
     self.visibleViews = nil;
     self.viewKeysToRemove = nil;
@@ -98,14 +123,26 @@ collectionViewDataSource = _collectionViewDataSource;
     [super dealloc];
 }
 
-#pragma mark - KVO
-//- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-//    if ([object isEqual:self]) {
-//        [self removeAndAddCellsIfNecessary];
-//    }
-//}
+#pragma mark - Setters
+
+- (void)setLoadingView:(UIView *)loadingView {
+    if (_loadingView && [_loadingView respondsToSelector:@selector(removeFromSuperview)]) {
+        [_loadingView removeFromSuperview];
+    }
+    [_loadingView release], _loadingView = nil;
+    _loadingView = [loadingView retain];
+    
+    [self addSubview:_loadingView];
+}
+
+#pragma mark - DataSource
+
+- (void)reloadData {
+    [self relayoutViews];
+}
 
 #pragma mark - View
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     
@@ -115,77 +152,6 @@ collectionViewDataSource = _collectionViewDataSource;
         [self relayoutViews];
     } else {
         [self removeAndAddCellsIfNecessary];
-    }
-}
-
-- (void)removeAndAddCellsIfNecessary {
-    static NSInteger bufferViewFactor = 5;
-    static NSInteger topIndex = 0;
-    static NSInteger bottomIndex = 0;
-    
-    NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
-    
-    if (numViews == 0) return;
-    
-    // Find out what rows are visible
-    CGRect visibleRect = CGRectMake(self.contentOffset.x, self.contentOffset.y, self.width, self.height);
-    
-    // Remove all rows that are not inside the visible rect
-    [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        UIView *view = (UIView *)obj;
-        CGRect viewRect = view.frame;
-        if (!CGRectIntersectsRect(visibleRect, viewRect)) {
-            [self enqueueReusableView:view];
-            [self.viewKeysToRemove addObject:key];
-        }
-    }];
-    
-    [self.visibleViews removeObjectsForKeys:self.viewKeysToRemove];
-    [self.viewKeysToRemove removeAllObjects];
-    
-    if ([self.visibleViews count] == 0) {
-        topIndex = 0;
-        bottomIndex = numViews;
-    } else {
-        NSArray *sortedKeys = [[self.visibleViews allKeys] sortedArrayUsingComparator:^(id obj1, id obj2) {
-            if ([obj1 integerValue] < [obj2 integerValue]) {
-                return (NSComparisonResult)NSOrderedAscending;
-            } else if ([obj1 integerValue] > [obj2 integerValue]) {
-                return (NSComparisonResult)NSOrderedDescending;
-            } else {
-                return (NSComparisonResult)NSOrderedSame;
-            }
-        }];
-        topIndex = [[sortedKeys objectAtIndex:0] integerValue];
-        bottomIndex = [[sortedKeys lastObject] integerValue];
-        
-        topIndex = MAX(0, topIndex - (bufferViewFactor * self.numCols));
-        bottomIndex = MIN(numViews, bottomIndex + (bufferViewFactor * self.numCols));
-    }
-//    NSLog(@"topIndex: %d, bottomIndex: %d", topIndex, bottomIndex);
-    
-    // Add views
-    for (NSInteger i = topIndex; i < bottomIndex; i++) {
-        NSString *key = PSCollectionKeyForIndex(i);
-        CGRect rect = CGRectFromString([self.indexToRectMap objectForKey:key]);
-        
-        // If view is within visible rect and is not already shown
-        if (![self.visibleViews objectForKey:key] && CGRectIntersectsRect(visibleRect, rect)) {
-            // Only add views if not visible
-            UIView *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
-            newView.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
-            [self addSubview:newView];
-            
-            // Setup gesture recognizer
-            if ([newView.gestureRecognizers count] == 0) {
-                PSCollectionViewTapGestureRecognizer *gr = [[[PSCollectionViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
-                gr.delegate = self;
-                [newView addGestureRecognizer:gr];
-                newView.userInteractionEnabled = YES;
-            }
-            
-            [self.visibleViews setObject:newView forKey:key];
-        }
     }
 }
 
@@ -253,7 +219,7 @@ collectionViewDataSource = _collectionViewDataSource;
             }
             
             if (top != top) {
-                NSLog(@"nan");
+                // NaN
             }
             
             CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
@@ -265,7 +231,7 @@ collectionViewDataSource = _collectionViewDataSource;
             CGFloat test = top + colHeight + kMargin;
             
             if (test != test) {
-                NSLog(@"nan");
+                // NaN
             }
             [colOffsets replaceObjectAtIndex:col withObject:[NSNumber numberWithFloat:test]];
         }
@@ -292,17 +258,83 @@ collectionViewDataSource = _collectionViewDataSource;
     }
     
     self.contentSize = CGSizeMake(self.width, totalHeight);
-    //    self.contentOffset = CGPointZero;
     
     [self removeAndAddCellsIfNecessary];
 }
 
-#pragma mark - DataSource
-- (void)reloadViews {
-    [self relayoutViews];
+- (void)removeAndAddCellsIfNecessary {
+    static NSInteger bufferViewFactor = 5;
+    static NSInteger topIndex = 0;
+    static NSInteger bottomIndex = 0;
+    
+    NSInteger numViews = [self.collectionViewDataSource numberOfViewsInCollectionView:self];
+    
+    if (numViews == 0) return;
+    
+    // Find out what rows are visible
+    CGRect visibleRect = CGRectMake(self.contentOffset.x, self.contentOffset.y, self.width, self.height);
+    
+    // Remove all rows that are not inside the visible rect
+    [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        UIView *view = (UIView *)obj;
+        CGRect viewRect = view.frame;
+        if (!CGRectIntersectsRect(visibleRect, viewRect)) {
+            [self enqueueReusableView:view];
+            [self.viewKeysToRemove addObject:key];
+        }
+    }];
+    
+    [self.visibleViews removeObjectsForKeys:self.viewKeysToRemove];
+    [self.viewKeysToRemove removeAllObjects];
+    
+    if ([self.visibleViews count] == 0) {
+        topIndex = 0;
+        bottomIndex = numViews;
+    } else {
+        NSArray *sortedKeys = [[self.visibleViews allKeys] sortedArrayUsingComparator:^(id obj1, id obj2) {
+            if ([obj1 integerValue] < [obj2 integerValue]) {
+                return (NSComparisonResult)NSOrderedAscending;
+            } else if ([obj1 integerValue] > [obj2 integerValue]) {
+                return (NSComparisonResult)NSOrderedDescending;
+            } else {
+                return (NSComparisonResult)NSOrderedSame;
+            }
+        }];
+        topIndex = [[sortedKeys objectAtIndex:0] integerValue];
+        bottomIndex = [[sortedKeys lastObject] integerValue];
+        
+        topIndex = MAX(0, topIndex - (bufferViewFactor * self.numCols));
+        bottomIndex = MIN(numViews, bottomIndex + (bufferViewFactor * self.numCols));
+    }
+    //    NSLog(@"topIndex: %d, bottomIndex: %d", topIndex, bottomIndex);
+    
+    // Add views
+    for (NSInteger i = topIndex; i < bottomIndex; i++) {
+        NSString *key = PSCollectionKeyForIndex(i);
+        CGRect rect = CGRectFromString([self.indexToRectMap objectForKey:key]);
+        
+        // If view is within visible rect and is not already shown
+        if (![self.visibleViews objectForKey:key] && CGRectIntersectsRect(visibleRect, rect)) {
+            // Only add views if not visible
+            UIView *newView = [self.collectionViewDataSource collectionView:self viewAtIndex:i];
+            newView.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
+            [self addSubview:newView];
+            
+            // Setup gesture recognizer
+            if ([newView.gestureRecognizers count] == 0) {
+                PSCollectionViewTapGestureRecognizer *gr = [[[PSCollectionViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectView:)] autorelease];
+                gr.delegate = self;
+                [newView addGestureRecognizer:gr];
+                newView.userInteractionEnabled = YES;
+            }
+            
+            [self.visibleViews setObject:newView forKey:key];
+        }
+    }
 }
 
 #pragma mark - Reusing Views
+
 - (UIView *)dequeueReusableView {
     UIView *view = [self.reuseableViews anyObject];
     if (view) {
@@ -325,6 +357,7 @@ collectionViewDataSource = _collectionViewDataSource;
 }
 
 #pragma mark - Gesture Recognizer
+
 - (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {    
     NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];

@@ -46,6 +46,10 @@ isReload = _isReload;
     [super viewDidLoad];
 }
 
+- (void)setupSubviews {
+    [super setupSubviews];
+}
+
 #pragma mark - PSStateMachine
 // Data Source
 - (void)loadDataSource {

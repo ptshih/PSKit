@@ -82,6 +82,9 @@ contentOffset = _contentOffset;
     VLog(@"#%@", [self class]);
 }
 
+- (void)setupSubviews {
+}
+
 #pragma mark - Post View Config
 - (void)addRoundedCorners {
     // iPad doesn't need rounded corners
