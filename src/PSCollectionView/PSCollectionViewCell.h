@@ -10,6 +10,8 @@
 
 @interface PSCollectionViewCell : UIView
 
+@property (nonatomic, retain) id object;
+
 - (void)prepareForReuse;
 - (void)fillViewWithObject:(id)object;
 + (CGFloat)heightForViewWithObject:(id)object inColumnWidth:(CGFloat)columnWidth;

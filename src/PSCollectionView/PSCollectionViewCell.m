@@ -10,8 +10,6 @@
 
 @interface PSCollectionViewCell ()
 
-@property (nonatomic, retain) id object;
-
 @end
 
 @implementation PSCollectionViewCell

@@ -67,6 +67,7 @@ pullRefreshView = _pullRefreshView;
     [self setupHeader];
     
     self.collectionView = [[[PSCollectionView alloc] initWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height)] autorelease];
+    [self.view addSubview:self.collectionView];
     self.collectionView.delegate = self;
     self.collectionView.collectionViewDelegate = self;
     self.collectionView.collectionViewDataSource = self;

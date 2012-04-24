@@ -13,17 +13,16 @@
 #pragma mark - Additions
 @property(nonatomic) CGFloat left;
 @property(nonatomic) CGFloat top;
-@property(nonatomic,readonly) CGFloat right;
-@property(nonatomic,readonly) CGFloat bottom;
-
+@property(nonatomic, readonly) CGFloat right;
+@property(nonatomic, readonly) CGFloat bottom;
 @property(nonatomic) CGFloat width;
 @property(nonatomic) CGFloat height;
 
-@property(nonatomic,readonly) CGFloat screenX;
-@property(nonatomic,readonly) CGFloat screenY;
+@property(nonatomic, readonly) CGFloat screenX;
+@property(nonatomic, readonly) CGFloat screenY;
 
-@property(nonatomic,readonly) CGFloat screenViewX;
-@property(nonatomic,readonly) CGFloat screenViewY;
+@property(nonatomic, readonly) CGFloat screenViewX;
+@property(nonatomic, readonly) CGFloat screenViewY;
 
 - (UIScrollView*)findFirstScrollView;
 
