@@ -93,7 +93,7 @@ extendedPermissions = _extendedPermissions;
 }
 
 - (void)requestPublishStream {
-    UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Facebook" message:@"We need your permission to post on your behalf, just this once!" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Okay", nil] autorelease];
+    UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Facebook" message:@"We need your permission to post on your behalf, just this once!" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"OK", nil] autorelease];
     av.tag = kAlertFacebookPermissionsPublish;
     [av show];
 }
