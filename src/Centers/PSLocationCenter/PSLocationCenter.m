@@ -117,7 +117,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
         
         [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
         
-        UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Location Services Disabled" message:@"Lunchbox works a lot better when it knows your location. Until then... welcome to NYC!" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] autorelease];
+        UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Location Unknown" message:@"1. Open the iOS Settings App\r\n2. Tap on Location Services\r\n3. Switch Lunchbox to \"On\"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
         [av show];
     } else {
         self.foregroundDate = [NSDate date];
