@@ -19,6 +19,9 @@
 @property (nonatomic, assign) UIScrollView *activeScrollView; // subclasses should set this if they have a scrollView
 @property (nonatomic, assign) CGPoint contentOffset;
 
+// Config
+@property (nonatomic, assign) BOOL shouldAddRoundedCorners;
+
 /**
  Used to update the view when the orientation changes
  */

@@ -23,9 +23,11 @@
 @property (nonatomic, retain) UISearchBar *searchBar;
 @property (nonatomic, retain) UIView *loadMoreView;
 
+// Config
+@property (nonatomic, assign) BOOL shouldPullRefresh;
+
 // View Setup
 - (void)setupTableViewWithFrame:(CGRect)frame style:(UITableViewStyle)style separatorStyle:(UITableViewCellSeparatorStyle)separatorStyle separatorColor:(UIColor *)separatorColor;
-- (void)setupPullRefresh;
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles;
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles andPlaceholder:(NSString *)placeholder;
 

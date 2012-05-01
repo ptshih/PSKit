@@ -10,6 +10,8 @@
 
 @interface PSCollectionViewController ()
 
+- (void)setupPullRefresh;
+
 @end
 
 @implementation PSCollectionViewController
@@ -19,17 +21,27 @@ items = _items,
 collectionView = _collectionView,
 pullRefreshView = _pullRefreshView;
 
+@synthesize
+shouldPullRefresh = _shouldPullRefresh;
+
 #pragma mark - Init
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.items = [NSMutableArray array];
+        
+        // Config
+        self.shouldPullRefresh = NO;
     }
     return self;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    if (self.shouldPullRefresh) {
+        [self setupPullRefresh];
+    }
 }
 
 - (void)viewDidUnload {

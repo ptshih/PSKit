@@ -16,11 +16,15 @@ footerView = _footerView,
 activeScrollView = _activeScrollView,
 contentOffset = _contentOffset;
 
+@synthesize
+shouldAddRoundedCorners = _shouldAddRoundedCorners;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         //  VLog(@"#%@", [self class]);
         self.contentOffset = CGPointZero;
+        self.shouldAddRoundedCorners = NO;
     }
     return self;
 }
@@ -60,6 +64,14 @@ contentOffset = _contentOffset;
     } else if ([self respondsToSelector:@selector(baseBackgroundColor)]) {
         self.view.backgroundColor = [self baseBackgroundColor];
     }
+    
+    // Setup Subviews
+    [self setupSubviews];
+    
+    // Add rounded corners
+    if (self.shouldAddRoundedCorners) {
+        [self addRoundedCorners];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -83,6 +95,7 @@ contentOffset = _contentOffset;
 }
 
 - (void)setupSubviews {
+    // subclass should implement
 }
 
 #pragma mark - Post View Config

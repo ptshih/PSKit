@@ -10,6 +10,8 @@
 
 @interface PSTableViewController (Private)
 
+- (void)setupPullRefresh;
+
 @end
 
 @implementation PSTableViewController
@@ -26,6 +28,9 @@ pullRefreshView = _pullRefreshView,
 searchBar = _searchBar,
 loadMoreView = _loadMoreView;
 
+@synthesize
+shouldPullRefresh = _shouldPullRefresh;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
@@ -36,6 +41,9 @@ loadMoreView = _loadMoreView;
         
         // View State
         self.contentOffset = CGPointZero;
+        
+        // Config
+        self.shouldPullRefresh = NO;
     }
     return self;
 }
@@ -92,6 +100,14 @@ loadMoreView = _loadMoreView;
 }
 
 #pragma mark - View
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    if (self.shouldPullRefresh) {
+        [self setupPullRefresh];
+    }
+}
+
 // SUBCLASS CAN OPTIONALLY IMPLEMENT IF THEY WANT A SEARCH BAR
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles {
     [self setupSearchDisplayControllerWithScopeButtonTitles:scopeButtonTitles andPlaceholder:nil];

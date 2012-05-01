@@ -16,6 +16,7 @@
 @property (nonatomic, retain) PSCollectionView *collectionView;
 @property (nonatomic, retain) PSPullRefreshView *pullRefreshView;
 
-- (void)setupPullRefresh;
+// Config
+@property (nonatomic, assign) BOOL shouldPullRefresh;
 
 @end
