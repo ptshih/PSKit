@@ -24,6 +24,7 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
 @interface PSURLCache ()
 
 @property (nonatomic, strong) NSOperationQueue *networkQueue;
+@property (nonatomic, strong) NSMutableSet *pendingURLs;
 @property (nonatomic, strong) NSMutableArray *pendingOperations;
 
 // Retrieves the corresponding directory for a cache type
@@ -39,6 +40,7 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
 
 @synthesize
 networkQueue = _networkQueue,
+pendingURLs = _pendingURLs,
 pendingOperations = _pendingOperations;
 
 + (id)sharedCache {
@@ -55,6 +57,7 @@ pendingOperations = _pendingOperations;
         self.networkQueue = [[NSOperationQueue alloc] init];
         self.networkQueue.maxConcurrentOperationCount = 4;
         
+        self.pendingURLs = [NSMutableSet set];
         self.pendingOperations = [NSMutableArray array];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resume) name:kPSURLCacheDidIdle object:self];
@@ -111,6 +114,13 @@ pendingOperations = _pendingOperations;
     ASSERT_MAIN_THREAD;
     
     NSURL *cachedURL = [request.URL copy];
+    
+    if ([self.pendingURLs containsObject:PSURLCacheKeyWithURL(cachedURL)]) {
+        return;
+    } else {
+        [self.pendingURLs addObject:PSURLCacheKeyWithURL(cachedURL)];
+    }
+    
     NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
     NSData *data = [NSData dataWithContentsOfFile:cachePath];
     
@@ -141,6 +151,8 @@ pendingOperations = _pendingOperations;
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:blockSelf];
                 completionBlock(cachedData, cachedURL, NO, error);
+                
+                [self.pendingURLs removeObject:PSURLCacheKeyWithURL(cachedURL)];
             }];
         };
              
