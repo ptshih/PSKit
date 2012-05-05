@@ -54,7 +54,7 @@ double kmFromMiles(double miles) {
   CFUUIDRef theUUID = CFUUIDCreate(NULL);
   CFStringRef string = CFUUIDCreateString(NULL, theUUID);
   CFRelease(theUUID);
-  return (__bridge NSString *)string;
+  return (__bridge_transfer NSString *)string;
 }
 
 #pragma mark - MIME
