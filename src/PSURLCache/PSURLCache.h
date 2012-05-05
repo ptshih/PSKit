@@ -9,11 +9,17 @@
 #import <Foundation/Foundation.h>
 
 #define kPSURLCacheDidIdle @"kPSURLCacheDidIdle"
+#define kPSURLCacheDidCache @"PSURLCacheDidCache"
 
 typedef enum {
     PSURLCacheTypeSession = 1,
     PSURLCacheTypePermanent = 2
 } PSURLCacheType;
+
+typedef enum {
+    PSURLCachePriorityLow = 1,
+    PSURLCachePriorityHigh = 2
+} PSURLCachePriority;
 
 @interface PSURLCache : NSObject
 
@@ -30,6 +36,11 @@ typedef enum {
 // Read from Cache (block style)
 // Blocks are called on the main thread
 - (void)loadURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock;
+
+- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType cachePriority:(PSURLCachePriority)cachePriority usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock;
+
+// Read from cache only
+- (NSData *)dataForCachedURL:(NSURL *)cachedURL cacheType:(PSURLCacheType)cacheType;
 
 /**
  completionBlock is always called on the mainQueue

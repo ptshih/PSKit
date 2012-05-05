@@ -14,15 +14,17 @@ typedef void (^PSURLCacheNetworkBlock)(void);
 static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
     // NOTE: If the URL is extremely long, the path becomes too long for the file system to handle and it fails
     return [[URL absoluteString] stringFromMD5Hash];
-//    return [(NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
-//                                                               (CFStringRef)[URL absoluteString],
-//                                                               NULL,
-//                                                               (CFStringRef)@"!*'();:@&=+$,/?%#[]",
-//                                                               kCFStringEncodingUTF8) autorelease];
+    //    return [(NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
+    //                                                               (CFStringRef)[URL absoluteString],
+    //                                                               NULL,
+    //                                                               (CFStringRef)@"!*'();:@&=+$,/?%#[]",
+    //                                                               kCFStringEncodingUTF8) autorelease];
 }
+
 
 @interface PSURLCache ()
 
+@property (nonatomic, strong) NSOperationQueue *priorityQueue;
 @property (nonatomic, strong) NSOperationQueue *networkQueue;
 @property (nonatomic, strong) NSMutableSet *pendingURLs;
 @property (nonatomic, strong) NSMutableArray *pendingOperations;
@@ -39,6 +41,7 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
 @implementation PSURLCache
 
 @synthesize
+priorityQueue = _priorityQueue,
 networkQueue = _networkQueue,
 pendingURLs = _pendingURLs,
 pendingOperations = _pendingOperations;
@@ -54,6 +57,9 @@ pendingOperations = _pendingOperations;
 - (id)init {
     self = [super init];
     if (self) {
+        self.priorityQueue = [[NSOperationQueue alloc] init];
+        self.priorityQueue.maxConcurrentOperationCount = 1;
+        
         self.networkQueue = [[NSOperationQueue alloc] init];
         self.networkQueue.maxConcurrentOperationCount = 4;
         
@@ -110,7 +116,11 @@ pendingOperations = _pendingOperations;
     [self loadRequest:request cacheType:cacheType usingCache:usingCache completionBlock:completionBlock];
 }
 
-- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock {
+- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *, NSURL *, BOOL, NSError *))completionBlock {
+    [self loadRequest:request cacheType:cacheType cachePriority:PSURLCachePriorityLow usingCache:usingCache completionBlock:completionBlock];
+}
+
+- (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType cachePriority:(PSURLCachePriority)cachePriority usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock {
     ASSERT_MAIN_THREAD;
     
     NSURL *cachedURL = [request.URL copy];
@@ -125,7 +135,12 @@ pendingOperations = _pendingOperations;
     NSData *data = [NSData dataWithContentsOfFile:cachePath];
     
     if (data && usingCache) {
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[cachedURL copy], @"cachedURL", [NSNumber numberWithInteger:cacheType], @"cacheType", nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kPSURLCacheDidCache object:self userInfo:userInfo];
+        
         completionBlock(data, cachedURL, YES, nil);
+        
+        [self.pendingURLs removeObject:PSURLCacheKeyWithURL(cachedURL)];
     } else {
         BLOCK_SELF;
         
@@ -135,7 +150,7 @@ pendingOperations = _pendingOperations;
             [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:self];
             
             NSLog(@"### Request: %@", request.URL.absoluteString);
-            NSLog(@"### Request: %d remaining in queue", self.networkQueue.operationCount);
+            NSLog(@"### Request: %d remaining in low priority queue", self.networkQueue.operationCount);
             
             NSError *error = nil;
             NSURLResponse *response = nil;
@@ -150,6 +165,10 @@ pendingOperations = _pendingOperations;
                 ASSERT_MAIN_THREAD;
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:blockSelf];
+                
+                NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[cachedURL copy], @"cachedURL", [NSNumber numberWithInteger:cacheType], @"cacheType", nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kPSURLCacheDidCache object:self userInfo:userInfo];
+                
                 completionBlock(cachedData, cachedURL, NO, error);
                 
                 [self.pendingURLs removeObject:PSURLCacheKeyWithURL(cachedURL)];
@@ -157,12 +176,22 @@ pendingOperations = _pendingOperations;
         };
              
         // Queue up a network request
-        if (self.networkQueue.isSuspended) {
-            [self.pendingOperations addObject:[networkBlock copy]];
+        if (cachePriority == PSURLCachePriorityHigh) {
+             [self.priorityQueue addOperationWithBlock:networkBlock];
         } else {
-            [self.networkQueue addOperationWithBlock:networkBlock];
+            if (self.networkQueue.isSuspended) {
+                [self.pendingOperations addObject:[networkBlock copy]];
+            } else {
+                [self.networkQueue addOperationWithBlock:networkBlock];
+            }
         }
     }
+}
+
+- (NSData *)dataForCachedURL:(NSURL *)cachedURL cacheType:(PSURLCacheType)cacheType {
+    NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
+    NSData *data = [NSData dataWithContentsOfFile:cachePath];
+    return data;
 }
 
 #pragma mark - Cache Path

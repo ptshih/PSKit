@@ -39,6 +39,9 @@ loadingIndicator = _loadingIndicator;
     return self;
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
 - (void)setFrame:(CGRect)frame {
     [super setFrame:frame];
@@ -59,6 +62,9 @@ loadingIndicator = _loadingIndicator;
 
 - (void)loadImageWithURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType {
     self.URL = URL;
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageDidLoad:) name:kPSURLCacheDidCache object:[PSURLCache sharedCache]];
     
     BLOCK_SELF;
     
@@ -69,18 +75,28 @@ loadingIndicator = _loadingIndicator;
             DLog(@"eror loading image: %@", cachedURL);
             blockSelf.image = blockSelf.placeholderImage;
         } else {
-            if ([blockSelf.URL isEqual:cachedURL]) {
-                [blockSelf.loadingIndicator stopAnimating];
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-                    UIImage *image = [UIImage imageWithData:cachedData];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        ASSERT_MAIN_THREAD;
-                        blockSelf.image = image;
-                    });
-                });
-            }
+            // use notification
         }
     }];
+}
+
+- (void)imageDidLoad:(NSNotification *)notification {
+    NSURL *cachedURL = [notification.userInfo objectForKey:@"cachedURL"];
+    PSURLCacheType cacheType = [[notification.userInfo objectForKey:@"cacheType"] integerValue];
+    
+    if ([self.URL isEqual:cachedURL]) {
+        NSLog(@"local URL: %@, remote URL: %@", self.URL, cachedURL);
+
+        [self.loadingIndicator stopAnimating];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            NSData *cachedData = [[PSURLCache sharedCache] dataForCachedURL:cachedURL cacheType:cacheType];
+            UIImage *image = [UIImage imageWithData:cachedData];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                ASSERT_MAIN_THREAD;
+                self.image = image;
+            });
+        });
+    }
 }
 
 @end
