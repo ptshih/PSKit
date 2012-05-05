@@ -12,8 +12,8 @@
 
 @interface PSErrorView : PSView <UIGestureRecognizerDelegate>
 
-@property (nonatomic, retain) UILabel *messageLabel;
-@property (nonatomic, assign) id <PSErrorViewDelegate> delegate;
+@property (nonatomic, strong) UILabel *messageLabel;
+@property (nonatomic, unsafe_unretained) id <PSErrorViewDelegate> delegate;
 
 
 - (void)showWithMessage:(NSString *)message inRect:(CGRect)rect;

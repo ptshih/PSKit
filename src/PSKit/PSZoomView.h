@@ -12,7 +12,7 @@
 
 @interface PSZoomView : PSView
 
-@property (nonatomic, assign) id <PSZoomViewDelegate> delegate;
+@property (nonatomic, unsafe_unretained) id <PSZoomViewDelegate> delegate;
 
 + (id)sharedView;
 

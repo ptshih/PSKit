@@ -67,8 +67,7 @@ paddedInsets = _paddedInsets;
         return;
     }
     
-    [_placeholder release];
-    _placeholder = [string retain];
+    _placeholder = string;
     
     [self updateShouldDrawPlaceholder];
 }
@@ -119,9 +118,8 @@ paddedInsets = _paddedInsets;
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextViewTextDidChangeNotification object:self];
     
-    [_placeholder release], _placeholder = nil;
-    [_placeholderColor release], _placeholderColor = nil;
+    _placeholder = nil;
+    _placeholderColor = nil;
     
-    [super dealloc];
 }
 @end

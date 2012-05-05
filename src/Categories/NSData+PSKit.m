@@ -19,7 +19,7 @@ static char base64EncodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq
   
   CC_MD5(cStr, [self length], result);
   
-  NSData *md5 = [[[NSData alloc] initWithBytes:result length:CC_MD5_DIGEST_LENGTH] autorelease];
+  NSData *md5 = [[NSData alloc] initWithBytes:result length:CC_MD5_DIGEST_LENGTH];
   return [md5 base64EncodedString];
 }
 

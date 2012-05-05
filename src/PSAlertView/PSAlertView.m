@@ -45,9 +45,6 @@
     CGGradientRelease(backgroundGradient);
 }
 
-- (void)dealloc {
-    [super dealloc];
-}
 
 @end
 
@@ -139,15 +136,15 @@
 - (void)relayoutViews;
 
 @property (nonatomic, copy) PSAlertViewCompletionBlock completionBlock;
-@property (nonatomic, retain) UIImageView *backgroundView;
-@property (nonatomic, retain) UILabel *titleLabel;
-@property (nonatomic, retain) UILabel *messageLabel;
-@property (nonatomic, retain) PSAlertViewTextField *textField;
-@property (nonatomic, retain) UIButton *emailButton;
-@property (nonatomic, retain) NSMutableArray *buttons;
+@property (nonatomic, strong) UIImageView *backgroundView;
+@property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UILabel *messageLabel;
+@property (nonatomic, strong) PSAlertViewTextField *textField;
+@property (nonatomic, strong) UIButton *emailButton;
+@property (nonatomic, strong) NSMutableArray *buttons;
 
-@property (nonatomic, retain) UIWindow *alertWindow;
-@property (nonatomic, retain) UIWindow *oldKeyWindow;
+@property (nonatomic, strong) UIWindow *alertWindow;
+@property (nonatomic, strong) UIWindow *oldKeyWindow;
 
 @end
 
@@ -171,7 +168,7 @@ oldKeyWindow = _oldKeyWindow;
     
     NSAssert([buttonTitles count] <= 4, @"PSAlertView only supports up to 4 buttons");
     
-    PSAlertView *av = [[[PSAlertView alloc] initWithTitle:title message:message buttonTitles:buttonTitles textFieldPlaceholder:textFieldPlaceholder completionBlock:completionBlock] autorelease];
+    PSAlertView *av = [[PSAlertView alloc] initWithTitle:title message:message buttonTitles:buttonTitles textFieldPlaceholder:textFieldPlaceholder completionBlock:completionBlock];
     [av show:YES];
 }
 
@@ -179,7 +176,7 @@ oldKeyWindow = _oldKeyWindow;
     
     NSAssert([buttonTitles count] <= 2, @"PSAlertView only supports up to 2 buttons");
     
-    PSAlertView *av = [[[PSAlertView alloc] initWithTitle:title message:message buttonTitles:buttonTitles emailText:emailText completionBlock:completionBlock] autorelease];
+    PSAlertView *av = [[PSAlertView alloc] initWithTitle:title message:message buttonTitles:buttonTitles emailText:emailText completionBlock:completionBlock];
     [av show:YES];
 }
 
@@ -195,16 +192,16 @@ oldKeyWindow = _oldKeyWindow;
         self.completionBlock = completionBlock; // copy
         
         // Window
-        self.alertWindow = [[[PSAlertViewWindow alloc] initWithFrame:[UIScreen mainScreen].bounds] autorelease];
+        self.alertWindow = [[PSAlertViewWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
         self.alertWindow.windowLevel = UIWindowLevelAlert;
         self.alertWindow.backgroundColor = [UIColor clearColor];
         
         // Background Image
-        self.backgroundView = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSAlertView.bundle/Background.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:40]] autorelease];
+        self.backgroundView = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSAlertView.bundle/Background.png"] stretchableImageWithLeftCapWidth:0 topCapHeight:40]];
         [self addSubview:self.backgroundView];
         
         // Title Label
-        self.titleLabel = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
+        self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         self.titleLabel.backgroundColor = [UIColor clearColor];
         self.titleLabel.numberOfLines = 1;
         self.titleLabel.textAlignment = UITextAlignmentCenter;
@@ -216,7 +213,7 @@ oldKeyWindow = _oldKeyWindow;
         [self addSubview:self.titleLabel];
         
         // Message Label
-        self.messageLabel = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
+        self.messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         self.messageLabel.backgroundColor = [UIColor clearColor];
         self.messageLabel.numberOfLines = 4; // approx 140 chars
         self.messageLabel.textAlignment = UITextAlignmentCenter;
@@ -265,24 +262,13 @@ oldKeyWindow = _oldKeyWindow;
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    if (self.completionBlock) {
-        Block_release(self.completionBlock);
-    }
-    
     self.textField.delegate = nil;
-    self.textField = nil;
-    self.emailButton = nil;
-    self.titleLabel = nil;
-    self.messageLabel = nil;
-    self.buttons = nil;
     
-    self.oldKeyWindow = nil;
-    [super dealloc];
 }
 
 #pragma mark - Create UI Elements
 - (void)addTextFieldWithPlaceholder:(NSString *)placeholder {
-    self.textField = [[[PSAlertViewTextField alloc] initWithFrame:CGRectZero] autorelease];
+    self.textField = [[PSAlertViewTextField alloc] initWithFrame:CGRectZero];
     self.textField.background = [[UIImage imageNamed:@"PSAlertView.bundle/TextFieldBackground.png"] stretchableImageWithLeftCapWidth:1 topCapHeight:0];
     self.textField.placeholder = placeholder;
     self.textField.autocorrectionType = UITextAutocorrectionTypeNo;

@@ -29,7 +29,7 @@ inset = _inset;
     CGRect rightViewRect = [self rightViewRectForBounds:self.bounds];
     CGRect leftViewRect = [self leftViewRectForBounds:self.bounds];
     CGFloat rightMargin = MAX(clearViewRect.size.width, rightViewRect.size.width) + self.inset.right;
-    CGFloat leftMargin = leftViewRect.size.width;
+    CGFloat leftMargin = leftViewRect.size.width + self.inset.left;
     
     return UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsMake(inset.top, inset.left + leftMargin, inset.bottom, inset.right + rightMargin));
 }
@@ -49,19 +49,20 @@ inset = _inset;
 }
 
 - (CGRect)leftViewRectForBounds:(CGRect)bounds {
-    return CGRectMake(self.inset.left, floorf((bounds.size.height - 16) / 2), 24, 16);
+    return CGRectMake(self.inset.left, floorf((bounds.size.height - 16) / 2), 16, 16);
 }
 
 - (CGRect)rightViewRectForBounds:(CGRect)bounds {
-    return CGRectMake(self.width - self.inset.right, floorf((bounds.size.height - 16) / 2), 24, 16);
+    return CGRectMake(self.width - self.inset.right - 16, floorf((bounds.size.height - 16) / 2), 16, 16);
 }
 
 // This overrides the default image for a clear button
-- (UIButton *)clearButton {
-    UIButton *clearButton = [super clearButton];
-    [clearButton setImage:[UIImage imageNamed:@"PSKit.bundle/IconClear.png"] forState:UIControlStateNormal];
-    return clearButton;
-}
+//- (UIButton *)clearButton {
+//    UIButton *clearButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//    clearButton.frame = [self clearButtonRectForBounds:self.bounds];
+//    [clearButton setImage:[UIImage imageNamed:@"PSKit.bundle/IconClear.png"] forState:UIControlStateNormal];
+//    return clearButton;
+//}
 
 
 @end

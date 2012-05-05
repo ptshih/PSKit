@@ -16,11 +16,11 @@ static const NSTimeInterval __pollDuration = 30;
 
 @interface PSLocationCenter ()
 
-@property (nonatomic, retain) CLLocationManager *locationManager;
+@property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, copy) CLLocation *location;
-@property (nonatomic, retain) CLGeocoder *geocoder;
-@property (nonatomic, retain) NSDate *backgroundDate;
-@property (nonatomic, retain) NSDate *foregroundDate;
+@property (nonatomic, strong) CLGeocoder *geocoder;
+@property (nonatomic, strong) NSDate *backgroundDate;
+@property (nonatomic, strong) NSDate *foregroundDate;
 @property (nonatomic, assign) BOOL shouldDisableAfterLocationFix;
 
 @end
@@ -46,14 +46,14 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
 - (id)init {
     self = [super init];
     if (self) {
-        self.locationManager = [[[CLLocationManager alloc] init] autorelease];
+        self.locationManager = [[CLLocationManager alloc] init];
         self.locationManager.delegate = self;
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
         self.locationManager.distanceFilter = __updateDistanceFilter;
         
         self.location = nil;
         
-        self.geocoder = [[[CLGeocoder alloc] init] autorelease];
+        self.geocoder = [[CLGeocoder alloc] init];
         
         self.foregroundDate = [NSDate date];
         self.backgroundDate = [NSDate date];
@@ -70,16 +70,10 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidEnterBackgroundNotification object:nil];
     
-    self.backgroundDate = nil;
-    self.foregroundDate = nil;
     
     self.locationManager.delegate = nil;
-    self.locationManager = nil;
     
-    self.location = nil;
-    self.geocoder = nil;
     
-    [super dealloc];
 }
 
 #pragma mark CLLocationManagerDelegate
@@ -113,11 +107,11 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
     CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
     if (![CLLocationManager locationServicesEnabled] || (authStatus != kCLAuthorizationStatusAuthorized && authStatus != kCLAuthorizationStatusNotDetermined)) {
         // The user did not enable location services or denied it
-        self.location = [[[CLLocation alloc] initWithLatitude:40.7247 longitude:-73.9995] autorelease];
+        self.location = [[CLLocation alloc] initWithLatitude:40.7247 longitude:-73.9995];
         
         [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
         
-        UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Location Unknown" message:@"1. Open the iOS Settings App\r\n2. Tap on Location Services\r\n3. Switch Lunchbox to \"On\"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Location Unknown" message:@"1. Open the iOS Settings App\r\n2. Tap on Location Services\r\n3. Switch Lunchbox to \"On\"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [av show];
     } else {
         self.foregroundDate = [NSDate date];
@@ -220,7 +214,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
         [locDict setObject:[NSNumber numberWithFloat:exifLongitude] forKey:(NSString*) kCGImagePropertyGPSLongitude];
     }
     
-    return [locDict autorelease];
+    return locDict;
 }
 
 @end

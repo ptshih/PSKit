@@ -18,13 +18,13 @@ typedef enum
 
 @interface PSDateFormatter : NSObject
 
-@property (nonatomic, retain) NSCalendar *autoupdatingCurrentCalendar;
-@property (nonatomic, retain) NSDateFormatter *timeFormatter;
-@property (nonatomic, retain) NSDateFormatter *weekdayFormatter;
-@property (nonatomic, retain) NSDateFormatter *monthDayFormatter;
-@property (nonatomic, retain) NSDateFormatter *monthDayShortFormatter;
-@property (nonatomic, retain) NSDateFormatter *monthDayYearFormatter;
-@property (nonatomic, retain) NSDateFormatter *monthDayYearShortFormatter;
+@property (nonatomic, strong) NSCalendar *autoupdatingCurrentCalendar;
+@property (nonatomic, strong) NSDateFormatter *timeFormatter;
+@property (nonatomic, strong) NSDateFormatter *weekdayFormatter;
+@property (nonatomic, strong) NSDateFormatter *monthDayFormatter;
+@property (nonatomic, strong) NSDateFormatter *monthDayShortFormatter;
+@property (nonatomic, strong) NSDateFormatter *monthDayYearFormatter;
+@property (nonatomic, strong) NSDateFormatter *monthDayYearShortFormatter;
 
 + (id)sharedDateFormatter;
 

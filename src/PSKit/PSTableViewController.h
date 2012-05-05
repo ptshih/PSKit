@@ -12,16 +12,16 @@
 
 @interface PSTableViewController : PSBaseViewController <UITableViewDelegate, UITableViewDataSource, UISearchDisplayDelegate, UISearchBarDelegate, PSPullRefreshViewDelegate>
 
-@property (nonatomic, retain) NSMutableArray *items;
-@property (nonatomic, retain) NSMutableArray *searchItems;
-@property (nonatomic, retain) NSMutableArray *sectionTitles;
-@property (nonatomic, retain) NSMutableDictionary *selectedIndexes;
+@property (nonatomic, strong) NSMutableArray *items;
+@property (nonatomic, strong) NSMutableArray *searchItems;
+@property (nonatomic, strong) NSMutableArray *sectionTitles;
+@property (nonatomic, strong) NSMutableDictionary *selectedIndexes;
 @property (nonatomic, assign) CGPoint contentOffset;
 
-@property (nonatomic, retain) UITableView *tableView;
-@property (nonatomic, retain) PSPullRefreshView *pullRefreshView;
-@property (nonatomic, retain) UISearchBar *searchBar;
-@property (nonatomic, retain) UIView *loadMoreView;
+@property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) PSPullRefreshView *pullRefreshView;
+@property (nonatomic, strong) UISearchBar *searchBar;
+@property (nonatomic, strong) UIView *loadMoreView;
 
 // Config
 @property (nonatomic, assign) BOOL shouldPullRefresh;

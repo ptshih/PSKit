@@ -23,9 +23,9 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
 
 @interface PSURLCache ()
 
-@property (nonatomic, retain) NSOperationQueue *networkQueue;
-@property (nonatomic, retain) NSOperationQueue *responseQueue;
-@property (nonatomic, retain) NSMutableArray *pendingOperations;
+@property (nonatomic, strong) NSOperationQueue *networkQueue;
+@property (nonatomic, strong) NSOperationQueue *responseQueue;
+@property (nonatomic, strong) NSMutableArray *pendingOperations;
 
 // Retrieves the corresponding directory for a cache type
 - (NSString *)cacheDirectoryPathForCacheType:(PSURLCacheType)cacheType;
@@ -54,10 +54,10 @@ pendingOperations = _pendingOperations;
 - (id)init {
     self = [super init];
     if (self) {
-        self.networkQueue = [[[NSOperationQueue alloc] init] autorelease];
+        self.networkQueue = [[NSOperationQueue alloc] init];
         self.networkQueue.maxConcurrentOperationCount = 4;
         
-        self.responseQueue = [[[NSOperationQueue alloc] init] autorelease];
+        self.responseQueue = [[NSOperationQueue alloc] init];
         self.responseQueue.maxConcurrentOperationCount = 4;
         
         self.pendingOperations = [NSMutableArray array];
@@ -72,10 +72,6 @@ pendingOperations = _pendingOperations;
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kPSURLCacheDidIdle object:self];
-    self.networkQueue = nil;
-    self.responseQueue = nil;
-    self.pendingOperations = nil;
-    [super dealloc];
 }
 
 #pragma mark - Queue
@@ -108,7 +104,7 @@ pendingOperations = _pendingOperations;
 - (void)cacheData:(NSData *)data URL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType {
     if (!data || !URL) return;
     
-    NSURL *cachedURL = [[URL copy] autorelease];
+    NSURL *cachedURL = [URL copy];
     NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
     [data writeToFile:cachePath atomically:YES];
 }
@@ -123,7 +119,7 @@ pendingOperations = _pendingOperations;
 
 - (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock {
     
-    NSURL *cachedURL = [[request.URL copy] autorelease];
+    NSURL *cachedURL = [request.URL copy];
     NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
     NSData *data = [NSData dataWithContentsOfFile:cachePath];
     
@@ -152,8 +148,7 @@ pendingOperations = _pendingOperations;
              
         // Queue up a network request
         if (self.networkQueue.isSuspended) {
-            [self.pendingOperations addObject:Block_copy(networkBlock)];
-            Block_release(networkBlock);
+            [self.pendingOperations addObject:[networkBlock copy]];
         } else {
             [self.networkQueue addOperationWithBlock:networkBlock];
         }
@@ -191,7 +186,7 @@ pendingOperations = _pendingOperations;
 
 #pragma mark - Purge Cache
 - (void)removeCacheForURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType {
-    NSURL *cachedURL = [[URL copy] autorelease];
+    NSURL *cachedURL = [URL copy];
     NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
     [[NSFileManager defaultManager] removeItemAtPath:cachePath error:nil];
 }

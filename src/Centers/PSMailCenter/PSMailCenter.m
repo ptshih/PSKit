@@ -25,9 +25,6 @@
     return self;
 }
 
-- (void)dealloc {
-    [super dealloc];
-}
 
 - (void)controller:(UIViewController *)controller sendMailTo:(NSArray *)recipients withSubject:(NSString *)subject andMessageBody:(NSString *)messageBody {
     if([MFMailComposeViewController canSendMail]) {
@@ -41,12 +38,10 @@
         [mailVC setSubject:subject];
         [mailVC setMessageBody:messageBody isHTML:YES];
         [controller presentModalViewController:mailVC animated:YES];
-        [mailVC release];
     }
     else {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"No Mail Accounts Found", @"No Mail Accounts Found") message:NSLocalizedString(@"You must setup a Mail account before using this feature", @"You must setup a Mail account before using this feature") delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
-        [alert release];
     }
 }
 

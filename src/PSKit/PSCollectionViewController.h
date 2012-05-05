@@ -12,9 +12,9 @@
 
 @interface PSCollectionViewController : PSBaseViewController <PSCollectionViewDelegate, PSCollectionViewDataSource, PSPullRefreshViewDelegate, UIScrollViewDelegate>
 
-@property (nonatomic, retain) NSMutableArray *items;
-@property (nonatomic, retain) PSCollectionView *collectionView;
-@property (nonatomic, retain) PSPullRefreshView *pullRefreshView;
+@property (nonatomic, strong) NSMutableArray *items;
+@property (nonatomic, strong) PSCollectionView *collectionView;
+@property (nonatomic, strong) PSPullRefreshView *pullRefreshView;
 
 // Config
 @property (nonatomic, assign) BOOL shouldPullRefresh;

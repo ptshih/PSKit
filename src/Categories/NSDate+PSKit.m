@@ -46,7 +46,7 @@
 
 #pragma mark - AWS
 - (NSString *)stringWithAWSRequestFormat {
-  NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+  NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
   
   [dateFormatter setDateFormat:@"EEE, dd MMM yyyy HH:mm:ss z"];
   [dateFormatter setLocale:[NSLocale autoupdatingCurrentLocale]];

@@ -24,17 +24,13 @@ delegate = _delegate;
         self.messageLabel.frame = self.bounds;
         [self addSubview:self.messageLabel];
         
-        UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss)] autorelease];
+        UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss)];
         gr.numberOfTapsRequired = 1;
         [self addGestureRecognizer:gr];
     }
     return self;
 }
 
-- (void)dealloc {
-    self.messageLabel = nil;
-  [super dealloc];
-}
 
 - (void)showWithMessage:(NSString *)message inRect:(CGRect)rect {
     self.messageLabel.text = message;

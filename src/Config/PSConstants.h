@@ -37,10 +37,10 @@
  */
 
 #define ASSERT_MAIN_THREAD \
-NSAssert1([NSThread isMainThread], @"%@: must be called from the main thread", __FUNCTION__)
+NSAssert([NSThread isMainThread], @"Must be called from the main thread")
 
 #define ASSERT_NOT_MAIN_THREAD \
-NSAssert1(![NSThread isMainThread], @"%@: must be called from a background thread", __FUNCTION__)
+NSAssert(![NSThread isMainThread], @"Must be called from a background thread")
 
 /**
  Macros

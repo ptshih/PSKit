@@ -19,11 +19,11 @@ typedef uint32_t PSCellType;
 
 @interface PSCell : UITableViewCell
 
-@property (nonatomic, retain) PSCachedImageView *psImageView;
-@property (nonatomic, assign) UITableView *parentTableView;
+@property (nonatomic, strong) PSCachedImageView *psImageView;
+@property (nonatomic, weak) UITableView *parentTableView;
 @property (nonatomic, copy) NSIndexPath *indexPath;
 @property (nonatomic, assign) BOOL isExpanded;
-@property (nonatomic, retain) UIImageView *separatorLine;
+@property (nonatomic, strong) UIImageView *separatorLine;
 
 /**
  Reusable Cell Identifier

@@ -51,11 +51,6 @@ viewControllers = _viewControllers;
     [super viewDidUnload];
 }
 
-- (void)dealloc {  
-    self.overlayView = nil;
-    self.viewControllers = nil;
-    [super dealloc];
-}
 
 #pragma mark - View
 
@@ -69,7 +64,7 @@ viewControllers = _viewControllers;
     self.rootViewController.view.autoresizingMask = ~UIViewAutoresizingNone;
   
     
-    self.overlayView = [[[UIView alloc] initWithFrame:self.view.bounds] autorelease];
+    self.overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
     self.overlayView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.overlayView.exclusiveTouch = YES;
     self.overlayView.backgroundColor = [UIColor blackColor];
@@ -175,7 +170,7 @@ const CGFloat kAnimationDuration = 0.35;
     // Don't pop if at root
     if ([self.viewControllers count] == 1) return nil;
     
-    poppedViewController = [self.topViewController retain];
+    poppedViewController = self.topViewController;
     [self.viewControllers removeObject:poppedViewController];
     
     [poppedViewController willMoveToParentViewController:nil];
@@ -226,7 +221,6 @@ const CGFloat kAnimationDuration = 0.35;
         [self.overlayView removeFromSuperview];
         
         [poppedViewController removeFromParentViewController];
-        [poppedViewController release];
         
         self.isTransitioning = NO;
         

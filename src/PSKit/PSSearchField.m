@@ -32,7 +32,7 @@
         self.keyboardAppearance = UIKeyboardAppearanceAlert;
         self.clearButtonMode = UITextFieldViewModeWhileEditing;
         self.leftViewMode = UITextFieldViewModeAlways;
-        UIImageView *mag = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/IconMagnifier.png"]] autorelease];
+        UIImageView *mag = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/IconMagnifier.png"]];
         mag.contentMode = UIViewContentModeCenter;
         self.leftView = mag;
     }

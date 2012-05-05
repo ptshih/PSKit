@@ -25,7 +25,7 @@ static inline NSString *PSBoundaryEnd() {
 NSString *PSURLEncodedStringFromStringWithEncoding(NSString *string, NSStringEncoding encoding) {
     static NSString *const kPSCharactersToEscape = @"?!@#$^&%*+,:;='\"`<>()[]{}/\\|~ ";
     
-    return [(NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)[string stringByReplacingPercentEscapesUsingEncoding:encoding], NULL, (CFStringRef)kPSCharactersToEscape, CFStringConvertNSStringEncodingToEncoding(encoding)) autorelease];
+    return (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (__bridge CFStringRef)[string stringByReplacingPercentEscapesUsingEncoding:encoding], NULL, (__bridge CFStringRef)kPSCharactersToEscape, CFStringConvertNSStringEncodingToEncoding(encoding));
 }
 
 NSString *PSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSStringEncoding encoding) {
@@ -93,7 +93,7 @@ NSString *PSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
                 }
             }];
             
-            NSString *charset = (NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
+            NSString *charset = (__bridge NSString *)CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
             if (multipart) {
                 [request addValue:[NSString stringWithFormat:@"multipart/form-data; charset=%@; boundary=%@", charset, kPSBoundary] forHTTPHeaderField:@"Content-Type"];
                 NSMutableData *data = [NSMutableData data];
@@ -139,7 +139,7 @@ NSString *PSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
 - (NSString *)HTTPBodyString {
     NSString *httpBodyString = nil;
     if (self.HTTPBody) {
-        httpBodyString = [[[NSString alloc] initWithData:self.HTTPBody encoding:NSUTF8StringEncoding] autorelease];
+        httpBodyString = [[NSString alloc] initWithData:self.HTTPBody encoding:NSUTF8StringEncoding];
     }
     return httpBodyString;
 }

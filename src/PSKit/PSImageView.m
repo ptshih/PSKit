@@ -31,10 +31,6 @@ shouldAnimate = _shouldAnimate;
     return self;
 }
 
-- (void)dealloc {
-    self.placeholderImage = nil;
-    [super dealloc];
-}
 
 - (void)prepareForReuse {
     self.image = self.placeholderImage;

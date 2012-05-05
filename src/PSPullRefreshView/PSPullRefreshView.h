@@ -23,12 +23,12 @@ typedef enum {
 
 @interface PSPullRefreshView : UIView
 
-@property (nonatomic, assign) id <PSPullRefreshViewDelegate> delegate;
-@property (nonatomic, assign) UIScrollView *scrollView;
+@property (nonatomic, unsafe_unretained) id <PSPullRefreshViewDelegate> delegate;
+@property (nonatomic, weak) UIScrollView *scrollView;
 @property (nonatomic, assign) PSPullRefreshState state;
 @property (nonatomic, assign) PSPullRefreshStyle style;
-@property (nonatomic, retain) UIImageView *iconView;
-@property (nonatomic, retain) UILabel *statusLabel;
+@property (nonatomic, strong) UIImageView *iconView;
+@property (nonatomic, strong) UILabel *statusLabel;
 
 - (id)initWithFrame:(CGRect)frame style:(PSPullRefreshStyle)style;
 

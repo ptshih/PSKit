@@ -10,8 +10,8 @@
 
 @interface PSFacebookCenter ()
 
-@property (nonatomic, retain) Facebook *facebook;
-@property (nonatomic, retain) NSArray *extendedPermissions;
+@property (nonatomic, strong) Facebook *facebook;
+@property (nonatomic, strong) NSArray *extendedPermissions;
 
 @end
 
@@ -32,7 +32,7 @@ extendedPermissions = _extendedPermissions;
 - (id)init {
     self = [super init];
     if (self) {
-        self.facebook = [[[Facebook alloc] initWithAppId:FB_APP_ID urlSchemeSuffix:FB_APP_SUFFIX andDelegate:self] autorelease];
+        self.facebook = [[Facebook alloc] initWithAppId:FB_APP_ID urlSchemeSuffix:FB_APP_SUFFIX andDelegate:self];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         if ([defaults objectForKey:@"fbAccessToken"] && [defaults objectForKey:@"fbExpirationDate"]) {
             self.facebook.accessToken = [[NSUserDefaults standardUserDefaults] valueForKey:@"fbAccessToken"];
@@ -43,11 +43,6 @@ extendedPermissions = _extendedPermissions;
     return self;
 }
 
-- (void)dealloc {
-    self.extendedPermissions = nil;
-    self.facebook = nil;
-    [super dealloc];
-}
 
 - (BOOL)handleOpenURL:(NSURL *)url {
     return [self.facebook handleOpenURL:url];
@@ -93,7 +88,7 @@ extendedPermissions = _extendedPermissions;
 }
 
 - (void)requestPublishStream {
-    UIAlertView *av = [[[UIAlertView alloc] initWithTitle:@"Facebook" message:@"We need your permission to post on your behalf, just this once!" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"OK", nil] autorelease];
+    UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Facebook" message:@"We need your permission to post on your behalf, just this once!" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"OK", nil];
     av.tag = kAlertFacebookPermissionsPublish;
     [av show];
 }

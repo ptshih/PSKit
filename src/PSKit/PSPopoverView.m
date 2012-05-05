@@ -12,9 +12,9 @@
 
 @interface PSPopoverView ()
 
-@property (nonatomic, assign) UIView *containerView;
-@property (nonatomic, assign) UIImageView *arrowView;
-@property (nonatomic, assign) UILabel *titleLabel;
+@property (nonatomic, strong) UIView *containerView;
+@property (nonatomic, strong) UIImageView *arrowView;
+@property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, assign) CGSize popoverSize;
 
 - (void)positionPopover;
@@ -39,20 +39,20 @@ delegate = _delegate;
         
         self.popoverSize = CGSizeZero;
         
-        self.overlayView = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
+        self.overlayView = [[UIView alloc] initWithFrame:CGRectZero];
         self.overlayView.backgroundColor = [UIColor blackColor];
         self.overlayView.alpha = 0.5;
         self.overlayView.userInteractionEnabled = YES;
-        UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss)] autorelease];
+        UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss)];
         gr.delegate = self;
         [self.overlayView addGestureRecognizer:gr];
         [self addSubview:self.overlayView];
         
         // Container
-        self.containerView = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
+        self.containerView = [[UIView alloc] initWithFrame:CGRectZero];
         [self addSubview:self.containerView];
         
-        UIImageView *bgImageView = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/PopoverPortrait"] stretchableImageWithLeftCapWidth:152 topCapHeight:170]] autorelease];
+        UIImageView *bgImageView = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/PopoverPortrait"] stretchableImageWithLeftCapWidth:152 topCapHeight:170]];
         bgImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         bgImageView.frame = self.containerView.bounds;
         [self.containerView addSubview:bgImageView];
@@ -68,15 +68,12 @@ delegate = _delegate;
         
         
         // Arrow
-        self.arrowView = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/PopoverPortraitArrowUp"]] autorelease];
+        self.arrowView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PSKit.bundle/PopoverPortraitArrowUp"]];
         [self addSubview:self.arrowView];
     }
     return self;
 }
 
-- (void)dealloc {
-    [super dealloc];
-}
 
 - (void)layoutSubviews {
     [super layoutSubviews];

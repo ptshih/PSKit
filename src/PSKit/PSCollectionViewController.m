@@ -65,12 +65,8 @@ shouldPullRefresh = _shouldPullRefresh;
     self.collectionView.collectionViewDataSource = nil;
     
     // Views
-    self.pullRefreshView = nil;
-    self.collectionView = nil;
     
-    self.items = nil;
     
-    [super dealloc];
 }
 
 - (void)setupSubviews {
@@ -78,7 +74,7 @@ shouldPullRefresh = _shouldPullRefresh;
     
     [self setupHeader];
     
-    self.collectionView = [[[PSCollectionView alloc] initWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height)] autorelease];
+    self.collectionView = [[PSCollectionView alloc] initWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height)];
     [self.view addSubview:self.collectionView];
     self.collectionView.delegate = self;
     self.collectionView.collectionViewDelegate = self;
@@ -94,7 +90,7 @@ shouldPullRefresh = _shouldPullRefresh;
         self.collectionView.numColsLandscape = 3;
     }
     
-    UILabel *loadingLabel = [[[UILabel alloc] initWithFrame:self.collectionView.bounds] autorelease];
+    UILabel *loadingLabel = [[UILabel alloc] initWithFrame:self.collectionView.bounds];
     [PSStyleSheet applyStyle:@"emptyLabel" forLabel:loadingLabel];
     loadingLabel.text = @"Loading...";
     self.collectionView.loadingView = loadingLabel;
@@ -102,7 +98,7 @@ shouldPullRefresh = _shouldPullRefresh;
 
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
-        self.pullRefreshView = [[[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.view.frame.size.width, 48.0) style:PSPullRefreshStyleBlack] autorelease];
+        self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.view.frame.size.width, 48.0) style:PSPullRefreshStyleBlack];
         self.pullRefreshView.scrollView = self.collectionView;
         self.pullRefreshView.delegate = self;
         [self.collectionView addSubview:self.pullRefreshView];		

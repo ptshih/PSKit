@@ -14,7 +14,7 @@
     NSString *string = nil;
     
     NSData *data = [NSJSONSerialization dataWithJSONObject:obj options:NSJSONWritingPrettyPrinted error:error];
-    string = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+    string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
     return string;
 }

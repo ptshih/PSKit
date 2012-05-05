@@ -21,9 +21,5 @@
   return self;
 }
 
-- (void)dealloc {
-//  VLog(@"#%@", [self class]);
-  [super dealloc];
-}
 
 @end

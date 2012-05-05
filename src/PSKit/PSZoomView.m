@@ -12,9 +12,9 @@
 
 @interface PSZoomView ()
 
-@property (nonatomic, assign) UIView *superView;
-@property (nonatomic, assign) UIView *zoomedView;
-@property (nonatomic, retain) UIView *backgroundView;
+@property (nonatomic, weak) UIView *superView;
+@property (nonatomic, weak) UIView *zoomedView;
+@property (nonatomic, strong) UIView *backgroundView;
 @property (nonatomic, assign) CGRect convertedFrame;
 @property (nonatomic, assign) CGRect originalFrame;
 @property (nonatomic, assign) MKCoordinateRegion oldMapRegion;
@@ -57,13 +57,13 @@ isZooming = _isZooming;
         self.superView = nil;
         self.zoomedView = nil;
         
-        self.backgroundView = [[[UIView alloc] initWithFrame:self.bounds] autorelease];
+        self.backgroundView = [[UIView alloc] initWithFrame:self.bounds];
         self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.backgroundView.backgroundColor = [UIColor blackColor];
         self.backgroundView.alpha = 0.0;
         [self addSubview:self.backgroundView];
         
-        UITapGestureRecognizer *gr = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss:)] autorelease];
+        UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismiss:)];
         [self addGestureRecognizer:gr];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationDidChange:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
@@ -75,9 +75,7 @@ isZooming = _isZooming;
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    self.backgroundView = nil;
 
-    [super dealloc];
 }
 
 + (BOOL)prepareToZoom {
@@ -101,7 +99,7 @@ isZooming = _isZooming;
 }
 
 + (void)showImage:(UIImage *)image withFrame:(CGRect)frame inView:(UIView *)inView {
-    PSImageView *iv = [[[PSImageView alloc] initWithImage:[[image copy] autorelease]] autorelease];
+    PSImageView *iv = [[PSImageView alloc] initWithImage:[image copy]];
     [[[self class] sharedView] showView:iv withFrame:frame inView:inView fullscreen:NO];
 }
 

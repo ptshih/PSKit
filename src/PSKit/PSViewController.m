@@ -13,6 +13,9 @@
 @synthesize
 headerView = _headerView,
 footerView = _footerView,
+leftButton = _leftButton,
+centerButton = _centerButton,
+rightButton = _rightButton,
 activeScrollView = _activeScrollView,
 contentOffset = _contentOffset;
 
@@ -29,10 +32,6 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
     return self;
 }
 
-- (void)dealloc {
-    //  VLog(@"#%@", [self class]);
-    [super dealloc];
-}
 
 - (void)viewDidUnload {
     [super viewDidUnload];
@@ -46,7 +45,7 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
 
 #pragma mark - View
 - (void)loadView {
-    self.view = [[[UIView alloc] initWithFrame:self.parentViewController.view.bounds] autorelease];
+    self.view = [[UIView alloc] initWithFrame:self.parentViewController.view.bounds];
 }
 
 - (void)viewDidLoad {
@@ -102,11 +101,11 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
 - (void)addRoundedCorners {
     // iPad doesn't need rounded corners
     if (!isDeviceIPad()) {
-        UIImageView *topCorners = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/MaskCornersTop"] stretchableImageWithLeftCapWidth:160 topCapHeight:0]] autorelease];
+        UIImageView *topCorners = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/MaskCornersTop"] stretchableImageWithLeftCapWidth:160 topCapHeight:0]];
         topCorners.top = self.view.top;
         [self.view addSubview:topCorners];
         
-        UIImageView *bottomCorners = [[[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/MaskCornersBottom"] stretchableImageWithLeftCapWidth:160 topCapHeight:0]] autorelease];
+        UIImageView *bottomCorners = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/MaskCornersBottom"] stretchableImageWithLeftCapWidth:160 topCapHeight:0]];
         bottomCorners.top = self.view.height - bottomCorners.height;
         [self.view addSubview:bottomCorners];
     }

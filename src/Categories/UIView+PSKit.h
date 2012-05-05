@@ -11,18 +11,18 @@
 @interface UIView (PSKit)
 
 #pragma mark - Additions
-@property(nonatomic) CGFloat left;
-@property(nonatomic) CGFloat top;
-@property(nonatomic, readonly) CGFloat right;
-@property(nonatomic, readonly) CGFloat bottom;
-@property(nonatomic) CGFloat width;
-@property(nonatomic) CGFloat height;
+@property(nonatomic, assign) CGFloat left;
+@property(nonatomic, assign) CGFloat top;
+@property(nonatomic, assign, readonly) CGFloat right;
+@property(nonatomic, assign, readonly) CGFloat bottom;
+@property(nonatomic, assign) CGFloat width;
+@property(nonatomic, assign) CGFloat height;
 
-@property(nonatomic, readonly) CGFloat screenX;
-@property(nonatomic, readonly) CGFloat screenY;
+@property(nonatomic, assign, readonly) CGFloat screenX;
+@property(nonatomic, assign, readonly) CGFloat screenY;
 
-@property(nonatomic, readonly) CGFloat screenViewX;
-@property(nonatomic, readonly) CGFloat screenViewY;
+@property(nonatomic, assign, readonly) CGFloat screenViewX;
+@property(nonatomic, assign, readonly) CGFloat screenViewY;
 
 - (UIScrollView*)findFirstScrollView;
 

@@ -39,22 +39,22 @@ monthDayYearShortFormatter = _monthDayYearShortFormatter;
     if (self) {
         self.autoupdatingCurrentCalendar = [NSCalendar autoupdatingCurrentCalendar];
         
-        self.timeFormatter = [[[NSDateFormatter alloc] init] autorelease];
+        self.timeFormatter = [[NSDateFormatter alloc] init];
         self.timeFormatter.dateFormat = @"h:mm a";
         
-        self.weekdayFormatter = [[[NSDateFormatter alloc] init] autorelease];
+        self.weekdayFormatter = [[NSDateFormatter alloc] init];
         self.weekdayFormatter.dateFormat = @"EEEE";
         
-        self.monthDayFormatter = [[[NSDateFormatter alloc] init] autorelease];
+        self.monthDayFormatter = [[NSDateFormatter alloc] init];
         self.monthDayFormatter.dateFormat = @"MMMM d";
         
-        self.monthDayShortFormatter = [[[NSDateFormatter alloc] init] autorelease];
+        self.monthDayShortFormatter = [[NSDateFormatter alloc] init];
         self.monthDayShortFormatter.dateFormat = @"MMM d";
         
-        self.monthDayYearFormatter = [[[NSDateFormatter alloc] init] autorelease];
+        self.monthDayYearFormatter = [[NSDateFormatter alloc] init];
         self.monthDayYearFormatter.dateStyle = NSDateFormatterMediumStyle;
         
-        self.monthDayYearShortFormatter = [[[NSDateFormatter alloc] init] autorelease];
+        self.monthDayYearShortFormatter = [[NSDateFormatter alloc] init];
         self.monthDayYearShortFormatter.dateStyle = NSDateFormatterShortStyle;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning:) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
@@ -64,7 +64,6 @@ monthDayYearShortFormatter = _monthDayYearShortFormatter;
 
 - (void)dealloc {
     [self releaseDateFormatters];
-    [super dealloc];
 }
 
 - (void)releaseDateFormatters {

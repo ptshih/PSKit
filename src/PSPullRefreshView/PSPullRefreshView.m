@@ -42,7 +42,7 @@ statusLabel = _statusLabel;
             icon = [UIImage imageNamed:@"PSPullRefreshView.bundle/IconRefreshBlack.png"];
             labelStyle = @"pullRefreshBlackLabel";
         }
-        self.iconView = [[[UIImageView alloc] initWithImage:icon] autorelease];
+        self.iconView = [[UIImageView alloc] initWithImage:icon];
         self.iconView.contentMode = UIViewContentModeCenter;
         self.iconView.frame = CGRectMake(0, 0, self.height, self.height);
         
@@ -72,11 +72,6 @@ statusLabel = _statusLabel;
     return self;
 }
 
-- (void)dealloc {
-    self.iconView = nil;
-    self.statusLabel = nil;
-    [super dealloc];
-}
 
 - (void)setState:(PSPullRefreshState)state {
     _state = state;
@@ -84,29 +79,36 @@ statusLabel = _statusLabel;
 //    CGFloat y = 0.0;
     switch (state) {
         case PSPullRefreshStateIdle:
+        {
 //            y = 0.0;
             self.statusLabel.text = PSPullRefreshIdleStatus;
             [self stopSpinning];
             
             if (!self.scrollView) return;
             
+            BLOCK_SELF;
             [UIView animateWithDuration:0.2
                                   delay:0.0
                                 options:UIViewAnimationOptionCurveEaseInOut
                              animations:^{
-                                 self.scrollView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, 0.0);
+                                 blockSelf.scrollView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, 0.0);
                              }
                              completion:^(BOOL finished){
                                  
                              }];
             break;
+        }
         case PSPullRefreshStateRefreshing:
+        {
 //            y = self.height;
             [self startSpinning];
             self.statusLabel.text = PSPullRefreshRefreshingStatus;
             break;
+        }
         default:
+        {
             break;
+        }
     }
 }
 

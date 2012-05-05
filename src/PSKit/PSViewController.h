@@ -14,9 +14,12 @@
 
 @interface PSViewController : UIViewController <PSStateMachine>
 
-@property (nonatomic, assign) UIView *headerView;
-@property (nonatomic, assign) UIView *footerView;
-@property (nonatomic, assign) UIScrollView *activeScrollView; // subclasses should set this if they have a scrollView
+@property (nonatomic, strong) UIView *headerView;
+@property (nonatomic, strong) UIView *footerView;
+@property (nonatomic, strong) UIButton *leftButton;
+@property (nonatomic, strong) UIButton *centerButton;
+@property (nonatomic, strong) UIButton *rightButton;
+@property (nonatomic, weak) UIScrollView *activeScrollView; // subclasses should set this if they have a scrollView
 @property (nonatomic, assign) CGPoint contentOffset;
 
 // Config

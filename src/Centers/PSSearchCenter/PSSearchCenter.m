@@ -21,7 +21,7 @@ static NSString *_savedPath = nil;
 }
 
 + (void)initialize {
-  _savedPath = [[[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:PS_SEARCH_CENTER_PLIST] retain];
+  _savedPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:PS_SEARCH_CENTER_PLIST];
 }
 
 - (id)init {
@@ -31,7 +31,7 @@ static NSString *_savedPath = nil;
     if (fileExists) {
       NSError *error = nil;
       NSData *termsData = [NSData dataWithContentsOfFile:_savedPath];
-      _terms = [[NSMutableDictionary dictionaryWithDictionary:[NSPropertyListSerialization propertyListWithData:termsData options:0 format:NULL error:&error]] retain];
+      _terms = [NSMutableDictionary dictionaryWithDictionary:[NSPropertyListSerialization propertyListWithData:termsData options:0 format:NULL error:&error]];
     } else {
       _terms = [[NSMutableDictionary alloc] initWithCapacity:1];
     }
@@ -39,10 +39,6 @@ static NSString *_savedPath = nil;
   return self;
 }
 
-- (void)dealloc {
-  RELEASE_SAFELY(_terms);
-  [super dealloc];
-}
 
 #pragma mark - Terms
 - (NSArray *)searchResultsForTerm:(NSString *)term inContainer:(NSString *)container {

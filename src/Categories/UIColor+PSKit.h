@@ -11,14 +11,14 @@
 #define SUPPORTS_UNDOCUMENTED_API	0
 
 @interface UIColor (UIColor_Expanded)
-@property (nonatomic, readonly) CGColorSpaceModel colorSpaceModel;
-@property (nonatomic, readonly) BOOL canProvideRGBComponents;
-@property (nonatomic, readonly) CGFloat red; // Only valid if canProvideRGBComponents is YES
-@property (nonatomic, readonly) CGFloat green; // Only valid if canProvideRGBComponents is YES
-@property (nonatomic, readonly) CGFloat blue; // Only valid if canProvideRGBComponents is YES
-@property (nonatomic, readonly) CGFloat white; // Only valid if colorSpaceModel == kCGColorSpaceModelMonochrome
-@property (nonatomic, readonly) CGFloat alpha;
-@property (nonatomic, readonly) UInt32 rgbHex;
+@property (nonatomic, assign, readonly) CGColorSpaceModel colorSpaceModel;
+@property (nonatomic, assign, readonly) BOOL canProvideRGBComponents;
+@property (nonatomic, assign, readonly) CGFloat red; // Only valid if canProvideRGBComponents is YES
+@property (nonatomic, assign, readonly) CGFloat green; // Only valid if canProvideRGBComponents is YES
+@property (nonatomic, assign, readonly) CGFloat blue; // Only valid if canProvideRGBComponents is YES
+@property (nonatomic, assign, readonly) CGFloat white; // Only valid if colorSpaceModel == kCGColorSpaceModelMonochrome
+@property (nonatomic, assign, readonly) CGFloat alpha;
+@property (nonatomic, assign, readonly) UInt32 rgbHex;
 
 - (NSString *)colorSpaceString;
 

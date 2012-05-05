@@ -28,12 +28,6 @@ separatorLine = _separatorLine;
     return self;
 }
 
-- (void)dealloc {
-    //  VLog(@"#%@", [self class]);
-    self.psImageView = nil;
-    self.separatorLine = nil;
-    [super dealloc];
-}
 
 - (void)prepareForReuse {
     [super prepareForReuse];

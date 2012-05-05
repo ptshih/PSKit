@@ -73,7 +73,7 @@
   [button setBackgroundImage:[[self class] bgForBarButtonType:buttonType pressed:YES] forState:UIControlStateHighlighted];
   [button setBackgroundImage:[[self class] bgForBarButtonType:buttonType pressed:YES] forState:UIControlStateSelected];
   [button addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];  
-  UIBarButtonItem *navButton = [[[UIBarButtonItem alloc] initWithCustomView:button] autorelease];
+  UIBarButtonItem *navButton = [[UIBarButtonItem alloc] initWithCustomView:button];
   return navButton;
 }
 
@@ -92,7 +92,7 @@
   [button setBackgroundImage:[[self class] bgForBarButtonType:buttonType pressed:YES] forState:UIControlStateSelected];
   
   [button addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];  
-  UIBarButtonItem *navButton = [[[UIBarButtonItem alloc] initWithCustomView:button] autorelease];
+  UIBarButtonItem *navButton = [[UIBarButtonItem alloc] initWithCustomView:button];
   return navButton;
 }
 
@@ -109,7 +109,7 @@
   [back setBackgroundImage:backImage forState:UIControlStateNormal];
   [back setBackgroundImage:backHighlightedImage forState:UIControlStateHighlighted];
   [back addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];  
-  UIBarButtonItem *backButton = [[[UIBarButtonItem alloc] initWithCustomView:back] autorelease];
+  UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithCustomView:back];
   return backButton;
 }
 

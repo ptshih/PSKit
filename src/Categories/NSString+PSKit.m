@@ -54,7 +54,7 @@ double kmFromMiles(double miles) {
   CFUUIDRef theUUID = CFUUIDCreate(NULL);
   CFStringRef string = CFUUIDCreateString(NULL, theUUID);
   CFRelease(theUUID);
-  return [(NSString *)string autorelease];
+  return (__bridge NSString *)string;
 }
 
 #pragma mark - MIME
@@ -256,16 +256,16 @@ double kmFromMiles(double miles) {
 
 // This is more rarely used
 - (NSString *)stringByEscapingQuery {
-  NSString *result = (NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
-                                                                         (CFStringRef)self,
+  NSString *result = (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                                                         (__bridge CFStringRef)self,
                                                                          NULL,              
                                                                          CFSTR("?=&+"),         
                                                                          kCFStringEncodingUTF8);
-  return [result autorelease];
+  return result;
 }
 
 - (NSString *)stringWithPercentEscape {
-  return [(NSString *) CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[[self mutableCopy] autorelease], NULL, CFSTR("￼=,!$&'()*+;@?\n\"<>#\t :/"),kCFStringEncodingUTF8) autorelease];
+  return (__bridge_transfer NSString *) CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)[self mutableCopy], NULL, CFSTR("￼=,!$&'()*+;@?\n\"<>#\t :/"),kCFStringEncodingUTF8);
 }
 
 #pragma mark - HTML
@@ -310,7 +310,7 @@ double kmFromMiles(double miles) {
 
 - (NSString *)stringByUnescapingHTML {
 	NSMutableString *s = [NSMutableString string];
-	NSMutableString *target = [[self mutableCopy] autorelease];
+	NSMutableString *target = [self mutableCopy];
 	NSCharacterSet *chs = [NSCharacterSet characterSetWithCharactersInString:@"&"];
 	
 	while ([target length] > 0) {
@@ -414,7 +414,7 @@ double kmFromMiles(double miles) {
         }
     }
     
-    NSNumberFormatter *formatter = [[[NSNumberFormatter alloc] init] autorelease];
+    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
     [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
     [formatter setMaximumFractionDigits:precision];
     

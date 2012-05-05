@@ -16,7 +16,7 @@
 @interface PSLocationCenter : NSObject <CLLocationManagerDelegate>
 
 @property (nonatomic, copy, readonly) CLLocation *location;
-@property (nonatomic, retain, readonly) CLGeocoder *geocoder;
+@property (nonatomic, strong, readonly) CLGeocoder *geocoder;
 
 + (id)defaultCenter;
 

@@ -37,7 +37,6 @@
 
 - (void)dealloc {
     [self unsubscribeFromNetworkReachabilityNotifications];
-    [super dealloc];
 }
 
 - (void)registerForNetworkReachabilityNotifications {

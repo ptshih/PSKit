@@ -23,7 +23,7 @@ isReload = _isReload;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.requestQueue = [[[NSOperationQueue alloc] init] autorelease];
+        self.requestQueue = [[NSOperationQueue alloc] init];
         self.requestQueue.maxConcurrentOperationCount = 1;
         self.reloading = NO;
         self.hasLoadedOnce = NO;
@@ -36,10 +36,6 @@ isReload = _isReload;
     [super viewDidUnload];
 }
 
-- (void)dealloc {
-    self.requestQueue = nil;
-    [super dealloc];
-}
 
 #pragma mark - View
 - (void)viewDidLoad {
@@ -100,7 +96,7 @@ isReload = _isReload;
         NSError *jsonError = nil;
         results = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&jsonError];
     } else {
-        results = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+        results = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     }
     return results;
 }

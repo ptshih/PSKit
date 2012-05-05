@@ -20,9 +20,9 @@ static UIImage *_halfStar = nil;
 @synthesize rating = _rating;
 
 + (void)initialize {
-  _silverStar = [[UIImage imageNamed:@"PSKit.bundle/StarSilver.png"] retain];
-  _goldStar = [[UIImage imageNamed:@"PSKit.bundle/StarGold.png"] retain];
-  _halfStar = [[UIImage imageNamed:@"PSKit.bundle/StarHalf.png"] retain];
+  _silverStar = [UIImage imageNamed:@"PSKit.bundle/StarSilver.png"];
+  _goldStar = [UIImage imageNamed:@"PSKit.bundle/StarGold.png"];
+  _halfStar = [UIImage imageNamed:@"PSKit.bundle/StarHalf.png"];
 }
 
 - (id)initWithFrame:(CGRect)frame rating:(CGFloat)rating {
@@ -35,9 +35,6 @@ static UIImage *_halfStar = nil;
   return self;
 }
 
-- (void)dealloc {
-  [super dealloc];
-}
 
 - (void)setRating:(CGFloat)rating {
   _rating = rating;
@@ -50,13 +47,13 @@ static UIImage *_halfStar = nil;
     if (rating > i) {
       if (rating < i + 1) {
         // half star
-        star = [[[UIImageView alloc] initWithImage:_halfStar] autorelease];
+        star = [[UIImageView alloc] initWithImage:_halfStar];
       } else {
         // full star
-        star = [[[UIImageView alloc] initWithImage:_goldStar] autorelease];
+        star = [[UIImageView alloc] initWithImage:_goldStar];
       }
     } else {
-      star = [[[UIImageView alloc] initWithImage:_silverStar] autorelease];
+      star = [[UIImageView alloc] initWithImage:_silverStar];
     }
     star.top = 0;
     star.left = i * STAR_SIZE;

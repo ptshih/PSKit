@@ -10,7 +10,7 @@
 
 @interface PSCachedImageView ()
 
-@property (nonatomic, retain) NSOperationQueue *imageQueue;
+@property (nonatomic, strong) NSOperationQueue *imageQueue;
 
 @end
 
@@ -26,10 +26,10 @@ loadingIndicator = _loadingIndicator;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.imageQueue = [[[NSOperationQueue alloc] init] autorelease];
+        self.imageQueue = [[NSOperationQueue alloc] init];
         self.imageQueue.maxConcurrentOperationCount = 1;
         
-        self.loadingIndicator = [[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray] autorelease];
+        self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         self.loadingIndicator.hidesWhenStopped = YES;
         self.loadingIndicator.frame = self.bounds;
         self.loadingIndicator.contentMode = UIViewContentModeCenter;
@@ -39,14 +39,6 @@ loadingIndicator = _loadingIndicator;
     return self;
 }
 
-- (void)dealloc {
-    self.imageQueue = nil;
-    self.URL = nil;
-    self.originalURL = nil;
-    self.thumbnailURL = nil;
-    self.loadingIndicator = nil;
-    [super dealloc];
-}
 
 - (void)setFrame:(CGRect)frame {
     [super setFrame:frame];
@@ -68,27 +60,25 @@ loadingIndicator = _loadingIndicator;
 - (void)loadImageWithURL:(NSURL *)URL cacheType:(PSURLCacheType)cacheType {
     self.URL = URL;
     
-    [self.imageQueue cancelAllOperations];
-    [self.imageQueue addOperationWithBlock:^{
-        [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error) {
-            ASSERT_MAIN_THREAD;
-            if (error) {
-                [self.loadingIndicator stopAnimating];
-                DLog(@"eror loading image: %@", cachedURL);
-                self.image = self.placeholderImage;
-            } else {
-                if ([self.URL isEqual:cachedURL]) {
-                    [self.loadingIndicator stopAnimating];
-                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-                        UIImage *image = [UIImage imageWithData:cachedData];
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            ASSERT_MAIN_THREAD;
-                            self.image = image;
-                        });
+    BLOCK_SELF;
+    [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error) {
+        ASSERT_MAIN_THREAD;
+        if (error) {
+            [blockSelf.loadingIndicator stopAnimating];
+            DLog(@"eror loading image: %@", cachedURL);
+            blockSelf.image = blockSelf.placeholderImage;
+        } else {
+            if ([blockSelf.URL isEqual:cachedURL]) {
+                [blockSelf.loadingIndicator stopAnimating];
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+                    UIImage *image = [UIImage imageWithData:cachedData];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        ASSERT_MAIN_THREAD;
+                        blockSelf.image = image;
                     });
-                }
+                });
             }
-        }];
+        }
     }];
 }
 

@@ -85,18 +85,9 @@ shouldPullRefresh = _shouldPullRefresh;
         self.pullRefreshView.delegate = nil;
     }
     
-    self.tableView = nil;
-    self.searchBar = nil;
-    self.pullRefreshView = nil;
-    self.loadMoreView = nil;
     
     // Non-Views
-    self.items = nil;
-    self.searchItems = nil;
-    self.sectionTitles = nil;
-    self.selectedIndexes = nil;
     
-    [super dealloc];
 }
 
 #pragma mark - View
@@ -114,7 +105,7 @@ shouldPullRefresh = _shouldPullRefresh;
 }
 
 - (void)setupSearchDisplayControllerWithScopeButtonTitles:(NSArray *)scopeButtonTitles andPlaceholder:(NSString *)placeholder {
-    self.searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)] autorelease];
+    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)];
     self.searchBar.delegate = self;
     //  self.searchBar.tintColor = [UIColor darkGrayColor];
     self.searchBar.placeholder = placeholder;
@@ -135,7 +126,7 @@ shouldPullRefresh = _shouldPullRefresh;
 
 // SUBCLASS SHOULD CALL THIS
 - (void)setupTableViewWithFrame:(CGRect)frame style:(UITableViewStyle)style separatorStyle:(UITableViewCellSeparatorStyle)separatorStyle separatorColor:(UIColor *)separatorColor {
-    self.tableView = [[[UITableView alloc] initWithFrame:frame style:style] autorelease];
+    self.tableView = [[UITableView alloc] initWithFrame:frame style:style];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.separatorStyle = separatorStyle;
@@ -163,7 +154,7 @@ shouldPullRefresh = _shouldPullRefresh;
 // SUBCLASS CAN OPTIONALLY CALL
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
-        self.pullRefreshView = [[[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.view.frame.size.width, 48.0) style:PSPullRefreshStyleBlack] autorelease];
+        self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.view.frame.size.width, 48.0) style:PSPullRefreshStyleBlack];
         self.pullRefreshView.scrollView = self.tableView;
         self.pullRefreshView.delegate = self;
         [self.tableView addSubview:self.pullRefreshView];		
@@ -405,7 +396,7 @@ shouldPullRefresh = _shouldPullRefresh;
     
     id cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
     if (!cell) { 
-        cell = [[[cellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier] autorelease];
+        cell = [[cellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
     }
     
     [self tableView:tableView configureCell:cell atIndexPath:indexPath];
