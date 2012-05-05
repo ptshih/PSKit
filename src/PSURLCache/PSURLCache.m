@@ -24,7 +24,6 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
 @interface PSURLCache ()
 
 @property (nonatomic, strong) NSOperationQueue *networkQueue;
-@property (nonatomic, strong) NSOperationQueue *responseQueue;
 @property (nonatomic, strong) NSMutableArray *pendingOperations;
 
 // Retrieves the corresponding directory for a cache type
@@ -40,7 +39,6 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
 
 @synthesize
 networkQueue = _networkQueue,
-responseQueue = _responseQueue,
 pendingOperations = _pendingOperations;
 
 + (id)sharedCache {
@@ -57,15 +55,9 @@ pendingOperations = _pendingOperations;
         self.networkQueue = [[NSOperationQueue alloc] init];
         self.networkQueue.maxConcurrentOperationCount = 4;
         
-        self.responseQueue = [[NSOperationQueue alloc] init];
-        self.responseQueue.maxConcurrentOperationCount = 4;
-        
         self.pendingOperations = [NSMutableArray array];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self 
-                                                 selector:@selector(resume) 
-                                                     name:kPSURLCacheDidIdle 
-                                                   object:self];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resume) name:kPSURLCacheDidIdle object:self];
     }
     return self;
 }
@@ -94,9 +86,7 @@ pendingOperations = _pendingOperations;
 
 - (void)suspend {
     [self.networkQueue setSuspended:YES];
-    [[NSNotificationQueue defaultQueue] enqueueNotification:[NSNotification 
-                                                             notificationWithName:kPSURLCacheDidIdle object:self] 
-                                               postingStyle:NSPostWhenIdle];
+    [[NSNotificationQueue defaultQueue] enqueueNotification:[NSNotification notificationWithName:kPSURLCacheDidIdle object:self] postingStyle:NSPostWhenIdle];
 }
 
 #pragma mark - Cache
@@ -118,32 +108,39 @@ pendingOperations = _pendingOperations;
 }
 
 - (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock {
+    ASSERT_MAIN_THREAD;
     
     NSURL *cachedURL = [request.URL copy];
     NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
     NSData *data = [NSData dataWithContentsOfFile:cachePath];
     
     if (data && usingCache) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            completionBlock(data, cachedURL, YES, nil);
-        }];
+        completionBlock(data, cachedURL, YES, nil);
     } else {
+        BLOCK_SELF;
+        
         PSURLCacheNetworkBlock networkBlock = ^(void) {
-            BLOCK_SELF;
+            ASSERT_NOT_MAIN_THREAD;
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:self];
+            
+            NSLog(@"### Request: %@", request.URL.absoluteString);
+            NSLog(@"### Request: %d remaining in queue", self.networkQueue.operationCount);
+            
+            NSError *error = nil;
+            NSURLResponse *response = nil;
+            NSData *cachedData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+            if (cachedData && !error) {
+                [blockSelf cacheData:cachedData URL:cachedURL cacheType:cacheType];
+            } else {
+                // error
+            }
+            
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:self];
-                NSLog(@"### NSURLConnection: %@", request.URL.absoluteString);
+                ASSERT_MAIN_THREAD;
                 
-                [NSURLConnection sendAsynchronousRequest:request 
-                                                   queue:blockSelf.responseQueue 
-                                       completionHandler:^(NSURLResponse *response, NSData *cachedData, NSError *error) {
-                                           // This is in the background
-                                           [blockSelf cacheData:cachedData URL:cachedURL cacheType:cacheType];
-                                           [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                               [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:blockSelf];
-                                               completionBlock(cachedData, cachedURL, NO, error);
-                                           }];
-                                       }];
+                [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:blockSelf];
+                completionBlock(cachedData, cachedURL, NO, error);
             }];
         };
              
@@ -167,10 +164,7 @@ pendingOperations = _pendingOperations;
     BOOL isDir = NO;
     NSError *error;
     if (![[NSFileManager defaultManager] fileExistsAtPath:cacheDirectoryPath isDirectory:&isDir] && isDir == NO) {
-        [[NSFileManager defaultManager] createDirectoryAtPath:cacheDirectoryPath 
-                                  withIntermediateDirectories:YES 
-                                                   attributes:nil 
-                                                        error:&error];
+        [[NSFileManager defaultManager] createDirectoryAtPath:cacheDirectoryPath withIntermediateDirectories:YES attributes:nil error:&error];
     }
     
     return cacheDirectoryPath;
@@ -200,10 +194,7 @@ pendingOperations = _pendingOperations;
     NSError *error;
     if ([[NSFileManager defaultManager] fileExistsAtPath:cacheDirectoryPath isDirectory:&isDir] && isDir == YES) {
         [[NSFileManager defaultManager] removeItemAtPath:cacheDirectoryPath error:&error];
-        [[NSFileManager defaultManager] createDirectoryAtPath:cacheDirectoryPath 
-                                  withIntermediateDirectories:YES 
-                                                   attributes:nil 
-                                                        error:&error];
+        [[NSFileManager defaultManager] createDirectoryAtPath:cacheDirectoryPath withIntermediateDirectories:YES attributes:nil error:&error];
     }
 }
 
