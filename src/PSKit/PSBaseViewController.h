@@ -17,7 +17,6 @@
  */
 @property (nonatomic, strong) NSOperationQueue *requestQueue;
 @property (nonatomic, assign) BOOL reloading;
-@property (nonatomic, assign) BOOL hasLoadedOnce;
 @property (nonatomic, assign) BOOL isReload;
 
 @end

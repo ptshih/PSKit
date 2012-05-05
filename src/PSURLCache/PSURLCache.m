@@ -129,17 +129,18 @@ pendingOperations = _pendingOperations;
         }];
     } else {
         PSURLCacheNetworkBlock networkBlock = ^(void) {
+            BLOCK_SELF;
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:self];
                 NSLog(@"### NSURLConnection: %@", request.URL.absoluteString);
                 
                 [NSURLConnection sendAsynchronousRequest:request 
-                                                   queue:self.responseQueue 
+                                                   queue:blockSelf.responseQueue 
                                        completionHandler:^(NSURLResponse *response, NSData *cachedData, NSError *error) {
                                            // This is in the background
-                                           [self cacheData:cachedData URL:cachedURL cacheType:cacheType];
+                                           [blockSelf cacheData:cachedData URL:cachedURL cacheType:cacheType];
                                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                               [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:self];
+                                               [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:blockSelf];
                                                completionBlock(cachedData, cachedURL, NO, error);
                                            }];
                                        }];

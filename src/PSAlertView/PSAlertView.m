@@ -338,9 +338,8 @@ oldKeyWindow = _oldKeyWindow;
     // Optional Text Field
     if (self.textField) {
         self.textField.frame = CGRectMake(left, top, width, TEXTFIELD_HEIGHT);
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [self.textField becomeFirstResponder];
-        }];
+        
+        [self.textField becomeFirstResponder];
         
         top += TEXTFIELD_HEIGHT;
         top += MARGIN_Y / 2.0;

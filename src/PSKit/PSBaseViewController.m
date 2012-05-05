@@ -17,7 +17,6 @@
 @synthesize
 requestQueue = _requestQueue,
 reloading = _reloading,
-hasLoadedOnce = _hasLoadedOnce,
 isReload = _isReload;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -26,7 +25,6 @@ isReload = _isReload;
         self.requestQueue = [[NSOperationQueue alloc] init];
         self.requestQueue.maxConcurrentOperationCount = 1;
         self.reloading = NO;
-        self.hasLoadedOnce = NO;
         self.isReload = NO;
     }
     return self;
