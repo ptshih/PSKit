@@ -61,6 +61,7 @@ loadingIndicator = _loadingIndicator;
     self.URL = URL;
     
     BLOCK_SELF;
+    
     [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error) {
         ASSERT_MAIN_THREAD;
         if (error) {
