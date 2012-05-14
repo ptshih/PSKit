@@ -29,7 +29,10 @@ searchBar = _searchBar,
 loadMoreView = _loadMoreView;
 
 @synthesize
-shouldPullRefresh = _shouldPullRefresh;
+shouldPullRefresh = _shouldPullRefresh,
+tableViewStyle = _tableViewStyle,
+tableViewCellSeparatorStyle = _tableViewCellSeparatorStyle,
+separatorColor = _separatorColor;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -51,6 +54,8 @@ shouldPullRefresh = _shouldPullRefresh;
 #pragma mark - View
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self setupTableViewWithFrame:self.view.bounds style:self.tableViewStyle separatorStyle:self.tableViewCellSeparatorStyle separatorColor:self.separatorColor];
     
     if (self.shouldPullRefresh) {
         [self setupPullRefresh];
@@ -82,13 +87,13 @@ shouldPullRefresh = _shouldPullRefresh;
     [searchController setSearchResultsDataSource:self];
 }
 
-// SUBCLASS SHOULD CALL THIS
 - (void)setupTableViewWithFrame:(CGRect)frame style:(UITableViewStyle)style separatorStyle:(UITableViewCellSeparatorStyle)separatorStyle separatorColor:(UIColor *)separatorColor {
     self.tableView = [[UITableView alloc] initWithFrame:frame style:style];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.separatorStyle = separatorStyle;
     self.tableView.separatorColor = separatorColor;
+    self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     //    self.tableView.backgroundColor = [UIColor clearColor];
     //    self.tableView.backgroundView = nil;
     
@@ -112,7 +117,7 @@ shouldPullRefresh = _shouldPullRefresh;
 // SUBCLASS CAN OPTIONALLY CALL
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
-        self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.view.frame.size.width, 48.0) style:PSPullRefreshStyleBlack];
+        self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.tableView.frame.size.width, 48.0) style:PSPullRefreshStyleBlack];
         self.pullRefreshView.scrollView = self.tableView;
         self.pullRefreshView.delegate = self;
         [self.tableView addSubview:self.pullRefreshView];		

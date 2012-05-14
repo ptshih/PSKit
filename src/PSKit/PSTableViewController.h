@@ -25,6 +25,9 @@
 
 // Config
 @property (nonatomic, assign) BOOL shouldPullRefresh;
+@property (nonatomic, assign) UITableViewStyle tableViewStyle;
+@property (nonatomic, assign) UITableViewCellSeparatorStyle tableViewCellSeparatorStyle;
+@property (nonatomic, strong) UIColor *separatorColor;
 
 // View Setup
 - (void)setupTableViewWithFrame:(CGRect)frame style:(UITableViewStyle)style separatorStyle:(UITableViewCellSeparatorStyle)separatorStyle separatorColor:(UIColor *)separatorColor;

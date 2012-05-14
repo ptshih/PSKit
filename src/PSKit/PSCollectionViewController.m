@@ -73,7 +73,7 @@ shouldPullRefresh = _shouldPullRefresh;
 
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
-        self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.view.frame.size.width, 48.0) style:PSPullRefreshStyleBlack];
+        self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.collectionView.frame.size.width, 48.0) style:PSPullRefreshStyleBlack];
         self.pullRefreshView.scrollView = self.collectionView;
         self.pullRefreshView.delegate = self;
         [self.collectionView addSubview:self.pullRefreshView];		
