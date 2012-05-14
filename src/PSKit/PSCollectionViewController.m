@@ -44,31 +44,6 @@ shouldPullRefresh = _shouldPullRefresh;
     }
 }
 
-- (void)viewDidUnload {
-    [super viewDidUnload];
-    
-    self.contentOffset = self.collectionView.contentOffset;
-    
-    // Views
-    self.pullRefreshView.delegate = nil;
-    self.collectionView.delegate = nil;
-    self.collectionView.collectionViewDelegate = nil;
-    self.collectionView.collectionViewDataSource = nil;
-    self.pullRefreshView = nil;
-    self.collectionView = nil;
-}
-
-- (void)dealloc {
-    self.pullRefreshView.delegate = nil;
-    self.collectionView.delegate = nil;
-    self.collectionView.collectionViewDelegate = nil;
-    self.collectionView.collectionViewDataSource = nil;
-    
-    // Views
-    
-    
-}
-
 - (void)setupSubviews {
     [super setupSubviews];
     

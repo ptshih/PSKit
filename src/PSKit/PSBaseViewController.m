@@ -30,11 +30,6 @@ isReload = _isReload;
     return self;
 }
 
-- (void)viewDidUnload {
-    [super viewDidUnload];
-}
-
-
 #pragma mark - View
 - (void)viewDidLoad {
     [super viewDidLoad];

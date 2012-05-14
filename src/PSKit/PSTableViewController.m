@@ -48,48 +48,6 @@ shouldPullRefresh = _shouldPullRefresh;
     return self;
 }
 
-- (void)viewDidUnload {
-    [super viewDidUnload];
-    
-    // Save view state
-    self.contentOffset = self.tableView.contentOffset;
-    
-    if (self.searchBar) {
-        self.searchBar.delegate = nil;
-    }
-    if (self.tableView) {
-        self.tableView.delegate = nil, self.tableView.dataSource = nil;
-    }
-    if (self.pullRefreshView) {
-        self.pullRefreshView.delegate = nil;
-    }
-    
-    self.tableView = nil;
-    self.searchBar = nil;
-    self.pullRefreshView = nil;
-    self.loadMoreView = nil;
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-}
-
-- (void)dealloc {    
-    if (self.searchBar) {
-        self.searchBar.delegate = nil;
-    }
-    if (self.tableView) {
-        self.tableView.delegate = nil, self.tableView.dataSource = nil;
-    }
-    if (self.pullRefreshView) {
-        self.pullRefreshView.delegate = nil;
-    }
-    
-    
-    // Non-Views
-    
-}
-
 #pragma mark - View
 - (void)viewDidLoad {
     [super viewDidLoad];

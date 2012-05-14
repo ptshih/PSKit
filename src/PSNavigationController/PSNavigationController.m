@@ -46,12 +46,6 @@ viewControllers = _viewControllers;
     return self;
 }
 
-- (void)viewDidUnload {
-    self.overlayView = nil;
-    [super viewDidUnload];
-}
-
-
 #pragma mark - View
 
 - (void)viewDidLoad {

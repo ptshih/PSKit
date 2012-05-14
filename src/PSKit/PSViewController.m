@@ -32,7 +32,6 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
     return self;
 }
 
-
 - (void)viewDidUnload {
     [super viewDidUnload];
     VLog(@"#%@", [self class]);
