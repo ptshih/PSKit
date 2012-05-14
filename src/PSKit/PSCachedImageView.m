@@ -85,7 +85,7 @@ loadingIndicator = _loadingIndicator;
     PSURLCacheType cacheType = [[notification.userInfo objectForKey:@"cacheType"] integerValue];
     
     if ([self.URL isEqual:cachedURL]) {
-        NSLog(@"local URL: %@, remote URL: %@", self.URL, cachedURL);
+        DLog(@"local URL: %@, remote URL: %@", self.URL, cachedURL);
 
         [self.loadingIndicator stopAnimating];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
