@@ -12,6 +12,7 @@
 
 @interface PSPopoverView ()
 
+@property (nonatomic, strong) UIViewController *containerController;
 @property (nonatomic, strong) UIView *containerView;
 @property (nonatomic, strong) UIImageView *arrowView;
 @property (nonatomic, strong) UILabel *titleLabel;
@@ -24,6 +25,7 @@
 @implementation PSPopoverView
 
 @synthesize
+containerController = _containerController,
 containerView = _containerView,
 arrowView = _arrowView,
 titleLabel = _titleLabel,
@@ -31,6 +33,14 @@ popoverSize = _popoverSize,
 overlayView = _overlayView,
 contentView = _contentView,
 delegate = _delegate;
+
+- (id)initWithTitle:(NSString *)title contentController:(UIViewController *)contentController {
+    self = [self initWithTitle:title contentView:contentController.view];
+    if (self) {
+        self.containerController = contentController;
+    }
+    return self;
+}
 
 - (id)initWithTitle:(NSString *)title contentView:(UIView *)contentView {
     self = [super initWithFrame:CGRectZero];

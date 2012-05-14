@@ -13,10 +13,11 @@
 @interface PSPopoverView : PSView <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) UIView *overlayView;
-@property (nonatomic, weak) UIView *contentView;
+@property (nonatomic, strong) UIView *contentView;
 @property (nonatomic, unsafe_unretained) id <PSPopoverViewDelegate> delegate;
 
 - (id)initWithTitle:(NSString *)title contentView:(UIView *)contentView;
+- (id)initWithTitle:(NSString *)title contentController:(UIViewController *)contentController;
 
 - (void)showWithSize:(CGSize)size inView:(UIView *)view;
 - (void)dismiss;
