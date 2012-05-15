@@ -47,9 +47,7 @@ shouldPullRefresh = _shouldPullRefresh;
 - (void)setupSubviews {
     [super setupSubviews];
     
-    [self setupHeader];
-    
-    self.collectionView = [[PSCollectionView alloc] initWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height)];
+    self.collectionView = [[PSCollectionView alloc] initWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height - self.footerView.height)];
     [self.view addSubview:self.collectionView];
     self.collectionView.delegate = self;
     self.collectionView.collectionViewDelegate = self;

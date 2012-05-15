@@ -94,6 +94,16 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
 
 - (void)setupSubviews {
     // subclass should implement
+    [self setupHeader];
+    [self setupFooter];
+}
+
+- (void)setupHeader {
+    // subclass may implement
+}
+
+- (void)setupFooter {
+    // subclass may implement
 }
 
 #pragma mark - Post View Config

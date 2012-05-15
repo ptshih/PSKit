@@ -55,7 +55,7 @@ separatorColor = _separatorColor;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self setupTableViewWithFrame:self.view.bounds style:self.tableViewStyle separatorStyle:self.tableViewCellSeparatorStyle separatorColor:self.separatorColor];
+    [self setupTableViewWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height - self.footerView.height) style:self.tableViewStyle separatorStyle:self.tableViewCellSeparatorStyle separatorColor:self.separatorColor];
     
     if (self.shouldPullRefresh) {
         [self setupPullRefresh];
