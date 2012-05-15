@@ -46,7 +46,7 @@
 
 // Views
 - (void)setupSubviews;
-- (void)setupPullRefresh;
+- (void)updateSubviews;
 
 // Tables
 - (void)setupTableHeader;

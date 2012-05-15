@@ -69,6 +69,11 @@ shouldPullRefresh = _shouldPullRefresh;
     self.collectionView.loadingView = loadingLabel;
 }
 
+- (void)updateSubviews {
+    [super updateSubviews];
+    self.collectionView.frame = CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height - self.footerView.height);
+}
+
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
         self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.collectionView.frame.size.width, 48.0) style:PSPullRefreshStyleBlack];

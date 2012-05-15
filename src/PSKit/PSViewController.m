@@ -92,10 +92,20 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
     VLog(@"#%@", [self class]);
 }
 
+/*
+ This creates and adds subviews
+ */
 - (void)setupSubviews {
     // subclass should implement
     [self setupHeader];
     [self setupFooter];
+}
+
+/*
+ This relayouts the subviews
+ */
+- (void)updateSubviews {
+    // subclass may implement
 }
 
 - (void)setupHeader {

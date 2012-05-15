@@ -114,6 +114,11 @@ separatorColor = _separatorColor;
     self.activeScrollView = self.tableView;
 }
 
+- (void)updateSubviews {
+    [super updateSubviews];
+    self.tableView.frame = CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height - self.footerView.height);
+}
+
 // SUBCLASS CAN OPTIONALLY CALL
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
