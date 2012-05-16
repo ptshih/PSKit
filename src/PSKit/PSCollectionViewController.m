@@ -38,10 +38,6 @@ shouldPullRefresh = _shouldPullRefresh;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    if (self.shouldPullRefresh) {
-        [self setupPullRefresh];
-    }
 }
 
 - (void)setupSubviews {
@@ -67,6 +63,10 @@ shouldPullRefresh = _shouldPullRefresh;
     [PSStyleSheet applyStyle:@"emptyLabel" forLabel:loadingLabel];
     loadingLabel.text = @"Loading...";
     self.collectionView.loadingView = loadingLabel;
+    
+    if (self.shouldPullRefresh) {
+        [self setupPullRefresh];
+    }
 }
 
 - (void)updateSubviews {

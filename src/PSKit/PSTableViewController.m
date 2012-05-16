@@ -54,12 +54,6 @@ separatorColor = _separatorColor;
 #pragma mark - View
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    [self setupTableViewWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height - self.footerView.height) style:self.tableViewStyle separatorStyle:self.tableViewCellSeparatorStyle separatorColor:self.separatorColor];
-    
-    if (self.shouldPullRefresh) {
-        [self setupPullRefresh];
-    }
 }
 
 // SUBCLASS CAN OPTIONALLY IMPLEMENT IF THEY WANT A SEARCH BAR
@@ -112,6 +106,16 @@ separatorColor = _separatorColor;
     
     // Set the active scrollView
     self.activeScrollView = self.tableView;
+}
+
+- (void)setupSubviews {
+    [super setupSubviews];
+    
+    [self setupTableViewWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height - self.footerView.height) style:self.tableViewStyle separatorStyle:self.tableViewCellSeparatorStyle separatorColor:self.separatorColor];
+    
+    if (self.shouldPullRefresh) {
+        [self setupPullRefresh];
+    }
 }
 
 - (void)updateSubviews {
