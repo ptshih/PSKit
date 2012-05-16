@@ -10,7 +10,7 @@
 
 #define MARGIN 8.0
 
-@interface PSPopoverView ()
+@interface PSPopoverView () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) UIViewController *containerController;
 @property (nonatomic, strong) UIView *containerView;

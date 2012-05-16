@@ -10,7 +10,7 @@
 
 @protocol PSPopoverViewDelegate;
 
-@interface PSPopoverView : PSView <UIGestureRecognizerDelegate>
+@interface PSPopoverView : PSView
 
 @property (nonatomic, strong) UIView *overlayView;
 @property (nonatomic, strong) UIView *contentView;
