@@ -191,10 +191,6 @@ indexToRectMap = _indexToRectMap;
     self.delegate = nil;
     self.collectionViewDataSource = nil;
     self.collectionViewDelegate = nil;
-    
-    // release retains
-    self.loadingView = nil;
-    
 }
 
 #pragma mark - Setters

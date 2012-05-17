@@ -36,6 +36,24 @@ shouldPullRefresh = _shouldPullRefresh;
     return self;
 }
 
+- (void)viewDidUnload {
+    [super viewDidUnload];
+    
+    self.collectionView.delegate = nil;
+    self.collectionView.collectionViewDelegate = nil;
+    self.collectionView.collectionViewDataSource = nil;
+    
+    self.pullRefreshView.delegate = nil;
+}
+
+- (void)dealloc {
+    self.collectionView.delegate = nil;
+    self.collectionView.collectionViewDelegate = nil;
+    self.collectionView.collectionViewDataSource = nil;
+    
+    self.pullRefreshView.delegate = nil;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 }

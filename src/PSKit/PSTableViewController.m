@@ -51,6 +51,25 @@ separatorColor = _separatorColor;
     return self;
 }
 
+- (void)viewDidUnload {
+    [super viewDidUnload];
+    self.tableView.delegate = nil;
+    self.tableView.dataSource = nil;
+    
+    self.searchBar.delegate = nil;
+    
+    self.pullRefreshView.delegate = nil;
+}
+
+- (void)dealloc {
+    self.tableView.delegate = nil;
+    self.tableView.dataSource = nil;
+    
+    self.searchBar.delegate = nil;
+    
+    self.pullRefreshView.delegate = nil;
+}
+
 #pragma mark - View
 - (void)viewDidLoad {
     [super viewDidLoad];
