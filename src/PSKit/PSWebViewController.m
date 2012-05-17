@@ -8,17 +8,31 @@
 
 #import "PSWebViewController.h"
 
+@interface PSWebViewController () <UIWebViewDelegate>
+
+@property (nonatomic, strong) UIWebView *webView;
+@property (nonatomic, strong) UIActivityIndicatorView *activityView;
+@property (nonatomic, copy) NSString *URLPath;
+@property (nonatomic, copy) NSString *webTitle;
+
+- (void)loadWebView;
+
+@end
+
 @implementation PSWebViewController
 
 @synthesize
 webView = _webView,
 activityView = _activityView,
-URLPath = _URLPath;
+URLPath = _URLPath,
+webTitle = _webTitle;
 
-- (id)initWithURLPath:(NSString *)URLPath {
+
+- (id)initWithURLPath:(NSString *)URLPath title:(NSString *)title {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         self.URLPath = URLPath;
+        self.webTitle = title;
     }
     return self;
 }
@@ -26,17 +40,10 @@ URLPath = _URLPath;
 - (void)viewDidUnload {
     [super viewDidUnload];
     self.webView.delegate = nil;
-    self.webView = nil;
-    self.activityView = nil;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     self.webView.delegate = nil;
-    self.webView = nil;
-    self.activityView = nil;
-    self.URLPath = nil;
-    [super dealloc];
 }
 
 #pragma mark - View Config
@@ -48,13 +55,66 @@ URLPath = _URLPath;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self loadWebView];
+}
+
+#pragma mark - Config Subviews
+- (void)setupSubviews {
+    [super setupSubviews];
+    
     // WebView
-    self.webView = [[[UIWebView alloc] initWithFrame:self.view.bounds] autorelease];
+    self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height - self.footerView.height)];
     self.webView.delegate = self;
     self.webView.scalesPageToFit = YES;
     [self.view addSubview:self.webView];
-    [self loadWebView];
 }
+
+- (void)setupHeader {
+    [super setupHeader];
+    
+    // Setup perma header
+    self.headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)];
+    self.headerView.backgroundColor = [UIColor blackColor];
+    self.headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    
+    self.leftButton = [UIButton buttonWithFrame:CGRectMake(0, 0, 44, 44) andStyle:nil target:self action:@selector(leftAction)];
+    [self.leftButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonLeftBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    [self.leftButton setImage:[UIImage imageNamed:@"IconBackWhite"] forState:UIControlStateNormal];
+    self.leftButton.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
+    
+    NSString *title = self.webTitle ? self.webTitle : @"Loading...";
+    self.centerButton = [UIButton buttonWithFrame:CGRectMake(44, 0, self.headerView.width - 88, 44) andStyle:@"navigationTitleLabel" target:self action:@selector(centerAction)];
+    [self.centerButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonCenterBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    [self.centerButton setTitle:title forState:UIControlStateNormal];
+    self.centerButton.titleLabel.adjustsFontSizeToFitWidth = YES;
+    self.centerButton.titleEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 8);
+    self.centerButton.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    self.centerButton.userInteractionEnabled = NO;
+    
+    self.rightButton = [UIButton buttonWithFrame:CGRectMake(self.headerView.width - 44, 0, 44, 44) andStyle:nil target:self action:@selector(rightAction)];
+    [self.rightButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonRightBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    //    [self.rightButton setImage:[UIImage imageNamed:@"IconPinWhite"] forState:UIControlStateNormal];
+    self.rightButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+    self.rightButton.userInteractionEnabled = NO;
+    
+    [self.headerView addSubview:self.leftButton];
+    [self.headerView addSubview:self.centerButton];
+    [self.headerView addSubview:self.rightButton];
+    [self.view addSubview:self.headerView];
+}
+
+#pragma mark - Actions
+- (void)leftAction {
+    [(PSNavigationController *)self.parentViewController popViewControllerWithDirection:PSNavigationControllerDirectionRight animated:YES];
+}
+
+- (void)centerAction {
+    
+}
+
+- (void)rightAction {
+}
+
 
 - (void)loadWebView {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self.URLPath]];
@@ -70,9 +130,8 @@ URLPath = _URLPath;
     }
     
     if (navigationType == UIWebViewNavigationTypeLinkClicked || navigationType == UIWebViewNavigationTypeFormSubmitted || navigationType == UIWebViewNavigationTypeFormResubmitted) {
-        PSWebViewController *vc = [[PSWebViewController alloc] initWithURLPath:[req.URL absoluteString]];
+        PSWebViewController *vc = [[PSWebViewController alloc] initWithURLPath:[req.URL absoluteString] title:nil];
         [self.navigationController pushViewController:vc animated:YES];
-        [vc release];
         return NO;
     } else {
         return YES;
@@ -80,7 +139,10 @@ URLPath = _URLPath;
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView{
-    self.title = [[webView stringByEvaluatingJavaScriptFromString:@"document.title"] stringByUnescapingHTML];
+    if (!self.webTitle) {
+        [self.centerButton setTitle:[[webView stringByEvaluatingJavaScriptFromString:@"document.title"] stringByUnescapingHTML] forState:UIControlStateNormal];
+    }
+//    self.title = [[webView stringByEvaluatingJavaScriptFromString:@"document.title"] stringByUnescapingHTML];
 }
 
 @end

@@ -9,14 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "PSViewController.h"
 
-@interface PSWebViewController : PSViewController <UIWebViewDelegate> {
-}
+@interface PSWebViewController : PSViewController
 
-@property (nonatomic, retain) UIWebView *webView;
-@property (nonatomic, retain) UIActivityIndicatorView *activityView;
-@property (nonatomic, copy) NSString *URLPath;
-
-- (id)initWithURLPath:(NSString *)URLPath;
-- (void)loadWebView;
+- (id)initWithURLPath:(NSString *)URLPath title:(NSString *)title;
 
 @end
