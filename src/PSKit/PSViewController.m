@@ -130,6 +130,11 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
     }
 }
 
+#pragma mark - DataSource
+- (void)loadDataSource {
+    // subclass should implement
+}
+
 #pragma mark - Rotation
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
