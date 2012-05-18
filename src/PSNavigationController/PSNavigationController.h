@@ -16,6 +16,8 @@
  iOS5 only, uses view containment
  */
 
+typedef void (^PSNavigationControllerCompletionBlock)(void);
+
 typedef enum {
     PSNavigationControllerDirectionLeft = 1,
     PSNavigationControllerDirectionRight = 2,
@@ -46,12 +48,18 @@ typedef enum {
  Push and Pop
  */
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated;
+- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated completionBlock:(PSNavigationControllerCompletionBlock)completionBlock;
+
 - (void)pushViewController:(UIViewController *)viewController direction:(PSNavigationControllerDirection)direction animated:(BOOL)animated;
+- (void)pushViewController:(UIViewController *)viewController direction:(PSNavigationControllerDirection)direction animated:(BOOL)animated completionBlock:(PSNavigationControllerCompletionBlock)completionBlock;
+
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated;
 - (UIViewController *)popViewControllerWithDirection:(PSNavigationControllerDirection)direction animated:(BOOL)animated;
 
 - (NSArray *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated;
 - (NSArray *)popToRootViewControllerAnimated:(BOOL)animated;
+
+- (UIViewController *)removeViewController:(UIViewController *)viewController;
 
 @end
 

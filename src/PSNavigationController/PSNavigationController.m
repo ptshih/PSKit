@@ -87,7 +87,15 @@ const CGFloat kAnimationDuration = 0.35;
     [self pushViewController:viewController direction:PSNavigationControllerDirectionLeft animated:animated];
 }
 
+- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated completionBlock:(PSNavigationControllerCompletionBlock)completionBlock {
+    [self pushViewController:viewController direction:PSNavigationControllerDirectionLeft animated:animated completionBlock:completionBlock];
+}
+
 - (void)pushViewController:(UIViewController *)viewController direction:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
+    [self pushViewController:viewController direction:direction animated:animated completionBlock:NULL];
+}
+
+- (void)pushViewController:(UIViewController *)viewController direction:(PSNavigationControllerDirection)direction animated:(BOOL)animated completionBlock:(PSNavigationControllerCompletionBlock)completionBlock {
     
     if (!self.isTransitioning) {
         self.isTransitioning = YES;
@@ -143,6 +151,10 @@ const CGFloat kAnimationDuration = 0.35;
         self.isTransitioning = NO;
         
         [[UIApplication sharedApplication] endIgnoringInteractionEvents];
+        
+        if (completionBlock) {
+            completionBlock();
+        }
     }];
 }
 
@@ -251,6 +263,19 @@ const CGFloat kAnimationDuration = 0.35;
 
 - (NSArray *)popToRootViewControllerAnimated:(BOOL)animated {
     return [self popToViewController:[self.viewControllers firstObject] animated:animated];
+}
+
+- (UIViewController *)removeViewController:(UIViewController *)viewController {
+    // Make sure the view controller is in the stack
+    BOOL isInStack = [self.viewControllers containsObject:viewController];
+    if (!isInStack) return nil;
+    
+    // If the viewController is already at the top, don't do anything
+    if ([self.topViewController isEqual:viewController]) return nil;
+    
+    [self.viewControllers removeObject:viewController];
+    
+    return viewController;
 }
 
 #pragma mark - Rotation
