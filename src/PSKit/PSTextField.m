@@ -49,11 +49,13 @@ inset = _inset;
 }
 
 - (CGRect)leftViewRectForBounds:(CGRect)bounds {
-    return CGRectMake(self.inset.left, floorf((bounds.size.height - 16) / 2), 16, 16);
+    CGFloat dim = bounds.size.height - self.inset.top * 2;
+    return CGRectMake(self.inset.left, self.inset.top, dim, dim);
 }
 
 - (CGRect)rightViewRectForBounds:(CGRect)bounds {
-    return CGRectMake(self.width - self.inset.right - 16, floorf((bounds.size.height - 16) / 2), 16, 16);
+    CGFloat dim = bounds.size.height - self.inset.top * 2;
+    return CGRectMake(self.width - self.inset.right, self.inset.top, dim, dim);
 }
 
 // This overrides the default image for a clear button
