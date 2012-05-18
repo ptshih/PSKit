@@ -11,6 +11,20 @@
 
 @implementation NSArray (PSKit)
 
++ (id)withObjectOrNil:(id)objectOrNil {
+    return objectOrNil ? [self arrayWithObject:objectOrNil] : [self array];
+}
+
+
+- (id)objectAtIndexOrNil:(NSUInteger)index {
+    return (index < self.count) ? [self objectAtIndex:index] : nil;
+}
+
+
+- (id)lastObjectOrNil {
+    return (self.count ? self.lastObject : nil);
+}
+
 - (id)firstObject {
   if ([self count] > 0) {
     return [self objectAtIndex:0];

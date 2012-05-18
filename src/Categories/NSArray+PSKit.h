@@ -11,6 +11,10 @@
 
 @interface NSArray (PSKit)
 
++ (id)withObjectOrNil:(id)objectOrNil;
+- (id)objectAtIndexOrNil:(NSUInteger)index;
+- (id)lastObjectOrNil;
+
 - (id)firstObject;
 - (id)randomObject;
 
