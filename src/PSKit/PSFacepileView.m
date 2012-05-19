@@ -8,7 +8,7 @@
 
 #import "PSFacepileView.h"
 
-#define IMAGE_SIZE 30.0
+#define IMAGE_SIZE 28.0
 #define MARGIN 4.0
 #define NUM_FACES 4
 
