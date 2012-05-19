@@ -15,6 +15,8 @@
 @property (nonatomic, copy) NSString *URLPath;
 @property (nonatomic, copy) NSString *webTitle;
 
+@property (nonatomic, strong) UIActivityIndicatorView *spinnerView;
+
 - (void)loadWebView;
 
 @end
@@ -26,6 +28,9 @@ webView = _webView,
 activityView = _activityView,
 URLPath = _URLPath,
 webTitle = _webTitle;
+
+@synthesize
+spinnerView = _spinnerView;
 
 
 - (id)initWithURLPath:(NSString *)URLPath title:(NSString *)title {
@@ -96,6 +101,10 @@ webTitle = _webTitle;
     //    [self.rightButton setImage:[UIImage imageNamed:@"IconPinWhite"] forState:UIControlStateNormal];
     self.rightButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     self.rightButton.userInteractionEnabled = NO;
+    self.spinnerView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    self.spinnerView.frame = self.rightButton.bounds;
+    self.spinnerView.hidesWhenStopped = YES;
+    [self.rightButton addSubview:self.spinnerView];
     
     [self.headerView addSubview:self.leftButton];
     [self.headerView addSubview:self.centerButton];
@@ -123,6 +132,8 @@ webTitle = _webTitle;
 
 #pragma mark - UIWebViewDelegate
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)req navigationType:(UIWebViewNavigationType)navigationType {
+    [self.spinnerView startAnimating];
+    
     NSMutableURLRequest *request = (NSMutableURLRequest *)req;
     
     if ([request respondsToSelector:@selector(setValue:forHTTPHeaderField:)]) {
@@ -139,6 +150,8 @@ webTitle = _webTitle;
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView{
+    [self.spinnerView stopAnimating];
+    
     if (!self.webTitle) {
         [self.centerButton setTitle:[[webView stringByEvaluatingJavaScriptFromString:@"document.title"] stringByUnescapingHTML] forState:UIControlStateNormal];
     }
