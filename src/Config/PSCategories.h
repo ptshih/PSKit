@@ -9,6 +9,7 @@
 #import "UIButton+PSKit.h"
 #import "UIColor+PSKit.h"
 #import "UIImage+PSKit.h"
+#import "UIImageView+PSKit.h"
 #import "UILabel+PSKit.h"
 #import "UIScreen+PSKit.h"
 #import "UIView+PSKit.h"
