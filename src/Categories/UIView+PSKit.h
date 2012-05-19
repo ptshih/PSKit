@@ -38,4 +38,6 @@
 
 - (void)flipViewForInterfaceOrientation:(UIInterfaceOrientation)orientation;
 
+- (BOOL)findAndResignFirstResponder;
+
 @end
