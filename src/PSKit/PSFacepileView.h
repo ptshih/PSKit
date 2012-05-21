@@ -11,8 +11,8 @@
 @interface PSFacepileView : PSView
 
 - (void)prepareForReuse;
-- (void)loadWithFaces:(NSArray *)faces;
-+ (CGFloat)heightWithFaces:(NSArray *)faces;
-+ (CGFloat)widthWithFaces:(NSArray *)faces;
+- (void)loadWithFaces:(NSArray *)faces shouldShowNames:(BOOL)shouldShowNames;
++ (CGFloat)heightWithFaces:(NSArray *)faces shouldShowNames:(BOOL)shouldShowNames;
++ (CGFloat)widthWithFaces:(NSArray *)faces shouldShowNames:(BOOL)shouldShowNames;
 
 @end

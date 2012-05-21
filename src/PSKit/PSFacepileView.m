@@ -15,7 +15,8 @@
 @interface PSFacepileView ()
 
 @property (nonatomic, copy) NSArray *faces;
-@property (nonatomic, retain) NSMutableArray *faceViews;
+@property (nonatomic, strong) NSMutableArray *faceViews;
+@property (nonatomic, strong) UILabel *nameLabel;
 
 @end
 
@@ -23,12 +24,16 @@
 
 @synthesize
 faces = _faces,
-faceViews = _faceViews;
+faceViews = _faceViews,
+nameLabel = _nameLabel;
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         self.faceViews = [NSMutableArray array];
+        self.nameLabel = [UILabel labelWithStyle:@"facepileLabel"];
+        self.nameLabel.hidden = YES;
+        [self addSubview:self.nameLabel];
     }
     return self;
 }
@@ -36,6 +41,9 @@ faceViews = _faceViews;
 - (void)prepareForReuse {
     [self.faceViews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [self.faceViews removeAllObjects];
+    
+    self.nameLabel.text = nil;
+    self.nameLabel.hidden = YES;
 }
 
 - (void)layoutSubviews {
@@ -43,6 +51,16 @@ faceViews = _faceViews;
     
     CGFloat top = 0.0;
     CGFloat left = 0.0;
+    CGFloat width = self.width;
+    CGSize labelSize = CGSizeZero;
+    
+    // Name Label
+    if (!self.nameLabel.hidden) {
+        labelSize = [PSStyleSheet sizeForText:self.nameLabel.text width:width style:@"facepileLabel"];
+        self.nameLabel.frame = CGRectMake(left, top, labelSize.width, labelSize.height);
+        
+        top = self.nameLabel.bottom + MARGIN;
+    }
     
     NSInteger faceCount = 0;
     for (UIView *faceView in self.faceViews) {
@@ -59,8 +77,16 @@ faceViews = _faceViews;
 }
 
 
-- (void)loadWithFaces:(NSArray *)faces {
+- (void)loadWithFaces:(NSArray *)faces shouldShowNames:(BOOL)shouldShowNames {
     self.faces = faces;
+    
+    if (shouldShowNames) {
+        NSString *nameString = [NSString stringWithFormat:@"%@", [[faces valueForKey:@"name"] componentsJoinedByString:@", "]];
+        self.nameLabel.text = nameString;
+        self.nameLabel.hidden = NO;
+    } else {
+        self.nameLabel.hidden = YES;
+    }
     
     NSInteger faceCount = 0;
     for (NSDictionary *face in faces) {
@@ -88,13 +114,27 @@ faceViews = _faceViews;
     }
 }
 
-+ (CGFloat)heightWithFaces:(NSArray *)faces {
-    return IMAGE_SIZE;
++ (CGFloat)heightWithFaces:(NSArray *)faces shouldShowNames:(BOOL)shouldShowNames {
+    CGFloat width = [[self class] widthWithFaces:faces shouldShowNames:shouldShowNames];
+    CGFloat height = 0.0;
+    
+    if (shouldShowNames) {
+        NSString *nameString = [NSString stringWithFormat:@"%@", [[faces valueForKey:@"name"] componentsJoinedByString:@", "]];
+        CGSize labelSize = [PSStyleSheet sizeForText:nameString width:width style:@"facepileLabel"];
+        
+        height += labelSize.height;
+        
+        height += MARGIN;
+    }
+    
+    height += IMAGE_SIZE;
+
+    return height;
 }
 
-+ (CGFloat)widthWithFaces:(NSArray *)faces {
++ (CGFloat)widthWithFaces:(NSArray *)faces shouldShowNames:(BOOL)shouldShowNames {
     NSInteger faceCount = [faces count];
-    faceCount = MIN(5, faceCount);
+    faceCount = MAX(5, faceCount);
     
     CGFloat width = (IMAGE_SIZE * faceCount) + (MARGIN * (faceCount - 1));
     
