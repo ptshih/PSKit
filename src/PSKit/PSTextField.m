@@ -28,8 +28,8 @@ inset = _inset;
     CGRect clearViewRect = [self clearButtonRectForBounds:self.bounds];
     CGRect rightViewRect = [self rightViewRectForBounds:self.bounds];
     CGRect leftViewRect = [self leftViewRectForBounds:self.bounds];
-    CGFloat rightMargin = MAX(clearViewRect.size.width, rightViewRect.size.width) + self.inset.right;
-    CGFloat leftMargin = leftViewRect.size.width + self.inset.left;
+    CGFloat rightMargin = MAX(clearViewRect.size.width, rightViewRect.size.width);
+    CGFloat leftMargin = leftViewRect.size.width;
     
     return UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsMake(inset.top, inset.left + leftMargin, inset.bottom, inset.right + rightMargin));
 }
@@ -55,7 +55,7 @@ inset = _inset;
 
 - (CGRect)rightViewRectForBounds:(CGRect)bounds {
     CGFloat dim = bounds.size.height - self.inset.top * 2;
-    return CGRectMake(self.width - self.inset.right, self.inset.top, dim, dim);
+    return CGRectMake(self.width - self.inset.right - dim, self.inset.top, dim, dim);
 }
 
 // This overrides the default image for a clear button
