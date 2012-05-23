@@ -41,4 +41,21 @@
   }
 }
 
+- (NSString *)stringWithLengthAndCount:(NSInteger)length {
+    NSMutableString *s = [NSMutableString string];
+    
+    NSInteger l = MIN(length, self.count);
+    NSRange r = NSMakeRange(0, l);
+    
+    NSArray *subArray = [self subarrayWithRange:r];
+    NSInteger remainder = self.count - l;
+    
+    [s appendString:[subArray componentsJoinedByString:@", "]];
+    if (l < self.count) {
+        [s appendFormat:@" and %d more", remainder];
+    }
+    
+    return [NSString stringWithString:s];
+}
+
 @end

@@ -18,4 +18,6 @@
 - (id)firstObject;
 - (id)randomObject;
 
+- (NSString *)stringWithLengthAndCount:(NSInteger)length;
+
 @end
