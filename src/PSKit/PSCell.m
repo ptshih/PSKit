@@ -72,8 +72,8 @@ separatorLine = _separatorLine;
 
 // This is a class method because it is called before the cell has finished its layout
 + (CGFloat)rowHeightForObject:(id)object atIndexPath:(NSIndexPath *)indexPath forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // subclass must implement
-    return 0.0;
+    // subclass must implement, defaults to rowHeight
+    return [[self class] rowHeight];
 }
 
 - (void)tableView:(UITableView *)tableView fillCellWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath {
