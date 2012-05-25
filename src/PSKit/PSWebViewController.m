@@ -142,7 +142,7 @@ spinnerView = _spinnerView;
     
     if (navigationType == UIWebViewNavigationTypeLinkClicked || navigationType == UIWebViewNavigationTypeFormSubmitted || navigationType == UIWebViewNavigationTypeFormResubmitted) {
         PSWebViewController *vc = [[PSWebViewController alloc] initWithURLPath:[req.URL absoluteString] title:nil];
-        [self.navigationController pushViewController:vc animated:YES];
+        [(PSNavigationController *)self.parentViewController pushViewController:vc animated:YES];
         return NO;
     } else {
         return YES;
