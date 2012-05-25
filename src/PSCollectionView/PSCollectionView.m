@@ -199,7 +199,7 @@ indexToRectMap = _indexToRectMap;
     if (_loadingView && [_loadingView respondsToSelector:@selector(removeFromSuperview)]) {
         [_loadingView removeFromSuperview];
     }
-    _loadingView = nil;
+    
     _loadingView = loadingView;
     
     [self addSubview:_loadingView];
