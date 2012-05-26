@@ -61,7 +61,10 @@ shouldPullRefresh = _shouldPullRefresh;
 - (void)setupSubviews {
     [super setupSubviews];
     
-    self.collectionView = [[PSCollectionView alloc] initWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height - self.footerView.height)];
+    CGFloat visibleHeaderHeight = self.headerView.bottom;
+    CGFloat visibleFooterHeight = self.view.height - self.footerView.top;
+    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
+    self.collectionView = [[PSCollectionView alloc] initWithFrame:frame];
     [self.view addSubview:self.collectionView];
     self.collectionView.delegate = self;
     self.collectionView.collectionViewDelegate = self;
@@ -91,7 +94,8 @@ shouldPullRefresh = _shouldPullRefresh;
     [super updateSubviews];
     CGFloat visibleHeaderHeight = self.headerView.bottom;
     CGFloat visibleFooterHeight = self.view.height - self.footerView.top;
-    self.collectionView.frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
+    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
+    self.collectionView.frame = frame;
 }
 
 - (void)setupPullRefresh {

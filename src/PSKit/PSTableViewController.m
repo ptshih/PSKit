@@ -130,7 +130,10 @@ separatorColor = _separatorColor;
 - (void)setupSubviews {
     [super setupSubviews];
     
-    [self setupTableViewWithFrame:CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height - self.footerView.height) style:self.tableViewStyle separatorStyle:self.tableViewCellSeparatorStyle separatorColor:self.separatorColor];
+    CGFloat visibleHeaderHeight = self.headerView.bottom;
+    CGFloat visibleFooterHeight = self.view.height - self.footerView.top;
+    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
+    [self setupTableViewWithFrame:frame style:self.tableViewStyle separatorStyle:self.tableViewCellSeparatorStyle separatorColor:self.separatorColor];
     
     if (self.shouldPullRefresh) {
         [self setupPullRefresh];
@@ -141,7 +144,8 @@ separatorColor = _separatorColor;
     [super updateSubviews];
     CGFloat visibleHeaderHeight = self.headerView.bottom;
     CGFloat visibleFooterHeight = self.view.height - self.footerView.top;
-    self.tableView.frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
+    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
+    self.tableView.frame = frame;
 }
 
 // SUBCLASS CAN OPTIONALLY CALL
