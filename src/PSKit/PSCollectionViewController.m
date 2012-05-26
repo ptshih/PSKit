@@ -89,7 +89,9 @@ shouldPullRefresh = _shouldPullRefresh;
 
 - (void)updateSubviews {
     [super updateSubviews];
-    self.collectionView.frame = CGRectMake(0, self.headerView.bottom, self.view.width, self.view.height - self.headerView.height - self.footerView.height);
+    CGFloat visibleHeaderHeight = self.headerView.bottom;
+    CGFloat visibleFooterHeight = self.view.height - self.footerView.top;
+    self.collectionView.frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
 }
 
 - (void)setupPullRefresh {
