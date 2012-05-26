@@ -127,6 +127,10 @@ shouldPullRefresh = _shouldPullRefresh;
     [self endRefresh];
 }
 
+- (BOOL)dataSourceIsEmpty {
+    return ([self.items count] == 0);
+}
+
 #pragma mark - PSCollectionViewDelegate
 - (NSInteger)numberOfViewsInCollectionView:(PSCollectionView *)collectionView {
     return [self.items count];
