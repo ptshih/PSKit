@@ -153,12 +153,17 @@ pendingOperations = _pendingOperations;
             NSLog(@"### Request: %d remaining in low priority queue", self.networkQueue.operationCount);
             
             NSError *error = nil;
-            NSURLResponse *response = nil;
+            NSHTTPURLResponse *response = nil;
             NSData *cachedData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+            
+            // Handle HTTP response codes
+            if ([response isKindOfClass:[NSHTTPURLResponse class]] && response.statusCode != 200) {
+                error = [NSError errorWithDomain:@"PSURLCacheErrorDomain" code:response.statusCode userInfo:nil];
+            }
+            
+            // Cache data if exists
             if (cachedData && !error) {
                 [blockSelf cacheData:cachedData URL:cachedURL cacheType:cacheType];
-            } else {
-                // error
             }
             
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
