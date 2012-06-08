@@ -60,4 +60,9 @@ shouldAnimate = _shouldAnimate;
     }
 }
 
+- (void)setPlaceholderImage:(UIImage *)placeholderImage {
+    _placeholderImage = placeholderImage;
+    [super setImage:placeholderImage];
+}
+
 @end
