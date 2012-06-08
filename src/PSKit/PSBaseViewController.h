@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "PSViewController.h"
 
-@interface PSBaseViewController : PSViewController <PSErrorViewDelegate>
+@interface PSBaseViewController : PSViewController
 
 /**
  requestQueue is a serial queue for loading a view controller's data source.

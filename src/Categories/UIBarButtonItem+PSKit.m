@@ -7,6 +7,7 @@
 //
 
 #import "UIBarButtonItem+PSKit.h"
+#import "PSStyleSheet.h"
 
 @interface UIBarButtonItem (PSKit_Private)
 

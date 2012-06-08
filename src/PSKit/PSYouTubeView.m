@@ -33,10 +33,6 @@ static NSString *kYouTubeEmbedHTML = @"<html><head>"
     return self;
 }
 
-- (void)dealloc {
-    [super dealloc];
-}
-
 - (void)loadYouTubeWithSource:(NSString *)source {
     NSString *htmlString = [NSString stringWithFormat:kYouTubeEmbedHTML, source];
     [self loadHTMLString:htmlString baseURL:nil];

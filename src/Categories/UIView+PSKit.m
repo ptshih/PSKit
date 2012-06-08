@@ -7,7 +7,6 @@
 //
 
 #import "UIView+PSKit.h"
-#import <QuartzCore/QuartzCore.h>
 
 @implementation UIView (PSKit)
 

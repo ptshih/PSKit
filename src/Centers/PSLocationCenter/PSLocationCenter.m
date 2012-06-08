@@ -8,6 +8,12 @@
 
 #import "PSLocationCenter.h"
 
+#ifdef DEBUG
+    #define kSecondsBackgroundedUntilLocationRefresh 5
+#else
+    #define kSecondsBackgroundedUntilLocationRefresh 600
+#endif
+
 //  CLLocationDistance __accuracyThreshold = 1500; // For some reason, cell tower triangulation is always = 1414
 static const CLLocationDistance __accuracyThreshold = 1500;
 static const CLLocationDistance __updateDistanceFilter = 500;
@@ -86,7 +92,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
     
     if (age <= __locationAgeThreshold && accuracy < __accuracyThreshold && accuracy > 0) {
         // Good Location Acquired
-        DLog(@"Location updated: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, [newLocation distanceFromLocation:self.location]);
+        NSLog(@"Location updated: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, [newLocation distanceFromLocation:self.location]);
         
         // Set current Location
         self.location = newLocation;
@@ -94,7 +100,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
         // Notify
         [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
     } else {
-        DLog(@"Location discarded: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, [newLocation distanceFromLocation:self.location]);
+        NSLog(@"Location discarded: %@, oldLocation: %@, accuracy: %g, age: %g, distanceChanged: %g", newLocation, oldLocation, accuracy, age, [newLocation distanceFromLocation:self.location]);
     }
 }
 
@@ -119,7 +125,7 @@ shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
         
         // If we don't have a location yet, get one
         // If our app session expired, get a new location
-        if (![self hasAcquiredLocation] || secondsBackgrounded > kSecondsBackgroundedUntilStale) {
+        if (![self hasAcquiredLocation] || secondsBackgrounded > kSecondsBackgroundedUntilLocationRefresh) {
             self.location = nil;
             [self.locationManager startUpdatingLocation];
         }

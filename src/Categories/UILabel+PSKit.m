@@ -7,6 +7,7 @@
 //
 
 #import "UILabel+PSKit.h"
+#import "PSStyleSheet.h"
 
 @implementation UILabel (PSKit)
 

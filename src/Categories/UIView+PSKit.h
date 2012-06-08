@@ -6,7 +6,7 @@
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <QuartzCore/QuartzCore.h>
 
 @interface UIView (PSKit)
 

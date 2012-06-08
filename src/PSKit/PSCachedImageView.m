@@ -66,14 +66,12 @@ loadingIndicator = _loadingIndicator;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(imageDidLoad:) name:kPSURLCacheDidCache object:[PSURLCache sharedCache]];
     
-    BLOCK_SELF;
-    
     [[PSURLCache sharedCache] loadURL:self.URL cacheType:cacheType usingCache:YES completionBlock:^(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error) {
         ASSERT_MAIN_THREAD;
         if (error) {
-            [blockSelf.loadingIndicator stopAnimating];
-            DLog(@"eror loading image: %@", cachedURL);
-            blockSelf.image = blockSelf.placeholderImage;
+            [self.loadingIndicator stopAnimating];
+            NSLog(@"eror loading image: %@", cachedURL);
+            self.image = self.placeholderImage;
         } else {
             // use notification
         }
