@@ -34,12 +34,10 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
 
 - (void)viewDidUnload {
     [super viewDidUnload];
-    VLog(@"#%@", [self class]);
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    VLog(@"#%@", [self class]);
 }
 
 #pragma mark - View
@@ -49,7 +47,6 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    VLog(@"#%@", [self class]);
     
     self.view.autoresizingMask = ~UIViewAutoresizingNone;
     
@@ -74,22 +71,18 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    VLog(@"#%@", [self class]);
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    VLog(@"#%@", [self class]);
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    VLog(@"#%@", [self class]);
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    VLog(@"#%@", [self class]);
 }
 
 /*
