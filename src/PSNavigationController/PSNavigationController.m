@@ -182,9 +182,11 @@ const CGFloat kAnimationDuration = 0.35;
     [poppedViewController willMoveToParentViewController:nil];
 
     // In case the previous view controller was reloaded due to memory, restore transform
-    if (CGAffineTransformIsIdentity(self.topViewController.view.transform)) {
-        self.topViewController.view.transform = CGAffineTransformMakeScale(kPushPopScale, kPushPopScale);
-    }
+
+    // Reset hidden view controller's frame and transform
+    self.topViewController.view.transform = CGAffineTransformIdentity;
+    self.topViewController.view.frame = self.view.bounds;
+    self.topViewController.view.transform = CGAffineTransformMakeScale(kPushPopScale, kPushPopScale);
     
     // Add Gray Layer
     self.overlayView.frame = self.topViewController.view.bounds;
