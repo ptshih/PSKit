@@ -22,7 +22,8 @@ collectionView = _collectionView,
 pullRefreshView = _pullRefreshView;
 
 @synthesize
-shouldPullRefresh = _shouldPullRefresh;
+shouldPullRefresh = _shouldPullRefresh,
+pullRefreshStyle = _pullRefreshStyle;
 
 #pragma mark - Init
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -32,6 +33,7 @@ shouldPullRefresh = _shouldPullRefresh;
         
         // Config
         self.shouldPullRefresh = NO;
+        self.pullRefreshStyle = PSPullRefreshStyleBlack;
     }
     return self;
 }
@@ -100,7 +102,7 @@ shouldPullRefresh = _shouldPullRefresh;
 
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
-        self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.collectionView.frame.size.width, 48.0) style:PSPullRefreshStyleBlack];
+        self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.collectionView.frame.size.width, 48.0) style:self.pullRefreshStyle];
         self.pullRefreshView.scrollView = self.collectionView;
         self.pullRefreshView.delegate = self;
         [self.collectionView addSubview:self.pullRefreshView];		

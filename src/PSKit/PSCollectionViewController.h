@@ -18,5 +18,6 @@
 
 // Config
 @property (nonatomic, assign) BOOL shouldPullRefresh;
+@property (nonatomic, assign) PSPullRefreshStyle pullRefreshStyle;
 
 @end

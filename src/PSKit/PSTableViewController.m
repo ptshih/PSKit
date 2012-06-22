@@ -30,6 +30,7 @@ loadMoreView = _loadMoreView;
 
 @synthesize
 shouldPullRefresh = _shouldPullRefresh,
+pullRefreshStyle = _pullRefreshStyle,
 tableViewStyle = _tableViewStyle,
 tableViewCellSeparatorStyle = _tableViewCellSeparatorStyle,
 separatorColor = _separatorColor;
@@ -47,6 +48,7 @@ separatorColor = _separatorColor;
         
         // Config
         self.shouldPullRefresh = NO;
+        self.pullRefreshStyle = PSPullRefreshStyleBlack;
     }
     return self;
 }
@@ -151,7 +153,7 @@ separatorColor = _separatorColor;
 // SUBCLASS CAN OPTIONALLY CALL
 - (void)setupPullRefresh {
     if (self.pullRefreshView == nil) {
-        self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.tableView.frame.size.width, 48.0) style:PSPullRefreshStyleBlack];
+        self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.tableView.frame.size.width, 48.0) style:self.pullRefreshStyle];
         self.pullRefreshView.scrollView = self.tableView;
         self.pullRefreshView.delegate = self;
         [self.tableView addSubview:self.pullRefreshView];		

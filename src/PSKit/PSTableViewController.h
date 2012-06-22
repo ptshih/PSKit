@@ -25,6 +25,7 @@
 
 // Config
 @property (nonatomic, assign) BOOL shouldPullRefresh;
+@property (nonatomic, assign) PSPullRefreshStyle pullRefreshStyle;
 @property (nonatomic, assign) UITableViewStyle tableViewStyle;
 @property (nonatomic, assign) UITableViewCellSeparatorStyle tableViewCellSeparatorStyle;
 @property (nonatomic, strong) UIColor *separatorColor;
