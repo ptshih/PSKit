@@ -113,6 +113,9 @@ pendingOperations = _pendingOperations;
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL method:@"GET" headers:nil parameters:nil];
     
+    // Configure request
+    request.timeoutInterval = 15; // 15 seconds
+    
     [self loadRequest:request cacheType:cacheType usingCache:usingCache completionBlock:completionBlock];
 }
 
