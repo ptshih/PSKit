@@ -14,6 +14,7 @@
 #import "PSObject.h"
 #import "PSView.h"
 #import "PSCell.h"
+#import "PSLabel.h"
 #import "PSImageView.h"
 #import "PSRandomSortDescriptor.h"
 //#import "PSNavigationBar.h"
