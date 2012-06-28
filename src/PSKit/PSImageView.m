@@ -12,6 +12,7 @@
 
 @synthesize
 placeholderImage = _placeholderImage,
+bgColor = _bgColor,
 shouldResize = _shouldResize,
 shouldAnimate = _shouldAnimate;
 
@@ -27,6 +28,7 @@ shouldAnimate = _shouldAnimate;
         self.contentScaleFactor = [UIScreen mainScreen].scale;
         
         self.backgroundColor = RGBACOLOR(230, 230, 230, 1.0);
+        self.bgColor = [UIColor clearColor];
     }
     return self;
 }
@@ -43,7 +45,7 @@ shouldAnimate = _shouldAnimate;
 - (void)setImage:(UIImage *)image {
     ASSERT_MAIN_THREAD;
     if (image && ![image isEqual:self.placeholderImage]) {
-        self.backgroundColor = [UIColor clearColor];
+        self.backgroundColor = self.bgColor;
         // Only animate on Retina screens
         if (self.shouldAnimate && [UIScreen mainScreen].scale > 1.0) {
             self.alpha = 0.0;

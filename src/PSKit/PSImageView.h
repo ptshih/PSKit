@@ -12,6 +12,7 @@
 @interface PSImageView : UIImageView
 
 @property (nonatomic, strong) UIImage *placeholderImage;
+@property (nonatomic, strong) UIColor *bgColor;
 @property (nonatomic, assign) BOOL shouldResize;
 @property (nonatomic, assign) BOOL shouldAnimate;
 
