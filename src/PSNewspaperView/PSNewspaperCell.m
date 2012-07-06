@@ -30,6 +30,8 @@ textView = _textView;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.cellType = PSNewspaperCellSmall;
+        
         self.imageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
         self.imageView.clipsToBounds = YES;
         self.imageView.contentMode = UIViewContentModeScaleAspectFill;

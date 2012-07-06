@@ -10,8 +10,8 @@
 #import "NewspaperTextView.h"
 
 enum {
-    PSNewspaperCellPortrait = 0,
-    PSNewspaperCellLandscape = 1
+    PSNewspaperCellSmall = 0,
+    PSNewspaperCellLarge = 1
 };
 typedef uint32_t PSNewspaperCellType;
 
