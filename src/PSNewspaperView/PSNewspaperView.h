@@ -1,6 +1,6 @@
 //
 //  PSNewspaperView.h
-//  Satsuma
+//  PSKit
 //
 //  Created by Peter Shih on 7/3/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
@@ -15,6 +15,8 @@
 
 @property (nonatomic, unsafe_unretained) id <PSNewspaperViewDelegate> newspaperViewDelegate;
 @property (nonatomic, unsafe_unretained) id <PSNewspaperViewDataSource> newspaperViewDataSource;
+
+@property (nonatomic, assign) NSInteger cellsPerPage;
 
 #pragma mark - Public Methods
 
