@@ -423,7 +423,7 @@ indexToRectMap = _indexToRectMap;
 
 #pragma mark - Gesture Recognizer
 
-- (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {    
+- (void)didSelectView:(UITapGestureRecognizer *)gestureRecognizer {
     NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
     NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
     NSString *key = [matchingKeys lastObject];

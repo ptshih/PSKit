@@ -26,6 +26,7 @@ shouldPullRefresh = _shouldPullRefresh,
 pullRefreshStyle = _pullRefreshStyle;
 
 #pragma mark - Init
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
@@ -55,6 +56,8 @@ pullRefreshStyle = _pullRefreshStyle;
     
     self.pullRefreshView.delegate = nil;
 }
+
+#pragma mark - View
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -110,6 +113,7 @@ pullRefreshStyle = _pullRefreshStyle;
 }
 
 #pragma mark - State Machine
+
 - (void)loadDataSource {
     [super loadDataSource];
     [self beginRefresh];
