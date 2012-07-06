@@ -86,9 +86,6 @@ dividers = _dividers;
         [self.cells addObject:cell];
     }
     
-    // load first page
-    [self didShowPage:0];
-    
     [self setNeedsLayout];
 }
 

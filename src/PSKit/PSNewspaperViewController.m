@@ -8,8 +8,6 @@
 
 #import "PSNewspaperViewController.h"
 
-#import "NewspaperFeaturedCell.h"
-
 @interface PSNewspaperViewController ()
 
 @end
@@ -112,7 +110,7 @@ newspaperView = _newspaperView;
 - (PSNewspaperCell *)newspaperView:(PSNewspaperView *)newspaperView cellAtIndex:(NSInteger)index {
     NSDictionary *item = [self.items objectAtIndex:index];
     
-    NewspaperFeaturedCell *cell = [[NewspaperFeaturedCell alloc] initWithFrame:CGRectZero];
+    PSNewspaperCell *cell = [[PSNewspaperCell alloc] initWithFrame:CGRectZero];
     [cell fillCellWithObject:item];
     
     return cell;
