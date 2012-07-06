@@ -29,7 +29,7 @@ textView = _textView;
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    if (self) {        
+    if (self) {
         self.imageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
         self.imageView.clipsToBounds = YES;
         self.imageView.contentMode = UIViewContentModeScaleAspectFill;

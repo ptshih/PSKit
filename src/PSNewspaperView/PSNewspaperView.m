@@ -44,10 +44,9 @@ dividers = _dividers;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        
+        // Scroll View
         self.scrollView = [[UIScrollView alloc] initWithFrame:UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsMake(0, 0, 19.0, 0))];
         self.scrollView.delegate = self;
-        self.scrollView.backgroundColor = [UIColor whiteColor];
         self.scrollView.scrollEnabled = YES;
         self.scrollView.pagingEnabled = YES;
         self.scrollView.showsVerticalScrollIndicator = NO;
@@ -56,6 +55,7 @@ dividers = _dividers;
         self.scrollView.userInteractionEnabled = YES;
         [self addSubview:self.scrollView];
         
+        // Page Control
         self.pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(0.0, self.height - 19.0, self.width, 19.0)];
         self.pageControl.backgroundColor = [UIColor blackColor];
         self.pageControl.userInteractionEnabled = NO;
