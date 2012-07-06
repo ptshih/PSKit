@@ -15,10 +15,17 @@ enum {
 };
 typedef uint32_t PSNewspaperCellType;
 
+enum {
+    PSNewspaperCellPortrait = 0,
+    PSNewspaperCellLandscape = 1
+};
+typedef uint32_t PSNewspaperCellOrientation;
+
 @interface PSNewspaperCell : UIView
 
 @property (nonatomic, copy) NSDictionary *object;
 @property (nonatomic, assign) PSNewspaperCellType cellType;
+@property (nonatomic, assign) PSNewspaperCellOrientation cellOrientation;
 
 @property (nonatomic, strong) PSCachedImageView *imageView;
 @property (nonatomic, strong) UILabel *titleLabel;

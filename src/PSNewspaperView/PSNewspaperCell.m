@@ -17,7 +17,8 @@
 @implementation PSNewspaperCell
 
 @synthesize
-cellType = _cellType;
+cellType = _cellType,
+cellOrientation = _cellOrientation;
 
 @synthesize
 object = _object;
@@ -31,6 +32,7 @@ textView = _textView;
     self = [super initWithFrame:frame];
     if (self) {
         self.cellType = PSNewspaperCellSmall;
+        self.cellOrientation = PSNewspaperCellPortrait;
         
         self.imageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
         self.imageView.clipsToBounds = YES;

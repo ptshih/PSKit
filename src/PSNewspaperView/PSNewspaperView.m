@@ -146,6 +146,8 @@ dividers = _dividers;
             // iPad
             if (self.scrollView.height > self.scrollView.width) {
                 // Portrait
+                cell.cellOrientation = PSNewspaperCellPortrait;
+                
                 // Large
                 if (pos == 0) {
                     CGFloat cellHeight = floorf(pageHeight * 0.5);
@@ -186,6 +188,8 @@ dividers = _dividers;
                 
             } else {
                 // Landscape
+                cell.cellOrientation = PSNewspaperCellLandscape;
+                
                 // Large
                 if (pos == 0) {
                     CGFloat cellWidth = floorf(pageWidth * 0.45);
