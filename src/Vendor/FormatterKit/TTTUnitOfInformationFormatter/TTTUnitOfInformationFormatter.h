@@ -1,17 +1,17 @@
 // TTTUnitOfInformationFormatter.h
 //
 // Copyright (c) 2012 Mattt Thompson (http://mattt.me)
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,6 +22,9 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ Defines units of information.
+ */
 typedef enum {
     TTTBit,
     TTTNibble,
@@ -30,6 +33,9 @@ typedef enum {
     TTTDoubleWord
 } TTTUnitOfInformation;
 
+/**
+ Defines unit prefixes.
+ */
 typedef enum {
     TTTKilo,
     TTTMega,
@@ -39,33 +45,60 @@ typedef enum {
     TTTExa,
 } TTTUnitPrefix;
 
-@interface TTTUnitOfInformationFormatter : NSFormatter {
-@private
-    BOOL _displaysInTermsOfBytes;
-    BOOL _usesIECBinaryPrefixesForCalculation;
-    BOOL _usesIECBinaryPrefixesForDisplay;
-    
-    NSNumberFormatter *_numberFormatter;
-}
+/**
+ Instances of `TTTUnitOfInformationFormatter` create localized string representations of quantities of information.
 
-@property (readonly, nonatomic, retain) NSNumberFormatter *numberFormatter;
+ For example, the the value 1080 bytes could be formatted as "1.08 KB" or "8.46 Kibit".
 
+ @discussion By default, `TTTUnitOfInformationFormatter` uses IEC binary prefixes to calculate (i.e. 1 kilobit = 1,024 bits rather than 1,000 bits), but displays in terms of standard prefixes (i.e. kbit rather than kibit). See http://en.wikipedia.org/wiki/Binary_prefix#IEC_prefixes for more informaion about IEC prefixes. Additionally.
+ */
+@interface TTTUnitOfInformationFormatter : NSFormatter <NSCoding>
+
+/**
+ Specifies the `NSNumberFormatter` object used to format numeric values in all formatted strings. By default, this uses the `NSNumberFormatterDecimalStyle` number style, and sets a rounding increment of `0.01f`.
+ */
+@property (readonly) NSNumberFormatter *numberFormatter;
+
+/**
+ Specifies whether to display units of information in terms of bytes, as opposed to bits. `YES` by default.
+ */
+@property (nonatomic, assign) BOOL displaysInTermsOfBytes;
+
+/**
+ Specifies whether to use IEC binary prefixes for calculation. `YES` by default.
+ */
+@property (nonatomic, assign) BOOL usesIECBinaryPrefixesForCalculation;
+
+/**
+ Specifies whether to use IEC binary prefixes for display. `NO` by default.
+ */
+@property (nonatomic, assign) BOOL usesIECBinaryPrefixesForDisplay;
+
+/**
+ Returns a string representation of a given number of bits formatted using the receiver’s current settings.
+
+ @param numberOfBits The number of bits to format.
+ */
 - (NSString *)stringFromNumberOfBits:(NSNumber *)numberOfBits;
 
-- (NSString *)stringFromNumber:(NSNumber *)number 
+/**
+ Returns a string representation of a given number of a specified unit of information formatted using the receiver’s current settings.
+
+ @param number The number of specified units for format.
+ @param unit The number unit.
+ */
+- (NSString *)stringFromNumber:(NSNumber *)number
                         ofUnit:(TTTUnitOfInformation)unit;
 
-- (NSString *)stringFromNumber:(NSNumber *)number 
+/**
+ Returns a string representation of a given number of a specified unit of information with a particular prefix formatted using the receiver’s current settings.
+
+ @param number The number of specified units for format.
+ @param unit The number unit.
+ @param prefix The unit prefix.
+ */
+- (NSString *)stringFromNumber:(NSNumber *)number
                         ofUnit:(TTTUnitOfInformation)unit
                     withPrefix:(TTTUnitPrefix)prefix;
-
-- (BOOL)displaysInTermsOfBytes;
-- (void)setDisplaysInTermsOfBytes:(BOOL)flag;
-
-- (BOOL)usesIECBinaryPrefixesForCalculation;
-- (void)setUsesIECBinaryPrefixesForCalculation:(BOOL)flag;
-
-- (BOOL)usesIECBinaryPrefixesForDisplay;
-- (void)setUsesIECBinaryPrefixesForDisplay:(BOOL)flag;
 
 @end

@@ -1,17 +1,17 @@
 // TTTLocationFormatter.m
 //
 // Copyright (c) 2011 Mattt Thompson (http://mattt.me)
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,12 +45,12 @@ static inline double CLLocationDistanceToMiles(CLLocationDistance distance) {
 
 #pragma mark -
 
-static inline double DEG2RAD(double degrees) { 
-    return degrees * M_PI / 180; 
+static inline double DEG2RAD(double degrees) {
+    return degrees * M_PI / 180;
 }
 
-static inline double RAD2DEG(double radians) { 
-    return radians * 180 / M_PI; 
+static inline double RAD2DEG(double radians) {
+    return radians * 180 / M_PI;
 }
 
 static inline CLLocationDegrees CLLocationDegreesBearingBetweenCoordinates(CLLocationCoordinate2D originCoordinate, CLLocationCoordinate2D destinationCoordinate) {
@@ -58,17 +58,17 @@ static inline CLLocationDegrees CLLocationDegreesBearingBetweenCoordinates(CLLoc
 	double lon1 = DEG2RAD(originCoordinate.longitude);
 	double lat2 = DEG2RAD(destinationCoordinate.latitude);
 	double lon2 = DEG2RAD(destinationCoordinate.longitude);
-	
+
     double dLon = lon2 - lon1;
 	double y = sin(dLon) * cos(lat2);
 	double x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon);
 	double bearing = atan2(y, x) + (2 * M_PI);
-	
+
     // `atan2` works on a range of -π to 0 to π, so add on 2π and perform a modulo check
 	if (bearing > (2 * M_PI)) {
 		bearing = bearing - (2 * M_PI);
 	}
-    
+
 	return RAD2DEG(bearing);
 }
 
@@ -112,14 +112,6 @@ static inline double CLLocationSpeedToMilesPerHour(CLLocationSpeed speed) {
     return speed * kTTTMetersPerSecondToMilesPerHourCoefficient;
 }
 
-
-@interface TTTLocationFormatter ()
-@property (readwrite, nonatomic, assign) TTTLocationFormatterCoordinateOrder coordinateOrder;
-@property (readwrite, nonatomic, assign) TTTLocationFormatterBearingStyle bearingStyle;
-@property (readwrite, nonatomic, assign) TTTLocationUnitSystem unitSystem;
-@property (readwrite, nonatomic, retain) NSNumberFormatter *numberFormatter;
-@end
-
 @implementation TTTLocationFormatter
 @synthesize coordinateOrder = _coordinateOrder;
 @synthesize bearingStyle = _bearingStyle;
@@ -131,27 +123,23 @@ static inline double CLLocationSpeedToMilesPerHour(CLLocationSpeed speed) {
     if (!self) {
         return nil;
     }
-    
+
     self.coordinateOrder = TTTCoordinateLatLngOrder;
     self.bearingStyle = TTTBearingWordStyle;
     self.unitSystem = TTTMetricSystem;
-    
-    self.numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-    [self.numberFormatter setLocale:[NSLocale currentLocale]];
-    [self.numberFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
-    [self.numberFormatter setMaximumSignificantDigits:2];
-    [self.numberFormatter setUsesSignificantDigits:YES];
-    
+
+    _numberFormatter = [[NSNumberFormatter alloc] init];
+    [_numberFormatter setLocale:[NSLocale currentLocale]];
+    [_numberFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    [_numberFormatter setMaximumSignificantDigits:2];
+    [_numberFormatter setUsesSignificantDigits:YES];
+
     return self;
 }
 
-- (void)dealloc {
-    [_numberFormatter release];
-    [super dealloc];
-}
 
 - (NSString *)stringFromCoordinate:(CLLocationCoordinate2D)coordinate {
-    return [NSString stringWithFormat:NSLocalizedString(@"(%@, %@)", @"Coordinate format"), [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:coordinate.latitude]], [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:coordinate.longitude]], nil];
+    return [NSString stringWithFormat:NSLocalizedString(@"(%@, %@)", @"Coordinate format"), [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:coordinate.latitude]], [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:coordinate.longitude]], nil];
 }
 
 - (NSString *)stringFromLocation:(CLLocation *)location {
@@ -161,41 +149,41 @@ static inline double CLLocationSpeedToMilesPerHour(CLLocationSpeed speed) {
 - (NSString *)stringFromDistance:(CLLocationDistance)distance {
     NSString *distanceString = nil;
     NSString *unitString = nil;
-    
+
     switch (self.unitSystem) {
         case TTTMetricSystem: {
             double meterDistance = distance;
             double kilometerDistance = CLLocationDistanceToKilometers(distance);
-            
+
             if (kilometerDistance > 1) {
-                distanceString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:kilometerDistance]];
+                distanceString = [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:kilometerDistance]];
                 unitString = NSLocalizedString(@"km", @"Kilometer Unit");
             } else {
-                distanceString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:meterDistance]];
+                distanceString = [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:meterDistance]];
                 unitString = NSLocalizedString(@"m", @"Meter Unit");
             }
-            break; 
+            break;
         }
-            
+
         case TTTImperialSystem: {
             double feetDistance = CLLocationDistanceToFeet(distance);
             double yardDistance = CLLocationDistanceToYards(distance);
             double milesDistance = CLLocationDistanceToMiles(distance);
-            
+
             if (feetDistance < 300) {
-                distanceString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:feetDistance]];
+                distanceString = [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:feetDistance]];
                 unitString = NSLocalizedString(@"ft", @"Feet Unit");
             } else if (yardDistance < 500) {
-                distanceString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:yardDistance]];
+                distanceString = [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:yardDistance]];
                 unitString = NSLocalizedString(@"yds", @"Yard Unit");
             } else {
-                distanceString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:milesDistance]];
+                distanceString = [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:milesDistance]];
                 unitString = (milesDistance > 1.0 && milesDistance < 1.1) ? NSLocalizedString(@"mile", @"Mile Unit (Singular)") : NSLocalizedString(@"miles", @"Mile Unit (Plural)");
             }
-            break; 
+            break;
         }
     }
-    
+
     return [NSString stringWithFormat:NSLocalizedString(@"%@ %@", @"#{Distance} #{Unit}"), distanceString, unitString];
 }
 
@@ -242,62 +230,71 @@ static inline double CLLocationSpeedToMilesPerHour(CLLocationSpeed speed) {
             }
             break;
         case TTTBearingNumericStyle:
-            return [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:bearing]];
+            return [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:bearing]];
     }
-    
+
     return nil;
 }
 
 - (NSString *)stringFromSpeed:(CLLocationSpeed)speed {
     NSString *speedString = nil;
     NSString *unitString = nil;
-    
+
     switch (self.unitSystem) {
         case TTTMetricSystem: {
             double metersPerSecondSpeed = speed;
             double kilometersPerHourSpeed = CLLocationSpeedToKilometersPerHour(speed);
-            
+
             if (kilometersPerHourSpeed > 1) {
-                speedString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:kilometersPerHourSpeed]];
+                speedString = [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:kilometersPerHourSpeed]];
                 unitString = NSLocalizedString(@"km/h", @"Kilometers Per Hour Unit");
             } else {
-                speedString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:metersPerSecondSpeed]];
+                speedString = [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:metersPerSecondSpeed]];
                 unitString = NSLocalizedString(@"m/s", @"Meters Per Second Unit");
             }
-            break; 
+            break;
         }
-            
+
         case TTTImperialSystem: {
             double feetPerSecondSpeed = CLLocationSpeedToFeetPerSecond(speed);
             double milesPerHourSpeed = CLLocationSpeedToMilesPerHour(speed);
-            
+
             if (milesPerHourSpeed > 1) {
-                speedString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:milesPerHourSpeed]];
+                speedString = [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:milesPerHourSpeed]];
                 unitString = NSLocalizedString(@"mph", @"Miles Per Hour Unit");
             } else {
-                speedString = [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:feetPerSecondSpeed]];
+                speedString = [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:feetPerSecondSpeed]];
                 unitString = NSLocalizedString(@"ft/s", @"Feet Per Second Unit");
             }
-            break; 
+            break;
         }
     }
-    
+
     return [NSString stringWithFormat:NSLocalizedString(@"%@ %@", @"#{Speed} #{Unit}"), speedString, unitString];
 }
 
-- (NSString *)stringFromDistanceFromLocation:(CLLocation *)originLocation toLocation:(CLLocation *)destinationLocation {    
+- (NSString *)stringFromDistanceFromLocation:(CLLocation *)originLocation
+                                  toLocation:(CLLocation *)destinationLocation
+{
     return [self stringFromDistance:[destinationLocation distanceFromLocation:originLocation]];
 }
 
-- (NSString *)stringFromBearingFromLocation:(CLLocation *)originLocation toLocation:(CLLocation *)destinationLocation {
+- (NSString *)stringFromBearingFromLocation:(CLLocation *)originLocation
+                                 toLocation:(CLLocation *)destinationLocation
+{
     return [self stringFromBearing:CLLocationDegreesBearingBetweenCoordinates(originLocation.coordinate, destinationLocation.coordinate)];
 }
 
-- (NSString *)stringFromDistanceAndBearingFromLocation:(CLLocation *)originLocation toLocation:(CLLocation *)destinationLocation {
+- (NSString *)stringFromDistanceAndBearingFromLocation:(CLLocation *)originLocation
+                                            toLocation:(CLLocation *)destinationLocation
+{
     return [NSString stringWithFormat:NSLocalizedString(@"%@ %@", @"#{Dimensional Quantity} #{Direction}"), [self stringFromDistanceFromLocation:originLocation toLocation:destinationLocation], [self stringFromBearingFromLocation:originLocation toLocation:destinationLocation]];
 }
 
-- (NSString *)stringFromVelocityFromLocation:(CLLocation *)originLocation toLocation:(CLLocation *)destinationLocation atSpeed:(CLLocationSpeed)speed {
+- (NSString *)stringFromVelocityFromLocation:(CLLocation *)originLocation
+                                  toLocation:(CLLocation *)destinationLocation
+                                     atSpeed:(CLLocationSpeed)speed
+{
     return [NSString stringWithFormat:NSLocalizedString(@"%@ %@", @"#{Dimensional Quantity} #{Direction}"), [self stringFromSpeed:speed], [self stringFromBearingFromLocation:originLocation toLocation:destinationLocation]];
 }
 
@@ -305,22 +302,24 @@ static inline double CLLocationSpeedToMilesPerHour(CLLocationSpeed speed) {
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
-    
+
     self.coordinateOrder = [aDecoder decodeIntegerForKey:@"coordinateOrder"];
     self.bearingStyle = [aDecoder decodeIntegerForKey:@"bearingStyle"];
     self.unitSystem = [aDecoder decodeIntegerForKey:@"unitSystem"];
-    self.numberFormatter = [aDecoder decodeObjectForKey:@"numberFormatter"];
-    
+
+    _numberFormatter = [aDecoder decodeObjectForKey:@"numberFormatter"];
+
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [super encodeWithCoder:aCoder];
-    
+
     [aCoder encodeInteger:self.coordinateOrder forKey:@"coordinateOrder"];
     [aCoder encodeInteger:self.bearingStyle forKey:@"bearingStyle"];
     [aCoder encodeInteger:self.unitSystem forKey:@"unitSystem"];
-    [aCoder encodeObject:self.numberFormatter forKey:@"numberFormatter"];
+
+    [aCoder encodeObject:_numberFormatter forKey:@"numberFormatter"];
 }
 
 @end

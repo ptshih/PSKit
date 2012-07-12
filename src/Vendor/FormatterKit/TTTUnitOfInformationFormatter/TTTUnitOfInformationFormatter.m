@@ -1,17 +1,17 @@
 // TTTUnitOfInformationFormatter.m
 //
 // Copyright (c) 2012 Mattt Thompson (http://mattt.me)
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -138,15 +138,10 @@ static inline NSString * TTTByteUnitStringForSIPrefix(TTTUnitPrefix prefix) {
             return NSLocalizedString(@"EB", @"Exabyte Unit");
     }
 }
-                                                
+
 @interface TTTUnitOfInformationFormatter ()
 - (double)scaleFactorForPrefix:(TTTUnitPrefix)prefix;
 - (TTTUnitPrefix)prefixForInteger:(NSUInteger)value;
-
-@property (readwrite, nonatomic, retain) NSNumberFormatter *numberFormatter;
-@property (readwrite, nonatomic, assign) BOOL displaysInTermsOfBytes;
-@property (readwrite, nonatomic, assign) BOOL usesIECBinaryPrefixesForCalculation;
-@property (readwrite, nonatomic, assign) BOOL usesIECBinaryPrefixesForDisplay;
 @end
 
 @implementation TTTUnitOfInformationFormatter
@@ -160,22 +155,18 @@ static inline NSString * TTTByteUnitStringForSIPrefix(TTTUnitPrefix prefix) {
     if (!self) {
         return nil;
     }
-    
-    self.numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-    [self.numberFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
-    [self.numberFormatter setRoundingIncrement:[NSNumber numberWithFloat:0.01f]];
-    
+
+    _numberFormatter = [[NSNumberFormatter alloc] init];
+    [_numberFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    [_numberFormatter setRoundingIncrement:[NSNumber numberWithFloat:0.01f]];
+
     self.displaysInTermsOfBytes = YES;
     self.usesIECBinaryPrefixesForCalculation = YES;
     self.usesIECBinaryPrefixesForDisplay = NO;
-    
+
     return self;
 }
 
-- (void)dealloc {
-    [_numberFormatter release];
-    [super dealloc];
-}
 
 #pragma mark -
 
@@ -216,7 +207,7 @@ static inline NSString * TTTByteUnitStringForSIPrefix(TTTUnitPrefix prefix) {
     if (self.displaysInTermsOfBytes) {
         doubleValue /= TTTNumberOfBitsInUnit(TTTByte);
     }
-    
+
     if (doubleValue < [self scaleFactorForPrefix:TTTKilo]) {
         unitString = self.displaysInTermsOfBytes ? NSLocalizedString(@"bytes", @"Byte Unit") : NSLocalizedString(@"bits", @"Bit Unit");
     } else {
@@ -226,24 +217,48 @@ static inline NSString * TTTByteUnitStringForSIPrefix(TTTUnitPrefix prefix) {
         } else {
             unitString = self.usesIECBinaryPrefixesForDisplay ? TTTBitUnitStringForIECPrefix(prefix) : TTTBitUnitStringForSIPrefix(prefix);
         }
-        
+
         doubleValue /= [self scaleFactorForPrefix:prefix];
     }
-    
-    return [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"Unit of Information Format String", nil, [NSBundle mainBundle], @"%@ %@", @"#{Value} #{Unit}"), [self.numberFormatter stringFromNumber:[NSNumber numberWithDouble:doubleValue]], unitString];
+
+    return [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"Unit of Information Format String", nil, [NSBundle mainBundle], @"%@ %@", @"#{Value} #{Unit}"), [_numberFormatter stringFromNumber:[NSNumber numberWithDouble:doubleValue]], unitString];
 }
 
-- (NSString *)stringFromNumber:(NSNumber *)number 
+- (NSString *)stringFromNumber:(NSNumber *)number
                         ofUnit:(TTTUnitOfInformation)unit
-{    
+{
     return [self stringFromNumberOfBits:[NSNumber numberWithInteger:(TTTNumberOfBitsInUnit(unit) * [number integerValue])]];
 }
 
-- (NSString *)stringFromNumber:(NSNumber *)number 
+- (NSString *)stringFromNumber:(NSNumber *)number
                         ofUnit:(TTTUnitOfInformation)unit
                     withPrefix:(TTTUnitPrefix)prefix
 {
     return [self stringFromNumber:[NSNumber numberWithDouble:([self scaleFactorForPrefix:prefix] * [number integerValue])] ofUnit:unit];
+}
+
+#pragma mark - NSCoding
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+
+    self.displaysInTermsOfBytes = [aDecoder decodeBoolForKey:@"displaysInTermsOfBytes"];
+    self.usesIECBinaryPrefixesForCalculation = [aDecoder decodeBoolForKey:@"usesIECBinaryPrefixesForCalculation"];
+    self.usesIECBinaryPrefixesForDisplay = [aDecoder decodeBoolForKey:@"usesIECBinaryPrefixesForDisplay"];
+
+    _numberFormatter = [aDecoder decodeObjectForKey:@"numberFormatter"];
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder {
+    [super encodeWithCoder:aCoder];
+
+    [aCoder encodeBool:self.displaysInTermsOfBytes forKey:@"displaysInTermsOfBytes"];
+    [aCoder encodeBool:self.usesIECBinaryPrefixesForCalculation forKey:@"usesIECBinaryPrefixesForCalculation"];
+    [aCoder encodeBool:self.usesIECBinaryPrefixesForDisplay forKey:@"usesIECBinaryPrefixesForDisplay"];
+
+    [aCoder encodeObject:_numberFormatter forKey:@"numberFormatter"];
 }
 
 @end

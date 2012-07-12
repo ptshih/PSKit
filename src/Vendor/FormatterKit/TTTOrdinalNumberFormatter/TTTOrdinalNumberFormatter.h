@@ -1,17 +1,17 @@
 // TTTOrdinalNumberFormatter.h
 //
 // Copyright (c) 2011 Mattt Thompson (http://mattt.me)
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,12 +22,18 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ Specifies the grammatical gender of the word conjugated by the ordinal number.
+ */
 typedef enum {
     TTTOrdinalNumberFormatterMaleGender     = 1,
     TTTOrdinalNumberFormatterFemaleGender   = 2,
     TTTOrdinalNumberFormatterNeuterGender   = 3,
 } TTTOrdinalNumberFormatterPredicateGrammaticalGender;
 
+/**
+ Specifies the grammatical number of the word conjugatd by the ordinal number.
+ */
 typedef enum {
     TTTOrdinalNumberFormatterSingular       = 1,
     TTTOrdinalNumberFormatterDual           = 2,
@@ -37,20 +43,28 @@ typedef enum {
     TTTOrdinalNumberFormatterPlural,
 } TTTOrdinalNumberFormatterPredicateGrammaticalNumber;
 
-@interface TTTOrdinalNumberFormatter : NSNumberFormatter {
-@private
-    NSString *_ordinalIndicator;
-    TTTOrdinalNumberFormatterPredicateGrammaticalGender _grammaticalGender;
-    TTTOrdinalNumberFormatterPredicateGrammaticalNumber _grammaticalNumber;
-}
+/**
+ Instances of `TTTOrdinalNumberFormatter` create localized ordinal string representations of `NSNumber` objects.
 
-- (NSString *)ordinalIndicator;
-- (void)setOrdinalIndicator:(NSString *)indicator;
+ Each instance has a default number style of `NSNumberFormatterNoStyle`, does not allow floats nor generates decimal numbers, has a rounding mode of `NSNumberFormatterRoundFloor`, a minimum value of @0, and is has leniency turned on.
 
-- (TTTOrdinalNumberFormatterPredicateGrammaticalGender)grammaticalGender;
-- (void)setGrammaticalGender:(TTTOrdinalNumberFormatterPredicateGrammaticalGender)gender;
+ For example, the numbers `@1`, `@2`, and `@3` would be formatted as `@"1st"`, `@"2nd"`, and `@"3rd"` in English.
+ */
+@interface TTTOrdinalNumberFormatter : NSNumberFormatter
 
-- (TTTOrdinalNumberFormatterPredicateGrammaticalNumber)grammaticalNumber;
-- (void)setGrammaticalNumber:(TTTOrdinalNumberFormatterPredicateGrammaticalNumber)number;
+/**
+ When specified, this overrides the indicator determined by the formatter. `nil` by default.
+ */
+@property (nonatomic, strong) NSString *ordinalIndicator;
+
+/**
+ Specifies the grammatical gender of the word conjugatd by the ordinal number.
+ */
+@property (nonatomic, assign) TTTOrdinalNumberFormatterPredicateGrammaticalGender grammaticalGender;
+
+/**
+ Specifies the grammatical number of the word conjugatd by the ordinal number.
+ */
+@property (nonatomic, assign) TTTOrdinalNumberFormatterPredicateGrammaticalNumber grammaticalNumber;
 
 @end
