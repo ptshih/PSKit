@@ -43,11 +43,11 @@ object = _object;
 - (void)prepareForReuse {
 }
 
-- (void)fillViewWithObject:(id)object {
+- (void)fillCellWithObject:(id)object {
     self.object = object;
 }
 
-+ (CGFloat)heightForViewWithObject:(id)object inColumnWidth:(CGFloat)columnWidth {
++ (CGFloat)rowHeightForObject:(id)object inColumnWidth:(CGFloat)columnWidth {
     return 0.0;
 }
 

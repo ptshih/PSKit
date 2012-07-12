@@ -28,7 +28,7 @@
 @property (nonatomic, strong) id object;
 
 - (void)prepareForReuse;
-- (void)fillViewWithObject:(id)object;
-+ (CGFloat)heightForViewWithObject:(id)object inColumnWidth:(CGFloat)columnWidth;
+- (void)fillCellWithObject:(id)object;
++ (CGFloat)rowHeightForObject:(id)object inColumnWidth:(CGFloat)columnWidth;
 
 @end

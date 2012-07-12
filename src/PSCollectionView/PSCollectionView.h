@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+#import "PSCollectionViewCell.h"
 
 @class PSCollectionViewCell;
 
@@ -55,7 +56,7 @@
  Dequeues a reusable view that was previously initialized
  This is similar to UITableView dequeueReusableCellWithIdentifier
  */
-- (UIView *)dequeueReusableView;
+- (PSCollectionViewCell *)dequeueReusableViewForClass:(Class)viewClass;
 
 @end
 
@@ -64,7 +65,7 @@
 @protocol PSCollectionViewDelegate <NSObject>
 
 @optional
-- (void)collectionView:(PSCollectionView *)collectionView didSelectView:(PSCollectionViewCell *)view atIndex:(NSInteger)index;
+- (void)collectionView:(PSCollectionView *)collectionView didSelectCell:(PSCollectionViewCell *)cell atIndex:(NSInteger)index;
 
 @end
 
@@ -73,8 +74,8 @@
 @protocol PSCollectionViewDataSource <NSObject>
 
 @required
-- (NSInteger)numberOfViewsInCollectionView:(PSCollectionView *)collectionView;
-- (PSCollectionViewCell *)collectionView:(PSCollectionView *)collectionView viewAtIndex:(NSInteger)index;
-- (CGFloat)heightForViewAtIndex:(NSInteger)index;
+- (NSInteger)numberOfRowsInCollectionView:(PSCollectionView *)collectionView;
+- (PSCollectionViewCell *)collectionView:(PSCollectionView *)collectionView cellForRowAtIndex:(NSInteger)index;
+- (CGFloat)heightForRowAtIndex:(NSInteger)index;
 
 @end

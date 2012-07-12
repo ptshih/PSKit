@@ -78,11 +78,11 @@ pullRefreshStyle = _pullRefreshStyle;
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
     if (isDeviceIPad()) {
-        self.collectionView.numColsPortrait = 4;
-        self.collectionView.numColsLandscape = 5;
+        self.collectionView.numColsPortrait = 3;
+        self.collectionView.numColsLandscape = 4;
     } else {
-        self.collectionView.numColsPortrait = 2;
-        self.collectionView.numColsLandscape = 3;
+        self.collectionView.numColsPortrait = 1;
+        self.collectionView.numColsLandscape = 2;
     }
     
     UILabel *loadingLabel = [[UILabel alloc] initWithFrame:self.collectionView.bounds];
@@ -144,15 +144,15 @@ pullRefreshStyle = _pullRefreshStyle;
 }
 
 #pragma mark - PSCollectionViewDelegate
-- (NSInteger)numberOfViewsInCollectionView:(PSCollectionView *)collectionView {
+- (NSInteger)numberOfRowsInCollectionView:(PSCollectionView *)collectionView {
     return [self.items count];
 }
 
-- (UIView *)collectionView:(PSCollectionView *)collectionView viewAtIndex:(NSInteger)index {
+- (UIView *)collectionView:(PSCollectionView *)collectionView cellForRowAtIndex:(NSInteger)index {
     return nil;
 }
 
-- (CGFloat)heightForViewAtIndex:(NSInteger)index {
+- (CGFloat)heightForRowAtIndex:(NSInteger)index {
     return 0.0;
 }
 
