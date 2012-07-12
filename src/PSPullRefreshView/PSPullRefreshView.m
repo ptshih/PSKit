@@ -74,40 +74,40 @@ statusLabel = _statusLabel;
 
 
 - (void)setState:(PSPullRefreshState)state {
+    BOOL stateChanged = state != _state;
     _state = state;
     
-//    CGFloat y = 0.0;
-    switch (state) {
-        case PSPullRefreshStateIdle:
-        {
-//            y = 0.0;
-            self.statusLabel.text = PSPullRefreshIdleStatus;
-            [self stopSpinning];
-            
-            if (!self.scrollView) return;
-            
-            BLOCK_SELF;
-            [UIView animateWithDuration:0.2
-                                  delay:0.0
-                                options:UIViewAnimationOptionCurveEaseInOut
-                             animations:^{
-                                 blockSelf.scrollView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, 0.0);
-                             }
-                             completion:^(BOOL finished){
-                                 
-                             }];
-            break;
-        }
-        case PSPullRefreshStateRefreshing:
-        {
-//            y = self.height;
-            [self startSpinning];
-            self.statusLabel.text = PSPullRefreshRefreshingStatus;
-            break;
-        }
-        default:
-        {
-            break;
+    if (stateChanged) {
+        switch (state) {
+            case PSPullRefreshStateIdle:
+            {
+                self.statusLabel.text = PSPullRefreshIdleStatus;
+                [self stopSpinning];
+                
+                if (!self.scrollView) return;
+                
+                BLOCK_SELF;
+                [UIView animateWithDuration:0.2
+                                      delay:0.0
+                                    options:UIViewAnimationOptionCurveEaseInOut
+                                 animations:^{
+                                     blockSelf.scrollView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, 0.0);
+                                 }
+                                 completion:^(BOOL finished){
+                                     
+                                 }];
+                break;
+            }
+            case PSPullRefreshStateRefreshing:
+            {
+                [self startSpinning];
+                self.statusLabel.text = PSPullRefreshRefreshingStatus;
+                break;
+            }
+            default:
+            {
+                break;
+            }
         }
     }
 }
