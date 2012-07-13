@@ -8,6 +8,23 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol PSCurtainControllerDelegate;
+
 @interface PSCurtainController : UIViewController
+
+@property (nonatomic, unsafe_unretained) id <PSCurtainControllerDelegate> delegate;
+
+- (void)toggleCurtain:(BOOL)animated;
+
+- (void)showCurtain:(BOOL)animated;
+- (void)showCurtain:(BOOL)animated completionBlock:(void (^)(void))completionBlock;
+- (void)hideCurtain:(BOOL)animated;
+- (void)hideCurtain:(BOOL)animated completionBlock:(void (^)(void))completionBlock;
+
+@end
+
+@protocol PSCurtainControllerDelegate <NSObject>
+
+@optional
 
 @end
