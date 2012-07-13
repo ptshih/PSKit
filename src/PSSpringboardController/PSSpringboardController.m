@@ -51,15 +51,20 @@ selectedIndex = _selectedIndex;
     if ([self.viewControllers containsObject:selectedViewController]) {
         selectedViewController.view.alpha = 1.0;
         selectedViewController.view.frame = self.view.bounds;
+        selectedViewController.view.top = selectedViewController.view.height;
         
-        CGAffineTransform scaleStart = CGAffineTransformMakeScale(0.01, 0.01);
-        CGAffineTransform scaleEnd = CGAffineTransformMakeScale(1.0, 1.0);
-        selectedViewController.view.transform = scaleStart;
+//        CGAffineTransform scaleStart = CGAffineTransformMakeScale(0.01, 0.01);
+//        CGAffineTransform scaleEnd = CGAffineTransformMakeScale(1.0, 1.0);
+//        selectedViewController.view.transform = scaleStart;
         
         [self transitionFromViewController:_selectedViewController toViewController:selectedViewController duration:0.4 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            selectedViewController.view.transform  = scaleEnd;
+//            selectedViewController.view.transform  = scaleEnd;
+            
+            selectedViewController.view.top = 0.0;
+            _selectedViewController.view.top = -_selectedViewController.view.height;
+            
             [selectedViewController willMoveToParentViewController:self];
-            _selectedViewController.view.alpha = 0.0;
+//            _selectedViewController.view.alpha = 0.0;
         } completion:^(BOOL finished){
             _selectedViewController = selectedViewController;
             [selectedViewController didMoveToParentViewController:self];
@@ -89,6 +94,12 @@ selectedIndex = _selectedIndex;
     [self.selectedViewController didMoveToParentViewController:self];
     self.selectedViewController.view.frame = self.view.bounds;
 
+}
+
+#pragma mark - Rotation
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    return [self.selectedViewController shouldAutorotateToInterfaceOrientation:interfaceOrientation];
 }
 
 @end

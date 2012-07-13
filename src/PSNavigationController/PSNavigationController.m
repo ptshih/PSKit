@@ -282,6 +282,7 @@ const CGFloat kAnimationDuration = 0.35;
 }
 
 #pragma mark - Rotation
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return [self.topViewController shouldAutorotateToInterfaceOrientation:interfaceOrientation];
 }

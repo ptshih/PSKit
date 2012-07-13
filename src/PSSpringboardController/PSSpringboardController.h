@@ -13,7 +13,7 @@
 @interface PSSpringboardController : UIViewController
 
 @property (nonatomic, unsafe_unretained) id <PSSpringboardControllerDelegate> delegate;
-@property (nonatomic, strong) NSMutableArray *viewControllers;
+@property (nonatomic, strong) NSArray *viewControllers;
 @property (nonatomic, weak) UIViewController *selectedViewController;
 @property (nonatomic, assign) NSInteger selectedIndex;
 
