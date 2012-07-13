@@ -66,7 +66,7 @@ selectedIndex = _selectedIndex;
 //        CGAffineTransform scaleEnd = CGAffineTransformMakeScale(1.0, 1.0);
 //        selectedViewController.view.transform = scaleStart;
         
-        [self transitionFromViewController:_selectedViewController toViewController:selectedViewController duration:0.4 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        [self transitionFromViewController:_selectedViewController toViewController:selectedViewController duration:0.3 options:UIViewAnimationOptionCurveEaseInOut animations:^{
 //            selectedViewController.view.transform  = scaleEnd;
             
             selectedViewController.view.top = 0.0;
