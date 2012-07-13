@@ -10,6 +10,7 @@
 
 @interface PSNavigationController ()
 
+@property (nonatomic, strong) UIView *overlayView;
 @property (nonatomic, assign) BOOL isTransitioning;
 
 @end
@@ -150,11 +151,11 @@ const CGFloat kAnimationDuration = 0.35;
         
         self.isTransitioning = NO;
         
-        [[UIApplication sharedApplication] endIgnoringInteractionEvents];
-        
         if (completionBlock) {
             completionBlock();
         }
+        
+        [[UIApplication sharedApplication] endIgnoringInteractionEvents];
     }];
 }
 

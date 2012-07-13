@@ -1,0 +1,84 @@
+//
+//  PSSpringboardController.m
+//  Appstand
+//
+//  Created by Peter Shih on 7/12/12.
+//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//
+
+#import "PSSpringboardController.h"
+
+@interface PSSpringboardController ()
+
+@end
+
+@implementation PSSpringboardController
+
+@synthesize
+delegate = _delegate;
+
+@synthesize
+viewControllers = _viewControllers,
+selectedViewController = _selectedViewController,
+selectedIndex = _selectedIndex;
+
+#pragma mark - Init
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        self.selectedIndex = 0;
+    }
+    return self;
+}
+
+- (void)setSelectedViewController:(UIViewController *)selectedViewController {
+    if ([_selectedViewController isEqual:selectedViewController]) return;
+    
+    if (!_selectedViewController) {
+        _selectedViewController = selectedViewController;
+        return;
+    }
+    
+    if ([self.viewControllers containsObject:selectedViewController]) {
+        selectedViewController.view.alpha = 1.0;
+        selectedViewController.view.frame = self.view.bounds;
+        
+        CGAffineTransform scaleStart = CGAffineTransformMakeScale(0.01, 0.01);
+        CGAffineTransform scaleEnd = CGAffineTransformMakeScale(1.0, 1.0);
+        selectedViewController.view.transform = scaleStart;
+        
+        [self transitionFromViewController:_selectedViewController toViewController:selectedViewController duration:0.4 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            selectedViewController.view.transform  = scaleEnd;
+            [selectedViewController willMoveToParentViewController:self];
+            _selectedViewController.view.alpha = 0.0;
+        } completion:^(BOOL finished){
+            _selectedViewController = selectedViewController;
+            [selectedViewController didMoveToParentViewController:self];
+        }];
+    }
+}
+
+- (void)setViewControllers:(NSMutableArray *)viewControllers {
+    _viewControllers = viewControllers;
+    
+    for (UIViewController *vc in viewControllers) {
+        [self addChildViewController:vc];
+    }
+}
+
+#pragma mark - View
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    // By now viewControllers should be set
+    self.selectedViewController = [self.viewControllers objectAtIndex:self.selectedIndex];
+    [self.view addSubview:self.selectedViewController.view];
+    [self.selectedViewController willMoveToParentViewController:self];
+    [self.selectedViewController didMoveToParentViewController:self];
+    self.selectedViewController.view.frame = self.view.bounds;
+
+}
+
+@end
