@@ -48,10 +48,19 @@ selectedIndex = _selectedIndex;
         return;
     }
     
+    NSInteger oldIndex = [self.viewControllers indexOfObject:_selectedViewController];
+    NSInteger newIndex = [self.viewControllers indexOfObject:selectedViewController];
+    
     if ([self.viewControllers containsObject:selectedViewController]) {
         selectedViewController.view.alpha = 1.0;
         selectedViewController.view.frame = self.view.bounds;
-        selectedViewController.view.top = selectedViewController.view.height;
+        
+        if (oldIndex < newIndex) {
+            selectedViewController.view.top = selectedViewController.view.height;
+        } else {
+            selectedViewController.view.top = -selectedViewController.view.height;
+        }
+        
         
 //        CGAffineTransform scaleStart = CGAffineTransformMakeScale(0.01, 0.01);
 //        CGAffineTransform scaleEnd = CGAffineTransformMakeScale(1.0, 1.0);
@@ -61,7 +70,11 @@ selectedIndex = _selectedIndex;
 //            selectedViewController.view.transform  = scaleEnd;
             
             selectedViewController.view.top = 0.0;
-            _selectedViewController.view.top = -_selectedViewController.view.height;
+            if (oldIndex < newIndex) {
+                _selectedViewController.view.top = -_selectedViewController.view.height;
+            } else {
+                _selectedViewController.view.top = _selectedViewController.view.height;
+            }
             
             [selectedViewController willMoveToParentViewController:self];
 //            _selectedViewController.view.alpha = 0.0;
