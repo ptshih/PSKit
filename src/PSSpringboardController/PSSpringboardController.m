@@ -32,6 +32,14 @@ selectedIndex = _selectedIndex;
     return self;
 }
 
+- (void)setSelectedIndex:(NSInteger)selectedIndex {
+    if (selectedIndex >= self.viewControllers.count) return;
+    if (_selectedIndex == selectedIndex) return;
+    
+    _selectedIndex = selectedIndex;
+    self.selectedViewController = [self.viewControllers objectAtIndex:selectedIndex];
+}
+
 - (void)setSelectedViewController:(UIViewController *)selectedViewController {
     if ([_selectedViewController isEqual:selectedViewController]) return;
     
@@ -55,6 +63,8 @@ selectedIndex = _selectedIndex;
         } completion:^(BOOL finished){
             _selectedViewController = selectedViewController;
             [selectedViewController didMoveToParentViewController:self];
+            
+            self.selectedIndex = [self.viewControllers indexOfObject:selectedViewController];
         }];
     }
 }

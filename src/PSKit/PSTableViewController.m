@@ -344,6 +344,7 @@ separatorColor = _separatorColor;
 }
 
 #pragma mark - Custom TableView Methods
+
 - (Class)cellClassAtIndexPath:(NSIndexPath *)indexPath {
     // Subclass should/may implement
     return [PSCell class];
@@ -361,6 +362,7 @@ separatorColor = _separatorColor;
 }
 
 #pragma mark - UITableView
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if (tableView == self.searchDisplayController.searchResultsTableView) {
         return [self.searchItems count];
@@ -378,12 +380,10 @@ separatorColor = _separatorColor;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    // subclass must override
     return 0.0;
 }
 
 - (void)tableView:(UITableView *)tableView configureCell:(id)cell atIndexPath:(NSIndexPath *)indexPath {
-    // subclass must override
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
