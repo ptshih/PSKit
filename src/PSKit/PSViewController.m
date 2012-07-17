@@ -134,7 +134,9 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    
+    if (self.headerView && [self.headerView.layer.sublayers count] > 0 && [[self.headerView.layer.sublayers firstObject] isKindOfClass:[CAGradientLayer class]]) {
+        [[self.headerView.layer.sublayers firstObject] setFrame:CGRectMake(0, self.headerView.height, self.headerView.width, 8.0)];
+    }
 }
 
 - (void)orientationChangedFromNotification:(NSNotification *)notification {
