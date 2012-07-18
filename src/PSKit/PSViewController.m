@@ -153,7 +153,8 @@
     self.curtainController = [[CurtainController alloc] initWithNibName:nil bundle:nil];
     [self.curtainController setDelegate:self];
     NSArray *titles = [[[(PSSpringboardController *)self.parentViewController.parentViewController viewControllers] valueForKey:@"topViewController"] valueForKey:@"title"];
-    [self.curtainController setItems:titles];
+    NSArray *items = [NSArray arrayWithObjects:titles, nil];
+    [self.curtainController setItems:items];
     self.curtainController.view.frame = self.contentView.frame;
     [self.view insertSubview:self.curtainController.view belowSubview:self.headerView];
 }
