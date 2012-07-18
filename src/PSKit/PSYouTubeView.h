@@ -10,6 +10,6 @@
 
 @interface PSYouTubeView : UIWebView <UIWebViewDelegate>
 
-- (void)loadYouTubeWithSource:(NSString *)source;
+- (void)loadYouTubeWithSource:(NSString *)source contentSize:(CGSize)contentSize;
 
 @end

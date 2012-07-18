@@ -8,14 +8,12 @@
 
 #import "PSYouTubeView.h"
 
-static NSString *kYouTubeEmbedHTML = @"<html><head>"
-"<meta name = \"viewport\" content = \"initial-scale = 1.0, user-scalable = no, width = 320\"/></head>"
-"<body style=\"background:#000000;margin:0px\">"
-"<div><object width=\"320\" height=\"240\">"
+static NSString *kYouTubeEmbedHTML = @"<html>"
+"<body style=\"background:#000000;margin:0\">"
 "<param name=\"wmode\" value=\"transparent\"></param>"
-"<embed src=\"%@\""
-"type=\"application/x-shockwave-flash\" wmode=\"transparent\" width=\"320\" height=\"240\"></embed>"
-"</object></div></body></html>";
+"<embed id=\"yt\" src=\"%@\""
+"type=\"application/x-shockwave-flash\" wmode=\"transparent\" width=\"%0.0f\" height=\"%0.0f\"></embed>"
+"</body></html>";
 
 @interface PSYouTubeView ()
 
@@ -33,8 +31,8 @@ static NSString *kYouTubeEmbedHTML = @"<html><head>"
     return self;
 }
 
-- (void)loadYouTubeWithSource:(NSString *)source {
-    NSString *htmlString = [NSString stringWithFormat:kYouTubeEmbedHTML, source];
+- (void)loadYouTubeWithSource:(NSString *)source contentSize:(CGSize)contentSize {
+    NSString *htmlString = [NSString stringWithFormat:kYouTubeEmbedHTML, source, contentSize.width, contentSize.height];
     [self loadHTMLString:htmlString baseURL:nil];
 }
 
@@ -43,8 +41,8 @@ static NSString *kYouTubeEmbedHTML = @"<html><head>"
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-    UIButton *b = [self findButtonInView:webView];
-    [b sendActionsForControlEvents:UIControlEventTouchUpInside];
+//    UIButton *b = [self findButtonInView:webView];
+//    [b sendActionsForControlEvents:UIControlEventTouchUpInside];
 }
 
 - (UIButton *)findButtonInView:(UIView *)view {
