@@ -65,18 +65,15 @@ pullRefreshStyle = _pullRefreshStyle;
 
 - (void)setupSubviews {
     [super setupSubviews];
-    
-    CGFloat visibleHeaderHeight = (self.headerView) ? self.headerView.bottom : 0.0;
-    CGFloat visibleFooterHeight = (self.footerView) ? self.view.height - self.footerView.top : 0.0;
-    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
-    self.collectionView = [[PSCollectionView alloc] initWithFrame:frame];
+
+    self.collectionView = [[PSCollectionView alloc] initWithFrame:self.contentView.bounds];
     self.collectionView.delegate = self;
     self.collectionView.collectionViewDelegate = self;
     self.collectionView.collectionViewDataSource = self;
     self.collectionView.backgroundColor = [UIColor clearColor];
     self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
-    [self.view addSubview:self.collectionView];
+    [self.contentView addSubview:self.collectionView];
     
     if (isDeviceIPad()) {
         self.collectionView.numColsPortrait = 3;

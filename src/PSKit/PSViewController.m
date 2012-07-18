@@ -10,23 +10,13 @@
 
 @implementation PSViewController
 
-@synthesize
-headerView = _headerView,
-footerView = _footerView,
-leftButton = _leftButton,
-centerButton = _centerButton,
-rightButton = _rightButton,
-activeScrollView = _activeScrollView,
-contentOffset = _contentOffset;
-
-@synthesize
-shouldAddRoundedCorners = _shouldAddRoundedCorners;
-
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         //  VLog(@"#%@", [self class]);
         self.contentOffset = CGPointZero;
+        self.shouldShowHeader = NO;
+        self.shouldShowFooter = NO;
         self.shouldAddRoundedCorners = NO;
     }
     return self;
@@ -92,6 +82,12 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
     // subclass should implement
     [self setupHeader];
     [self setupFooter];
+    [self setupContent];
+    
+    [self.view bringSubviewToFront:self.footerView];
+    [self.view bringSubviewToFront:self.headerView];
+    
+    [self setupCurtain];
 }
 
 /*
@@ -101,12 +97,64 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
     // subclass may implement
 }
 
+- (void)setupContent {
+    CGFloat visibleHeaderHeight = (self.headerView) ? self.headerView.bottom : 0.0;
+    CGFloat visibleFooterHeight = (self.footerView) ? self.view.height - self.footerView.top : 0.0;
+    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
+    
+    self.contentView = [[UIView alloc] initWithFrame:frame];
+    self.contentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.view addSubview:self.contentView];
+}
+
 - (void)setupHeader {
-    // subclass may implement
+    if (!self.shouldShowHeader) return;
+    
+    // Setup perma header
+    self.headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)];
+    self.headerView.backgroundColor = HEADER_BG_COLOR;
+    self.headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    
+    [self.headerView addGradientLayerWithFrame:CGRectMake(0, self.headerView.height, self.headerView.width, 8.0) colors:[NSArray arrayWithObjects:(id)RGBACOLOR(0, 0, 0, 0.5).CGColor, (id)RGBACOLOR(0, 0, 0, 0.3).CGColor, (id)RGBACOLOR(0, 0, 0, 0.1).CGColor, (id)RGBACOLOR(0, 0, 0, 0.0).CGColor, nil] locations:[NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.1], [NSNumber numberWithFloat:0.5], [NSNumber numberWithFloat:1.0], nil] startPoint:CGPointMake(0.5, 0.0) endPoint:CGPointMake(0.5, 1.0)];
+    
+    self.leftButton = [UIButton buttonWithFrame:CGRectMake(0, 0, 44, 44) andStyle:nil target:self action:@selector(leftAction)];
+    self.leftButton.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
+    //    [self.leftButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonLeftBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    
+    self.centerButton = [UIButton buttonWithFrame:CGRectMake(44, 0, self.headerView.width - 88, 44) andStyle:@"navigationTitleDarkLabel" target:self action:@selector(centerAction)];
+    self.centerButton.titleLabel.adjustsFontSizeToFitWidth = YES;
+    self.centerButton.titleEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 8);
+    self.centerButton.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    //    [self.centerButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonCenterBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    
+    self.rightButton = [UIButton buttonWithFrame:CGRectMake(self.headerView.width - 44, 0, 44, 44) andStyle:nil target:self action:@selector(rightAction)];
+    self.rightButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+    //    [self.rightButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonRightBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+
+    [self.headerView addSubview:self.leftButton];
+    [self.headerView addSubview:self.centerButton];
+    [self.headerView addSubview:self.rightButton];
+    [self.view addSubview:self.headerView];
 }
 
 - (void)setupFooter {
-    // subclass may implement
+    if (!self.shouldShowFooter) return;
+    
+    self.footerView = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.height - 44, self.view.width, 44)];
+    self.footerView.backgroundColor = RGBCOLOR(192, 192, 192);
+    self.footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [self.view addSubview:self.footerView];
+}
+
+- (void)setupCurtain {
+    CGFloat visibleHeaderHeight = (self.headerView) ? self.headerView.bottom : 0.0;
+    CGFloat visibleFooterHeight = (self.footerView) ? self.view.height - self.footerView.top : 0.0;
+    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
+    
+    self.curtainController = [[CurtainController alloc] initWithNibName:nil bundle:nil];
+    [self.curtainController setDelegate:self];
+    self.curtainController.view.frame = frame;
+    [self.view insertSubview:self.curtainController.view belowSubview:self.headerView];
 }
 
 #pragma mark - Post View Config
@@ -134,9 +182,6 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    if (self.headerView && [self.headerView.layer.sublayers count] > 0 && [[self.headerView.layer.sublayers firstObject] isKindOfClass:[CAGradientLayer class]]) {
-        [[self.headerView.layer.sublayers firstObject] setFrame:CGRectMake(0, self.headerView.height, self.headerView.width, 8.0)];
-    }
 }
 
 - (void)orientationChangedFromNotification:(NSNotification *)notification {
@@ -148,6 +193,12 @@ shouldAddRoundedCorners = _shouldAddRoundedCorners;
     if (self.activeScrollView) {
         self.activeScrollView.scrollsToTop = isEnabled;
     }
+}
+
+#pragma mark - CurtainControllerDelegate
+
+- (void)curtainController:(CurtainController *)curtainController selectedRowAtIndex:(NSInteger)index {
+    [(PSSpringboardController *)self.parentViewController.parentViewController setSelectedIndex:index];
 }
 
 @end

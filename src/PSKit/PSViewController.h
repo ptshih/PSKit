@@ -10,10 +10,12 @@
 #import <QuartzCore/QuartzCore.h>
 #import "PSStateMachine.h"
 
-#import "PSNavigationController.h"
+#import "CurtainController.h"
 
-@interface PSViewController : UIViewController <PSStateMachine>
+@interface PSViewController : UIViewController <PSStateMachine, CurtainControllerDelegate>
 
+@property (nonatomic, strong) CurtainController *curtainController;
+@property (nonatomic, strong) UIView *contentView;
 @property (nonatomic, strong) UIView *headerView;
 @property (nonatomic, strong) UIView *footerView;
 @property (nonatomic, strong) UIButton *leftButton;
@@ -23,6 +25,8 @@
 @property (nonatomic, assign) CGPoint contentOffset;
 
 // Config
+@property (nonatomic, assign) BOOL shouldShowHeader;
+@property (nonatomic, assign) BOOL shouldShowFooter;
 @property (nonatomic, assign) BOOL shouldAddRoundedCorners;
 
 /**

@@ -51,23 +51,19 @@ newspaperView = _newspaperView;
 - (void)setupSubviews {
     [super setupSubviews];
     
-    CGFloat visibleHeaderHeight = (self.headerView) ? self.headerView.bottom : 0.0;
-    CGFloat visibleFooterHeight = (self.footerView) ? self.view.height - self.footerView.top : 0.0;
-    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
-    self.newspaperView = [[PSNewspaperView alloc] initWithFrame:frame];
-    [self.view addSubview:self.newspaperView];
+    self.newspaperView = [[PSNewspaperView alloc] initWithFrame:self.contentView.bounds];
     self.newspaperView.newspaperViewDelegate = self;
     self.newspaperView.newspaperViewDataSource = self;
-    self.newspaperView.backgroundColor = [UIColor clearColor];
     self.newspaperView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.newspaperView.backgroundColor = [UIColor clearColor];
+
+    [self.contentView addSubview:self.newspaperView];
 }
 
 - (void)updateSubviews {
     [super updateSubviews];
-    CGFloat visibleHeaderHeight = (self.headerView) ? self.headerView.bottom : 0.0;
-    CGFloat visibleFooterHeight = (self.footerView) ? self.view.height - self.footerView.top : 0.0;
-    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
-    self.newspaperView.frame = frame;
+
+    self.newspaperView.frame = self.contentView.bounds;
 }
 
 #pragma mark - State Machine

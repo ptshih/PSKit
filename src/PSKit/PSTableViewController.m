@@ -112,7 +112,7 @@ separatorColor = _separatorColor;
     //    self.tableView.backgroundColor = [UIColor clearColor];
     //    self.tableView.backgroundView = nil;
     
-    [self.view addSubview:self.tableView];
+    [self.contentView addSubview:self.tableView];
     
     // Setup optional header/footer
     if ([self respondsToSelector:@selector(setupTableHeader)]) {
@@ -131,11 +131,8 @@ separatorColor = _separatorColor;
 
 - (void)setupSubviews {
     [super setupSubviews];
-    
-    CGFloat visibleHeaderHeight = (self.headerView) ? self.headerView.bottom : 0.0;
-    CGFloat visibleFooterHeight = (self.footerView) ? self.view.height - self.footerView.top : 0.0;
-    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
-    [self setupTableViewWithFrame:frame style:self.tableViewStyle separatorStyle:self.tableViewCellSeparatorStyle separatorColor:self.separatorColor];
+
+    [self setupTableViewWithFrame:self.contentView.bounds style:self.tableViewStyle separatorStyle:self.tableViewCellSeparatorStyle separatorColor:self.separatorColor];
     
     if (self.shouldPullRefresh) {
         [self setupPullRefresh];
