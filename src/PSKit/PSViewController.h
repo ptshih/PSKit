@@ -15,6 +15,7 @@
 @interface PSViewController : UIViewController <PSStateMachine, CurtainControllerDelegate>
 
 @property (nonatomic, strong) CurtainController *curtainController;
+@property (nonatomic, copy) NSArray *curtainItems;
 @property (nonatomic, strong) UIView *contentView;
 @property (nonatomic, strong) UIView *headerView;
 @property (nonatomic, strong) UIView *footerView;
@@ -27,6 +28,7 @@
 // Config
 @property (nonatomic, assign) BOOL shouldShowHeader;
 @property (nonatomic, assign) BOOL shouldShowFooter;
+@property (nonatomic, assign) BOOL shouldShowCurtain;
 @property (nonatomic, assign) BOOL shouldAddRoundedCorners;
 
 /**

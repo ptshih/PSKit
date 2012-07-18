@@ -17,6 +17,7 @@
         self.contentOffset = CGPointZero;
         self.shouldShowHeader = NO;
         self.shouldShowFooter = NO;
+        self.shouldShowCurtain = NO;
         self.shouldAddRoundedCorners = NO;
     }
     return self;
@@ -147,13 +148,13 @@
 }
 
 - (void)setupCurtain {
-    CGFloat visibleHeaderHeight = (self.headerView) ? self.headerView.bottom : 0.0;
-    CGFloat visibleFooterHeight = (self.footerView) ? self.view.height - self.footerView.top : 0.0;
-    CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
+    if (!self.shouldShowCurtain) return;
     
     self.curtainController = [[CurtainController alloc] initWithNibName:nil bundle:nil];
     [self.curtainController setDelegate:self];
-    self.curtainController.view.frame = frame;
+    NSArray *titles = [[[(PSSpringboardController *)self.parentViewController.parentViewController viewControllers] valueForKey:@"topViewController"] valueForKey:@"title"];
+    [self.curtainController setItems:titles];
+    self.curtainController.view.frame = self.contentView.frame;
     [self.view insertSubview:self.curtainController.view belowSubview:self.headerView];
 }
 
