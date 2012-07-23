@@ -81,6 +81,7 @@
 - (UIView *)baseBackgroundView;
 - (UIColor *)baseBackgroundColor;
 - (UIView *)rowBackgroundViewForIndexPath:(NSIndexPath *)indexPath selected:(BOOL)selected;
+- (UIColor *)rowBackgroundColorForIndexPath:(NSIndexPath *)indexPath selected:(BOOL)selected;
 
 /**
  Remotely fetch data

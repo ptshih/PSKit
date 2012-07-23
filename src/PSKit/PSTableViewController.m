@@ -404,6 +404,8 @@ separatorColor = _separatorColor;
     if ([self respondsToSelector:@selector(rowBackgroundViewForIndexPath:selected:)]) {
         cell.backgroundView = [self rowBackgroundViewForIndexPath:indexPath selected:NO];
         cell.selectedBackgroundView = [self rowBackgroundViewForIndexPath:indexPath selected:YES];
+    } else if ([self respondsToSelector:@selector(rowBackgroundColorForIndexPath:selected:)]) {
+        cell.backgroundColor = [self rowBackgroundColorForIndexPath:indexPath selected:YES];
     }
 }
 

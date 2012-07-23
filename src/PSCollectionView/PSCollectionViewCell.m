@@ -43,8 +43,10 @@ object = _object;
 - (void)prepareForReuse {
 }
 
-- (void)fillCellWithObject:(id)object {
+- (void)collectionView:(PSCollectionView *)collectionView fillCellWithObject:(id)object atIndex:(NSInteger)index {
+    self.collectionView = collectionView;
     self.object = object;
+    self.index = index;
 }
 
 + (CGFloat)rowHeightForObject:(id)object inColumnWidth:(CGFloat)columnWidth {
