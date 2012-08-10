@@ -63,8 +63,6 @@ typedef id AFNetworkReachabilityRef;
 
 typedef void (^AFCompletionBlock)(void);
 
-static NSUInteger const kAFHTTPClientDefaultMaxConcurrentOperationCount = 4;
-
 static NSString * AFBase64EncodedStringFromString(NSString *string) {
     NSData *data = [NSData dataWithBytes:[string UTF8String] length:[string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]];
     NSUInteger length = [data length];
@@ -285,7 +283,7 @@ static NSString * AFPropertyListStringFromParameters(NSDictionary *parameters) {
 #endif
     
     self.operationQueue = [[[NSOperationQueue alloc] init] autorelease];
-	[self.operationQueue setMaxConcurrentOperationCount:kAFHTTPClientDefaultMaxConcurrentOperationCount];
+	[self.operationQueue setMaxConcurrentOperationCount:NSOperationQueueDefaultMaxConcurrentOperationCount];
     
     return self;
 }
@@ -722,7 +720,7 @@ static inline NSString * AFMultipartFormFinalBoundary() {
     self.request = request;
     self.stringEncoding = encoding;
     
-    self.temporaryFilePath = [AFMultipartTemporaryFileDirectoryPath() stringByAppendingPathComponent:[NSString stringWithFormat:@"%u", [[self.request URL] hash]]];
+    self.temporaryFilePath = [AFMultipartTemporaryFileDirectoryPath() stringByAppendingPathComponent:[NSString stringWithFormat:@"%lu", (long)[[self.request URL] hash]]];
     self.outputStream = [NSOutputStream outputStreamToFileAtPath:self.temporaryFilePath append:NO];
     
     NSRunLoop *runLoop = [NSRunLoop currentRunLoop];

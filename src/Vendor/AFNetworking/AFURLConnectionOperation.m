@@ -355,15 +355,19 @@ static inline BOOL AFStateTransitionIsValid(AFOperationState fromState, AFOperat
 }
 
 - (void)pause {
-    if ([self isPaused]) {
+    if ([self isPaused] || [self isFinished] || [self isCancelled]) {
         return;
     }
     
     [self.lock lock];
-    self.state = AFHTTPOperationPausedState;
     
-    [self.connection performSelector:@selector(cancel) onThread:[[self class] networkRequestThread] withObject:nil waitUntilDone:NO modes:[self.runLoopModes allObjects]];
-    [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:self];
+    if ([self isExecuting]) {
+        [self.connection performSelector:@selector(cancel) onThread:[[self class] networkRequestThread] withObject:nil waitUntilDone:NO modes:[self.runLoopModes allObjects]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:self];
+    }
+    
+    self.state = AFHTTPOperationPausedState;
+
     [self.lock unlock];
 }
 
@@ -520,7 +524,7 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 
 - (NSURLRequest *)connection:(NSURLConnection *)connection
              willSendRequest:(NSURLRequest *)request
-            redirectResponse:(NSURLResponse *)redirectResponse;
+            redirectResponse:(NSURLResponse *)redirectResponse
 {
     if (self.redirectResponse) {
         return self.redirectResponse(connection, request, redirectResponse);
@@ -535,7 +539,9 @@ didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite
 {
     if (self.uploadProgress) {
-        self.uploadProgress(bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.uploadProgress(bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
+        });
     }
 }
 
@@ -558,7 +564,9 @@ didReceiveResponse:(NSURLResponse *)response
     }
     
     if (self.downloadProgress) {
-        self.downloadProgress((long long)[data length], self.totalBytesRead, self.response.expectedContentLength);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.downloadProgress((long long)[data length], self.totalBytesRead, self.response.expectedContentLength);
+        });
     }
 }
 
