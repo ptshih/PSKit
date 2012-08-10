@@ -77,7 +77,9 @@ separatorLine = _separatorLine;
 }
 
 - (void)tableView:(UITableView *)tableView fillCellWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath {
+    self.object = object;
     self.parentTableView = tableView;
+    self.indexPath = indexPath;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {

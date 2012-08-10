@@ -19,6 +19,7 @@ typedef uint32_t PSCellType;
 
 @interface PSCell : UITableViewCell
 
+@property (nonatomic, strong) id object;
 @property (nonatomic, strong) PSCachedImageView *psImageView;
 @property (nonatomic, weak) UITableView *parentTableView;
 @property (nonatomic, copy) NSIndexPath *indexPath;

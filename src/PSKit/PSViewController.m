@@ -116,8 +116,6 @@
     self.headerView.backgroundColor = HEADER_BG_COLOR;
     self.headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     
-    [self.headerView addGradientLayerWithFrame:CGRectMake(0, self.headerView.height, self.headerView.width, 8.0) colors:[NSArray arrayWithObjects:(id)RGBACOLOR(0, 0, 0, 0.5).CGColor, (id)RGBACOLOR(0, 0, 0, 0.3).CGColor, (id)RGBACOLOR(0, 0, 0, 0.1).CGColor, (id)RGBACOLOR(0, 0, 0, 0.0).CGColor, nil] locations:[NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.1], [NSNumber numberWithFloat:0.5], [NSNumber numberWithFloat:1.0], nil] startPoint:CGPointMake(0.5, 0.0) endPoint:CGPointMake(0.5, 1.0)];
-    
     self.leftButton = [UIButton buttonWithFrame:CGRectMake(0, 0, 44, 44) andStyle:nil target:self action:@selector(leftAction)];
     self.leftButton.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
     //    [self.leftButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonLeftBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
@@ -135,6 +133,11 @@
     [self.headerView addSubview:self.leftButton];
     [self.headerView addSubview:self.centerButton];
     [self.headerView addSubview:self.rightButton];
+    
+    UIImageView *ds = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.headerView.height, self.headerView.width, 8.0) image:[[UIImage imageNamed:@"DropShadow"] stretchableImageWithLeftCapWidth:1 topCapHeight:0]];
+    ds.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [self.headerView addSubview:ds];
+    
     [self.view addSubview:self.headerView];
 }
 
@@ -144,9 +147,12 @@
     self.footerView = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.height - 44, self.view.width, 44)];
     self.footerView.backgroundColor = FOOTER_BG_COLOR;
     self.footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    [self.view addSubview:self.footerView];
     
-    [self.footerView addGradientLayerWithFrame:CGRectMake(0, -8.0, self.footerView.width, 8.0) colors:[NSArray arrayWithObjects:(id)RGBACOLOR(0, 0, 0, 0.5).CGColor, (id)RGBACOLOR(0, 0, 0, 0.3).CGColor, (id)RGBACOLOR(0, 0, 0, 0.1).CGColor, (id)RGBACOLOR(0, 0, 0, 0.0).CGColor, nil] locations:[NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.1], [NSNumber numberWithFloat:0.5], [NSNumber numberWithFloat:1.0], nil] startPoint:CGPointMake(0.5, 1.0) endPoint:CGPointMake(0.5, 0.0)];
+    UIImageView *ds = [[UIImageView alloc] initWithFrame:CGRectMake(0, -8.0, self.footerView.width, 8.0) image:[[UIImage imageNamed:@"DropShadowInverted"] stretchableImageWithLeftCapWidth:1 topCapHeight:0]];
+    ds.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [self.footerView addSubview:ds];
+    
+    [self.view addSubview:self.footerView];
 }
 
 - (void)setupCurtain {
