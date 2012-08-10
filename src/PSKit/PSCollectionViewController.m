@@ -84,7 +84,7 @@ pullRefreshStyle = _pullRefreshStyle;
     }
     
     UILabel *loadingLabel = [[UILabel alloc] initWithFrame:self.collectionView.bounds];
-    [PSStyleSheet applyStyle:@"loadingLightLabel" forLabel:loadingLabel];
+    [PSStyleSheet applyStyle:@"loadingDarkLabel" forLabel:loadingLabel];
     loadingLabel.text = @"Loading...";
     self.collectionView.loadingView = loadingLabel;
     

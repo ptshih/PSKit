@@ -77,7 +77,7 @@ separatorLine = _separatorLine;
 }
 
 - (void)tableView:(UITableView *)tableView fillCellWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath {
-    // Subclasses must implement
+    self.parentTableView = tableView;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
