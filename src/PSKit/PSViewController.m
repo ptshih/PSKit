@@ -6,6 +6,15 @@
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.
 //
 
+// Margins
+static CGSize margin() {
+    if (isDeviceIPad()) {
+        return CGSizeMake(8.0, 6.0);
+    } else {
+        return CGSizeMake(8.0, 6.0);
+    }
+}
+
 #import "PSViewController.h"
 
 @implementation PSViewController
@@ -114,21 +123,23 @@
     // Setup perma header
     self.headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)];
     self.headerView.backgroundColor = HEADER_BG_COLOR;
-    self.headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    self.headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
     
-    self.leftButton = [UIButton buttonWithFrame:CGRectMake(0, 0, 44, 44) andStyle:nil target:self action:@selector(leftAction)];
+    self.leftButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navButton" target:self action:@selector(leftAction)];
     self.leftButton.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
     //    [self.leftButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonLeftBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
-    self.centerButton = [UIButton buttonWithFrame:CGRectMake(44, 0, self.headerView.width - 88, 44) andStyle:@"navigationTitleDarkLabel" target:self action:@selector(centerAction)];
+    self.rightButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navButton" target:self action:@selector(rightAction)];
+    self.rightButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+    //    [self.rightButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonRightBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    
+    self.centerButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navigationTitleDarkLabel" target:self action:@selector(centerAction)];
     self.centerButton.titleLabel.adjustsFontSizeToFitWidth = YES;
     self.centerButton.titleEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 8);
     self.centerButton.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     //    [self.centerButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonCenterBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
-    self.rightButton = [UIButton buttonWithFrame:CGRectMake(self.headerView.width - 44, 0, 44, 44) andStyle:nil target:self action:@selector(rightAction)];
-    self.rightButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
-    //    [self.rightButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonRightBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    [self layoutHeaderWithLeftWidth:32.0 rightWidth:32.0];
 
     [self.headerView addSubview:self.leftButton];
     [self.headerView addSubview:self.centerButton];
@@ -141,12 +152,18 @@
     [self.view addSubview:self.headerView];
 }
 
+- (void)layoutHeaderWithLeftWidth:(CGFloat)leftWidth rightWidth:(CGFloat)rightWidth {
+    self.leftButton.frame = CGRectMake(margin().width, margin().height, leftWidth, 32.0);
+    self.rightButton.frame = CGRectMake(self.headerView.width - rightWidth - margin().width, margin().height, rightWidth, 32.0);
+    self.centerButton.frame = CGRectMake(self.leftButton.right + margin().width, margin().height, self.headerView.width - leftWidth - rightWidth - margin().width * 4, 32.0);
+}
+
 - (void)setupFooter {
     if (!self.shouldShowFooter) return;
     
     self.footerView = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.height - 44, self.view.width, 44)];
     self.footerView.backgroundColor = FOOTER_BG_COLOR;
-    self.footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    self.footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
     
     UIImageView *ds = [[UIImageView alloc] initWithFrame:CGRectMake(0, -8.0, self.footerView.width, 8.0) image:[[UIImage imageNamed:@"DropShadowInverted"] stretchableImageWithLeftCapWidth:1 topCapHeight:0]];
     ds.autoresizingMask = UIViewAutoresizingFlexibleWidth;

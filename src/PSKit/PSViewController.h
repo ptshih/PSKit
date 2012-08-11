@@ -43,4 +43,6 @@
 
 - (void)addRoundedCorners;
 
+- (void)layoutHeaderWithLeftWidth:(CGFloat)leftWidth rightWidth:(CGFloat)rightWidth;
+
 @end
