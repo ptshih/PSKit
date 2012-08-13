@@ -259,13 +259,6 @@ static CGSize margin() {
     ASSERT_MAIN_THREAD;
     [self beginRefresh];
     self.isReload = YES;
-    
-    if (self.shouldShowNullView) {
-        [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
-            self.nullView.messageLabel.text = @"Loading...";
-            self.nullView.alpha = 1.0;
-        }];
-    }
 }
 
 - (void)dataSourceDidLoad {
