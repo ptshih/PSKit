@@ -33,6 +33,7 @@ pullRefreshStyle = _pullRefreshStyle;
         self.items = [NSMutableArray array];
         
         // Config
+        self.shouldShowNullView = YES;
         self.shouldPullRefresh = NO;
         self.pullRefreshStyle = PSPullRefreshStyleBlack;
     }
@@ -82,11 +83,6 @@ pullRefreshStyle = _pullRefreshStyle;
         self.collectionView.numColsPortrait = 1;
         self.collectionView.numColsLandscape = 2;
     }
-    
-    UILabel *loadingLabel = [[UILabel alloc] initWithFrame:self.collectionView.bounds];
-    [PSStyleSheet applyStyle:@"loadingDarkLabel" forLabel:loadingLabel];
-    loadingLabel.text = @"Loading...";
-    self.collectionView.loadingView = loadingLabel;
     
     if (self.shouldPullRefresh) {
         [self setupPullRefresh];

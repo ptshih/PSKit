@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PSBaseViewController.h"
+#import "PSViewController.h"
 #import "PSPullRefreshView.h"
 
-@interface PSTableViewController : PSBaseViewController <UITableViewDelegate, UITableViewDataSource, UISearchDisplayDelegate, UISearchBarDelegate, PSPullRefreshViewDelegate>
+@interface PSTableViewController : PSViewController <UITableViewDelegate, UITableViewDataSource, UISearchDisplayDelegate, UISearchBarDelegate, PSPullRefreshViewDelegate>
 
 @property (nonatomic, strong) NSMutableArray *items;
 @property (nonatomic, strong) NSMutableArray *searchItems;

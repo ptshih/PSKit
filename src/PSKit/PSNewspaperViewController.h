@@ -6,10 +6,10 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "PSBaseViewController.h"
+#import "PSViewController.h"
 #import "PSNewspaperView.h"
 
-@interface PSNewspaperViewController : PSBaseViewController <PSNewspaperViewDelegate, PSNewspaperViewDataSource>
+@interface PSNewspaperViewController : PSViewController <PSNewspaperViewDelegate, PSNewspaperViewDataSource>
 
 
 @property (nonatomic, strong) NSMutableArray *items;

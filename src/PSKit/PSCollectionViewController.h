@@ -6,11 +6,11 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "PSBaseViewController.h"
+#import "PSViewController.h"
 #import "PSCollectionView.h"
 #import "PSPullRefreshView.h"
 
-@interface PSCollectionViewController : PSBaseViewController <PSCollectionViewDelegate, PSCollectionViewDataSource, PSPullRefreshViewDelegate, UIScrollViewDelegate>
+@interface PSCollectionViewController : PSViewController <PSCollectionViewDelegate, PSCollectionViewDataSource, PSPullRefreshViewDelegate, UIScrollViewDelegate>
 
 @property (nonatomic, strong) NSMutableArray *items;
 @property (nonatomic, strong) PSCollectionView *collectionView;

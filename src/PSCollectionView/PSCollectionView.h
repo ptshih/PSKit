@@ -34,8 +34,6 @@
 
 @property (nonatomic, strong) UIView *headerView;
 @property (nonatomic, strong) UIView *footerView;
-@property (nonatomic, strong) UIView *emptyView;
-@property (nonatomic, strong) UIView *loadingView;
 
 @property (nonatomic, assign, readonly) CGFloat colWidth;
 @property (nonatomic, assign, readonly) NSInteger numCols;

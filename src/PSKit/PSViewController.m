@@ -15,6 +15,34 @@ static CGSize margin() {
     }
 }
 
+#define kNullViewAnimationDuration 0.2
+
+// PSNullView
+
+@interface PSNullView : UIView
+
+@property (nonatomic, strong) UILabel *messageLabel;
+
+@end
+
+@implementation PSNullView
+
+- (id)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.messageLabel = [[UILabel alloc] initWithFrame:self.bounds];
+        self.messageLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [PSStyleSheet applyStyle:@"loadingDarkLabel" forLabel:self.messageLabel];
+        self.messageLabel.text = @"Loading...";
+        [self addSubview:self.messageLabel];
+    }
+    return self;
+}
+
+@end
+
+// PSViewController
+
 #import "PSViewController.h"
 
 @implementation PSViewController
@@ -23,10 +51,14 @@ static CGSize margin() {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         //  VLog(@"#%@", [self class]);
+        self.reloading = NO;
+        self.isReload = NO;
+        
         self.contentOffset = CGPointZero;
         self.shouldShowHeader = NO;
         self.shouldShowFooter = NO;
         self.shouldShowCurtain = NO;
+        self.shouldShowNullView = NO;
         self.shouldAddRoundedCorners = NO;
     }
     return self;
@@ -41,9 +73,6 @@ static CGSize margin() {
 }
 
 #pragma mark - View
-- (void)loadView {
-    self.view = [[UIView alloc] initWithFrame:self.parentViewController.view.bounds];
-}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -62,6 +91,9 @@ static CGSize margin() {
     
     // Setup Subviews
     [self setupSubviews];
+    
+    // Null View
+    [self setupNullView];
     
     // Add rounded corners
     if (self.shouldAddRoundedCorners) {
@@ -184,7 +216,17 @@ static CGSize margin() {
     [self.view insertSubview:self.curtainController.view belowSubview:self.headerView];
 }
 
+- (void)setupNullView {
+    if (!self.shouldShowNullView) return;
+    
+    self.nullView = [[PSNullView alloc] initWithFrame:self.contentView.bounds];
+    self.nullView.autoresizingMask = self.contentView.autoresizingMask;
+    self.nullView.backgroundColor = BASE_BG_COLOR;
+    [self.contentView addSubview:self.nullView];
+}
+
 #pragma mark - Post View Config
+
 - (void)addRoundedCorners {
     // iPad doesn't need rounded corners
     if (!isDeviceIPad()) {
@@ -199,8 +241,78 @@ static CGSize margin() {
 }
 
 #pragma mark - DataSource
+
 - (void)loadDataSource {
-    // subclass should implement
+    ASSERT_MAIN_THREAD;
+    [self beginRefresh];
+    self.isReload = NO;
+    
+    if (self.shouldShowNullView) {
+        [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
+            self.nullView.messageLabel.text = @"Loading...";
+            self.nullView.alpha = 1.0;
+        }];
+    }
+}
+
+- (void)reloadDataSource {
+    ASSERT_MAIN_THREAD;
+    [self beginRefresh];
+    self.isReload = YES;
+    
+    if (self.shouldShowNullView) {
+        [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
+            self.nullView.messageLabel.text = @"Loading...";
+            self.nullView.alpha = 1.0;
+        }];
+    }
+}
+
+- (void)dataSourceDidLoad {
+    ASSERT_MAIN_THREAD;
+    [self endRefresh];
+    
+    if ([self dataSourceIsEmpty]) {
+        if (self.shouldShowNullView) {
+            [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
+                self.nullView.messageLabel.text = @"Empty...";
+                self.nullView.alpha = 1.0;
+            }];
+        }
+    } else {
+        if (self.shouldShowNullView) {
+            [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
+                self.nullView.messageLabel.text = nil;
+                self.nullView.alpha = 0.0;
+            }];
+        }
+    }
+}
+
+- (void)dataSourceDidError {
+    ASSERT_MAIN_THREAD;
+    [self endRefresh];
+    
+    if (self.shouldShowNullView) {
+        [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
+            self.nullView.messageLabel.text = @"Error...";
+            self.nullView.alpha = 1.0;
+        }];
+    }
+}
+
+- (BOOL)dataSourceIsEmpty {
+    return NO;
+}
+
+- (void)beginRefresh {
+    ASSERT_MAIN_THREAD;
+    self.reloading = YES;
+}
+
+- (void)endRefresh {
+    ASSERT_MAIN_THREAD;
+    self.reloading = NO;
 }
 
 #pragma mark - Rotation

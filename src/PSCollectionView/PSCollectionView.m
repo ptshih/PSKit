@@ -143,9 +143,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 // Public Views
 @synthesize
 headerView = _headerView,
-footerView = _footerView,
-emptyView = _emptyView,
-loadingView = _loadingView;
+footerView = _footerView;
 
 // Public
 @synthesize
@@ -192,18 +190,6 @@ indexToRectMap = _indexToRectMap;
     self.collectionViewDelegate = nil;
 }
 
-#pragma mark - Setters
-
-- (void)setLoadingView:(UIView *)loadingView {
-    if (_loadingView && [_loadingView respondsToSelector:@selector(removeFromSuperview)]) {
-        [_loadingView removeFromSuperview];
-    }
-    
-    _loadingView = loadingView;
-    
-    [self addSubview:_loadingView];
-}
-
 #pragma mark - DataSource
 
 - (void)reloadData {
@@ -235,11 +221,6 @@ indexToRectMap = _indexToRectMap;
     [self.visibleViews removeAllObjects];
     [self.viewKeysToRemove removeAllObjects];
     [self.indexToRectMap removeAllObjects];
-    
-    if (self.emptyView) {
-        [self.emptyView removeFromSuperview];
-    }
-    [self.loadingView removeFromSuperview];
     
     // This is where we should layout the entire grid first
     NSInteger numViews = [self.collectionViewDataSource numberOfRowsInCollectionView:self];
@@ -298,12 +279,6 @@ indexToRectMap = _indexToRectMap;
         }
     } else {
         totalHeight = self.height;
-        
-        // If we have an empty view, show it
-        if (self.emptyView) {
-            self.emptyView.frame = CGRectMake(kMargin, top, self.width - kMargin * 2, self.height - top - kMargin);
-            [self addSubview:self.emptyView];
-        }
     }
     
     // Add footerView if exists

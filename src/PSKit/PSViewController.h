@@ -12,6 +12,8 @@
 
 #import "CurtainController.h"
 
+@class PSNullView;
+
 @interface PSViewController : UIViewController <PSStateMachine, CurtainControllerDelegate>
 
 @property (nonatomic, strong) CurtainController *curtainController;
@@ -19,6 +21,7 @@
 @property (nonatomic, strong) UIView *contentView;
 @property (nonatomic, strong) UIView *headerView;
 @property (nonatomic, strong) UIView *footerView;
+@property (nonatomic, strong) PSNullView *nullView;
 @property (nonatomic, strong) UIButton *leftButton;
 @property (nonatomic, strong) UIButton *centerButton;
 @property (nonatomic, strong) UIButton *rightButton;
@@ -26,9 +29,13 @@
 @property (nonatomic, assign) CGPoint contentOffset;
 
 // Config
+@property (nonatomic, assign) BOOL reloading;
+@property (nonatomic, assign) BOOL isReload;
+
 @property (nonatomic, assign) BOOL shouldShowHeader;
 @property (nonatomic, assign) BOOL shouldShowFooter;
 @property (nonatomic, assign) BOOL shouldShowCurtain;
+@property (nonatomic, assign) BOOL shouldShowNullView;
 @property (nonatomic, assign) BOOL shouldAddRoundedCorners;
 
 /**
