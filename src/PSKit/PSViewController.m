@@ -15,7 +15,7 @@ static CGSize margin() {
     }
 }
 
-#define kNullViewAnimationDuration 0.2
+#define kNullViewAnimationDuration 0.3
 
 // PSNullView
 

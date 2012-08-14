@@ -25,13 +25,13 @@ inset = _inset;
 }
 
 - (CGRect)rectWithInset:(UIEdgeInsets)inset {
-    CGRect clearViewRect = [self clearButtonRectForBounds:self.bounds];
-    CGRect rightViewRect = [self rightViewRectForBounds:self.bounds];
-    CGRect leftViewRect = [self leftViewRectForBounds:self.bounds];
-    CGFloat rightMargin = MAX(clearViewRect.size.width, rightViewRect.size.width);
-    CGFloat leftMargin = leftViewRect.size.width;
+    CGFloat leftWidth = self.leftView.width;
+    CGFloat rightWidth = self.rightView.width;
     
-    return UIEdgeInsetsInsetRect(self.bounds, UIEdgeInsetsMake(inset.top, inset.left + leftMargin, inset.bottom, inset.right + rightMargin));
+    CGFloat width = self.width - leftWidth - rightWidth;
+    CGRect frame = CGRectMake(leftWidth, self.inset.top, width, self.height - self.inset.top - self.inset.bottom);
+    
+    return frame;
 }
 
 // placeholder position
@@ -49,13 +49,15 @@ inset = _inset;
 }
 
 - (CGRect)leftViewRectForBounds:(CGRect)bounds {
-    CGFloat dim = bounds.size.height - self.inset.top * 2;
-    return CGRectMake(self.inset.left, self.inset.top, dim, dim);
+    CGRect frame = UIEdgeInsetsInsetRect(self.leftView.bounds, self.inset);
+    
+    return frame;
 }
 
 - (CGRect)rightViewRectForBounds:(CGRect)bounds {
-    CGFloat dim = bounds.size.height - self.inset.top * 2;
-    return CGRectMake(self.width - self.inset.right - dim, self.inset.top, dim, dim);
+    CGRect frame = UIEdgeInsetsInsetRect(self.rightView.bounds, self.inset);
+    
+    return frame;
 }
 
 // This overrides the default image for a clear button
