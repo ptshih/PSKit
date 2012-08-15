@@ -34,6 +34,10 @@ static CGSize margin() {
         
         self.textField = [[UITextField alloc] initWithFrame:CGRectZero];
         self.textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+        self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
+        self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+//        self.textField.adjustsFontSizeToFitWidth = YES;
+        self.textField.clearButtonMode = UITextFieldViewModeWhileEditing;
         [PSStyleSheet applyStyle:@"leadDarkField" forTextField:self.textField];
         [self.contentView addSubview:self.textField];
     }
@@ -50,18 +54,18 @@ static CGSize margin() {
     [super layoutSubviews];
     
     CGFloat left = margin().width;
-    CGFloat top = margin().height;
+    CGFloat top = 0.0;
     CGFloat width = self.contentView.width - margin().width * 2;
     CGFloat height = self.contentView.height;
     CGSize labelSize = CGSizeZero;
     
     labelSize = [self.textLabel sizeForLabelInWidth:width];
-    self.textLabel.frame = CGRectMake(left, top, labelSize.width, labelSize.height);
+    self.textLabel.frame = CGRectMake(left, top, labelSize.width, height);
     
-    left += MAX(labelSize.width, 120.0) + margin().width;
-    width -= MAX(labelSize.width, 120.0) + margin().width;
+    left += MAX(labelSize.width, 100.0) + margin().width;
+    width -= MAX(labelSize.width, 100.0) + margin().width;
     
-    self.textField.frame = CGRectMake(left, 0, width, height);
+    self.textField.frame = CGRectMake(left, top, width, height);
 }
 
 - (void)tableView:(UITableView *)tableView fillCellWithObject:(NSDictionary *)dict atIndexPath:(NSIndexPath *)indexPath {
