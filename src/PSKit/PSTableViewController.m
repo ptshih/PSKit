@@ -348,6 +348,16 @@ separatorColor = _separatorColor;
     return [PSCell class];
 }
 
+- (UITableViewCellAccessoryType)accessoryTypeAtIndexPath:(NSIndexPath *)indexPath {
+    // Subclass should/may implement
+    return UITableViewCellAccessoryNone;
+}
+
+- (UITableViewCellSelectionStyle)selectionStyleAtIndexPath:(NSIndexPath *)indexPath {
+    // Subclass should/may implement
+    return UITableViewCellSelectionStyleNone;
+}
+
 - (BOOL)cellIsSelected:(NSIndexPath *)indexPath {
     // Return whether the cell at the specified index path is selected or not
     NSNumber *selectedIndex = [_selectedIndexes objectForKey:indexPath];
@@ -394,6 +404,8 @@ separatorColor = _separatorColor;
     id cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
     if (!cell) { 
         cell = [[cellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
+        [(UITableViewCell *)cell setAccessoryType:[self accessoryTypeAtIndexPath:indexPath]];
+        [(UITableViewCell *)cell setSelectionStyle:[self selectionStyleAtIndexPath:indexPath]];
     }
     
     [self tableView:tableView configureCell:cell atIndexPath:indexPath];

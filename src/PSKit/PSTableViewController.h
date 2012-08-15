@@ -41,6 +41,8 @@
 
 // Cell Type
 - (Class)cellClassAtIndexPath:(NSIndexPath *)indexPath;
+- (UITableViewCellAccessoryType)accessoryTypeAtIndexPath:(NSIndexPath *)indexPath;
+- (UITableViewCellSelectionStyle)selectionStyleAtIndexPath:(NSIndexPath *)indexPath;
 
 - (void)tableView:(UITableView *)tableView configureCell:(id)cell atIndexPath:(NSIndexPath *)indexPath;
 

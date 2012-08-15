@@ -10,13 +10,6 @@
 
 @implementation PSCell
 
-@synthesize
-psImageView = _psImageView,
-parentTableView = _parentTableView,
-indexPath = _indexPath,
-isExpanded = _isExpanded,
-separatorLine = _separatorLine;
-
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
@@ -35,6 +28,10 @@ separatorLine = _separatorLine;
     self.parentTableView = nil;
     self.indexPath = nil;
     self.isExpanded = NO;
+    
+    self.textLabel.text = nil;
+    self.detailTextLabel.text = nil;
+    
 }
 
 + (NSString *)reuseIdentifier {
