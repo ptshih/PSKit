@@ -6,6 +6,9 @@
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.
 //
 
+// Import PSKit Categories
+#import "PSCategories.h"
+
 // Global Imports
 #import "PSSpringboardController.h"
 #import "PSNavigationController.h"
@@ -32,8 +35,6 @@
 #import "UIActionSheet+MKBlockAdditions.h"
 #import "UIAlertView+MKBlockAdditions.h"
 
-// Import PSKit Categories
-#import "PSCategories.h"
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"

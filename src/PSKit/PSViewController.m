@@ -60,12 +60,15 @@ static CGSize margin() {
         self.shouldShowCurtain = NO;
         self.shouldShowNullView = NO;
         self.shouldAddRoundedCorners = NO;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     }
     return self;
 }
 
-- (void)viewDidUnload {
-    [super viewDidUnload];
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -73,6 +76,10 @@ static CGSize margin() {
 }
 
 #pragma mark - View
+
+- (void)viewDidUnload {
+    [super viewDidUnload];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -331,6 +338,44 @@ static CGSize margin() {
 
 - (void)curtainController:(CurtainController *)curtainController selectedRowAtIndex:(NSInteger)index {
     [(PSSpringboardController *)self.parentViewController.parentViewController setSelectedIndex:index];
+}
+
+#pragma mark - Keyboard Notifications
+
+- (void)keyboardWillShow:(NSNotification *)notification {
+    // Get animation info from userInfo
+    NSTimeInterval animationDuration;
+    UIViewAnimationCurve animationCurve;
+    [[[notification userInfo] objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
+    [[[notification userInfo] objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
+    UIViewAnimationOptions animationOptions = animationCurve << 16; // convert
+    
+    NSValue *frameValue = [[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey];
+    CGRect keyboardFrame = [frameValue CGRectValue];
+    CGFloat keyboardHeight = keyboardFrame.size.height;
+    [UIView animateWithDuration:animationDuration delay:0.0 options:animationOptions animations:^{
+        self.view.height -= keyboardHeight;
+    } completion:^(BOOL finished) {
+        
+    }];
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification {
+    // Get animation info from userInfo
+    NSTimeInterval animationDuration;
+    UIViewAnimationCurve animationCurve;
+    [[[notification userInfo] objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
+    [[[notification userInfo] objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
+    UIViewAnimationOptions animationOptions = animationCurve << 16; // convert
+    
+    NSValue *frameValue = [[notification userInfo] objectForKey:UIKeyboardFrameBeginUserInfoKey];
+    CGRect keyboardFrame = [frameValue CGRectValue];
+    CGFloat keyboardHeight = keyboardFrame.size.height;
+    [UIView animateWithDuration:animationDuration delay:0.0 options:animationOptions animations:^{
+        self.view.height += keyboardHeight;
+    } completion:^(BOOL finished) {
+        
+    }];
 }
 
 @end
