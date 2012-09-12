@@ -1,6 +1,6 @@
 //
 //  PSTextFieldCell.m
-//  Appstand
+//  PSKit
 //
 //  Created by Peter Shih on 8/14/12.
 //
