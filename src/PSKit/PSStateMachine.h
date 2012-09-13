@@ -17,6 +17,7 @@
 - (void)loadDataSource; // Loads from local if exists, else from remote
 - (void)reloadDataSource; // Attempts to reload from remote only
 - (void)loadDataSourceFromRemoteUsingCache:(BOOL)usingCache;
+- (void)loadDataSourceFromFixtures;
 
 // Load a single NSDictionary into the dataSource (not used for tableViews)
 - (void)dataSourceShouldLoadObject:(id)object;
