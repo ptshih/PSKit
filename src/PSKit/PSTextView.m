@@ -32,7 +32,7 @@ paddedInsets = _paddedInsets;
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textChanged:) name:UITextViewTextDidChangeNotification object:self];
         
-        self.insets = UIEdgeInsetsMake(0, 0, 0, 0);
+        self.insets = UIEdgeInsetsMake(-4, -8, 0, 0);
         self.paddedInsets = UIEdgeInsetsMake(0, 0, 8, 0);
         self.contentInset = self.insets;
         
@@ -89,30 +89,30 @@ paddedInsets = _paddedInsets;
 }
 
 #pragma mark Content Inset/Offset
-- (void)setContentOffset:(CGPoint)s {
-    if(self.tracking || self.decelerating){
-        //initiated by user...
-        self.contentInset = self.insets;
-    } else {
-        
-        float bottomOffset = (self.contentSize.height - self.frame.size.height + self.contentInset.bottom);
-        if(s.y < bottomOffset && self.scrollEnabled){
-            self.contentInset = self.paddedInsets; //maybe use scrollRangeToVisible?
-        }
-        
-    }
-    
-    [super setContentOffset:s];
-}
-
-- (void)setContentInset:(UIEdgeInsets)s {
-    UIEdgeInsets insets = s;
-    
-    if(s.bottom>8) insets.bottom = 0;
-    insets.top = 0;
-    
-    [super setContentInset:insets];
-}
+//- (void)setContentOffset:(CGPoint)s {
+//    if(self.tracking || self.decelerating){
+//        //initiated by user...
+//        self.contentInset = self.insets;
+//    } else {
+//        
+//        float bottomOffset = (self.contentSize.height - self.frame.size.height + self.contentInset.bottom);
+//        if(s.y < bottomOffset && self.scrollEnabled){
+//            self.contentInset = self.paddedInsets; //maybe use scrollRangeToVisible?
+//        }
+//        
+//    }
+//    
+//    [super setContentOffset:s];
+//}
+//
+//- (void)setContentInset:(UIEdgeInsets)s {
+//    UIEdgeInsets insets = s;
+//    
+//    if(s.bottom>8) insets.bottom = 0;
+//    insets.top = 0;
+//    
+//    [super setContentInset:insets];
+//}
 
 
 - (void)dealloc {

@@ -38,6 +38,9 @@
 @property (nonatomic, assign) BOOL shouldShowNullView;
 @property (nonatomic, assign) BOOL shouldAddRoundedCorners;
 
+@property (nonatomic, assign) CGFloat headerHeight;
+@property (nonatomic, assign) CGFloat footerHeight;
+
 /**
  Used to update the view when the orientation changes
  */

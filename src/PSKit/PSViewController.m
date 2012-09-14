@@ -61,6 +61,9 @@ static CGSize margin() {
         self.shouldShowNullView = NO;
         self.shouldAddRoundedCorners = NO;
         
+        self.headerHeight = 44.0;
+        self.footerHeight = 44.0;
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     }
@@ -90,6 +93,8 @@ static CGSize margin() {
     if ([self respondsToSelector:@selector(baseBackgroundView)]) {
         UIView *bgView = [self baseBackgroundView];
         if (bgView) {
+            bgView.frame = self.view.bounds;
+            bgView.autoresizingMask = self.view.autoresizingMask;
             [self.view insertSubview:bgView atIndex:0];
         }
     } else if ([self respondsToSelector:@selector(baseBackgroundColor)]) {
@@ -160,7 +165,7 @@ static CGSize margin() {
     if (!self.shouldShowHeader) return;
     
     // Setup perma header
-    self.headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, 44)];
+    self.headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.headerHeight)];
     self.headerView.backgroundColor = HEADER_BG_COLOR;
     self.headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
     
@@ -200,7 +205,7 @@ static CGSize margin() {
 - (void)setupFooter {
     if (!self.shouldShowFooter) return;
     
-    self.footerView = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.height - 44, self.view.width, 44)];
+    self.footerView = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.height - self.footerHeight, self.view.width, self.footerHeight)];
     self.footerView.backgroundColor = FOOTER_BG_COLOR;
     self.footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
     
@@ -220,6 +225,7 @@ static CGSize margin() {
     NSArray *items = [NSArray arrayWithObjects:titles, nil];
     [self.curtainController setItems:items];
     self.curtainController.view.frame = self.contentView.frame;
+    self.curtainController.view.height += self.footerView.height;
     [self.view insertSubview:self.curtainController.view belowSubview:self.headerView];
 }
 
