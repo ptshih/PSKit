@@ -28,6 +28,8 @@
 @property (nonatomic, weak) UIScrollView *activeScrollView; // subclasses should set this if they have a scrollView
 @property (nonatomic, assign) CGPoint contentOffset;
 
+@property (nonatomic, strong) UIImage *icon;
+
 // Config
 @property (nonatomic, assign) BOOL reloading;
 @property (nonatomic, assign) BOOL isReload;

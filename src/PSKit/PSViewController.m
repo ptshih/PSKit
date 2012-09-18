@@ -221,8 +221,7 @@ static CGSize margin() {
     
     self.curtainController = [[CurtainController alloc] initWithNibName:nil bundle:nil];
     [self.curtainController setDelegate:self];
-    NSArray *titles = [[[(PSSpringboardController *)self.parentViewController.parentViewController viewControllers] valueForKey:@"topViewController"] valueForKey:@"title"];
-    NSArray *items = [NSArray arrayWithObjects:titles, nil];
+    NSArray *items = [NSArray arrayWithObjects:[[(PSSpringboardController *)self.parentViewController.parentViewController viewControllers] valueForKey:@"topViewController"], nil];
     [self.curtainController setItems:items];
     self.curtainController.view.frame = self.contentView.frame;
     self.curtainController.view.height += self.footerView.height;
