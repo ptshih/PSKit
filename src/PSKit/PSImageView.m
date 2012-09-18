@@ -24,6 +24,7 @@ shouldAnimate = _shouldAnimate;
         self.shouldResize = NO;
         self.shouldAnimate = NO;
         
+        self.clipsToBounds = YES;
         self.contentMode = UIViewContentModeScaleAspectFill;
         self.contentScaleFactor = [UIScreen mainScreen].scale;
         
