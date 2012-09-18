@@ -26,10 +26,10 @@ inset = _inset;
 
 - (CGRect)rectWithInset:(UIEdgeInsets)inset {
     CGFloat leftWidth = self.leftView.width;
-    CGFloat rightWidth = self.rightView.width;
+    CGFloat rightWidth = self.rightView.width + [self clearButtonRectForBounds:[self bounds]].size.width;
     
-    CGFloat width = self.width - leftWidth - rightWidth;
-    CGRect frame = CGRectMake(leftWidth, self.inset.top, width, self.height - self.inset.top - self.inset.bottom);
+    CGFloat width = self.width - leftWidth - rightWidth - self.inset.left - self.inset.right;
+    CGRect frame = CGRectMake(leftWidth + self.inset.left, self.inset.top, width, self.height - self.inset.top - self.inset.bottom);
     
     return frame;
 }
