@@ -137,6 +137,7 @@ static CGSize margin() {
     [self setupHeader];
     [self setupFooter];
     [self setupContent];
+    [self updateSubviews];
     
     [self.view bringSubviewToFront:self.footerView];
     [self.view bringSubviewToFront:self.headerView];
@@ -148,15 +149,14 @@ static CGSize margin() {
  This relayouts the subviews
  */
 - (void)updateSubviews {
-    // subclass may implement
-}
-
-- (void)setupContent {
     CGFloat visibleHeaderHeight = (self.headerView) ? self.headerView.bottom : 0.0;
     CGFloat visibleFooterHeight = (self.footerView) ? self.view.height - self.footerView.top : 0.0;
     CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
-    
-    self.contentView = [[UIView alloc] initWithFrame:frame];
+    self.contentView.frame = frame;
+}
+
+- (void)setupContent {
+    self.contentView = [[UIView alloc] initWithFrame:CGRectZero];
     self.contentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:self.contentView];
 }
@@ -235,6 +235,8 @@ static CGSize margin() {
     self.nullView.autoresizingMask = self.contentView.autoresizingMask;
     self.nullView.backgroundColor = BASE_BG_COLOR;
     [self.contentView addSubview:self.nullView];
+    
+    [self.nullView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(reloadDataSource)]];
 }
 
 #pragma mark - Post View Config

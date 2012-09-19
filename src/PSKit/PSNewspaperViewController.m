@@ -60,12 +60,6 @@ newspaperView = _newspaperView;
     [self.contentView addSubview:self.newspaperView];
 }
 
-- (void)updateSubviews {
-    [super updateSubviews];
-
-    self.newspaperView.frame = self.contentView.bounds;
-}
-
 #pragma mark - State Machine
 
 - (void)loadDataSource {

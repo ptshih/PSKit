@@ -82,8 +82,8 @@ static CGSize margin() {
     NSString *subtitle = [dict objectForKey:@"subtitle"];
     
     height += [PSStyleSheet sizeForText:title width:width style:@"titleDarkLabel"].height;
-    if ([dict objectForKey:@"subtitle"] && [[dict objectForKey:@"subtitle"] length] > 0) {
-        height += [PSStyleSheet sizeForText:subtitle width:width style:@"textBlueLabel"].height;
+    if (subtitle && subtitle.length > 0) {
+        height += [PSStyleSheet sizeForText:subtitle width:width style:@"subtitleDarkLabel"].height;
     }
     
     height += margin().height;
