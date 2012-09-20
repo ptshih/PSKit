@@ -28,6 +28,8 @@
 @protocol PSCurtainControllerDelegate <NSObject>
 
 @optional
+- (NSInteger)numberOfRowsInCurtainController:(PSCurtainController *)curtainController;
+- (id)curtainController:(PSCurtainController *)curtainController rowAtIndex:(NSInteger)index;
 - (void)curtainController:(PSCurtainController *)curtainController selectedRowAtIndex:(NSInteger)index;
 
 @end

@@ -77,6 +77,7 @@
 - (void)setupSubviews {
     [super setupSubviews];
     
+    self.tableView.scrollEnabled = NO;
     self.tableView.backgroundColor = [UIColor clearColor];
     self.tableView.backgroundView = nil;
 }
@@ -86,17 +87,7 @@
 - (void)loadDataSource {
     [super loadDataSource];
     
-    NSMutableArray *items = [NSMutableArray array];
-    
-    NSMutableDictionary *d = [NSMutableDictionary dictionary];
-    [d setObject:@"Orders" forKey:@"title"];
-    [d setObject:[UIImage imageNamed:@"IconCartBlack"] forKey:@"icon"];
-    
-    [items addObject:[NSArray arrayWithObject:d]];
-    
-    [self dataSourceShouldLoadObjects:items animated:NO];
-    
-    [self dataSourceDidLoad];
+    [self.tableView reloadData];
 }
 
 - (void)reloadDataSource {
@@ -137,10 +128,11 @@
     self.topOffset = belowView.height;
     
     self.view.width = self.activeView.width;
-    self.view.height = self.activeView.height - belowView.height;
+    self.view.height = self.tableView.contentSize.height;
     self.view.top = -self.view.height + self.topOffset;
     
-    self.overlayView.frame = self.view.bounds;
+    self.overlayView.width = self.activeView.width;
+    self.overlayView.height = self.activeView.height - belowView.height;
     self.overlayView.top = self.topOffset;
     
     [self.activeView insertSubview:self.overlayView belowSubview:belowView];
@@ -206,11 +198,11 @@
 #pragma mark - Table
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return [self.items count];
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [[self.items objectAtIndex:section] count];
+    return [self.delegate numberOfRowsInCurtainController:self];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -228,7 +220,7 @@
 //}
 
 - (void)tableView:(UITableView *)tableView configureCell:(PSCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-    id item = [[self.items objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+    id item = [self.delegate curtainController:self rowAtIndex:indexPath.row];
     cell.imageView.image = [item valueForKey:@"icon"];
     cell.textLabel.text = [item valueForKey:@"title"];
 }

@@ -326,12 +326,6 @@ static CGSize margin() {
     }
 }
 
-//#pragma mark - CurtainControllerDelegate
-//
-//- (void)curtainController:(CurtainController *)curtainController selectedRowAtIndex:(NSInteger)index {
-//    [(PSSpringboardController *)self.parentViewController.parentViewController setSelectedIndex:index];
-//}
-
 #pragma mark - Keyboard Notifications
 
 - (void)keyboardWillShow:(NSNotification *)notification {
