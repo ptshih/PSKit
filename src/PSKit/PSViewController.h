@@ -10,13 +10,18 @@
 #import <QuartzCore/QuartzCore.h>
 #import "PSStateMachine.h"
 
-#import "CurtainController.h"
-
+@class PSNavigationController;
+@class PSSpringboardController;
+@class PSCurtainController;
 @class PSNullView;
 
-@interface PSViewController : UIViewController <PSStateMachine, CurtainControllerDelegate>
+@interface PSViewController : UIViewController <PSStateMachine>
 
-@property (nonatomic, strong) CurtainController *curtainController;
+// References
+@property (nonatomic, assign) PSNavigationController *navigationController;
+@property (nonatomic, assign) PSSpringboardController *springboardController;
+@property (nonatomic, assign) PSCurtainController *curtainController;
+
 @property (nonatomic, copy) NSArray *curtainItems;
 @property (nonatomic, strong) UIView *contentView;
 @property (nonatomic, strong) UIView *headerView;
@@ -36,7 +41,6 @@
 
 @property (nonatomic, assign) BOOL shouldShowHeader;
 @property (nonatomic, assign) BOOL shouldShowFooter;
-@property (nonatomic, assign) BOOL shouldShowCurtain;
 @property (nonatomic, assign) BOOL shouldShowNullView;
 @property (nonatomic, assign) BOOL shouldAddRoundedCorners;
 

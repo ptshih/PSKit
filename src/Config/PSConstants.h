@@ -10,8 +10,10 @@
 #import "PSCategories.h"
 
 // Global Imports
+#import "PSViewController.h"
 #import "PSSpringboardController.h"
 #import "PSNavigationController.h"
+#import "PSCurtainController.h"
 #import "PSReachabilityCenter.h"
 #import "PSURLCache.h"
 #import "PSStyleSheet.h"

@@ -42,6 +42,9 @@ viewControllers = _viewControllers;
 - (id)initWithRootViewController:(UIViewController *)rootViewController {
     self = [self initWithNibName:nil bundle:nil];
     if (self) {
+        if ([rootViewController isKindOfClass:[PSViewController class]]) {
+            [(PSViewController *)rootViewController setNavigationController:self];
+        }
         [self.viewControllers addObject:rootViewController];
     }
     return self;
@@ -102,6 +105,10 @@ const CGFloat kAnimationDuration = 0.35;
         self.isTransitioning = YES;
     } else {
         return;
+    }
+    
+    if ([viewController isKindOfClass:[PSViewController class]]) {
+        [(PSViewController *)viewController setNavigationController:self];
     }
     
     UIViewController *disappearingViewController = nil;

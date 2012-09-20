@@ -57,7 +57,6 @@ static CGSize margin() {
         self.contentOffset = CGPointZero;
         self.shouldShowHeader = NO;
         self.shouldShowFooter = NO;
-        self.shouldShowCurtain = NO;
         self.shouldShowNullView = NO;
         self.shouldAddRoundedCorners = NO;
         
@@ -141,8 +140,6 @@ static CGSize margin() {
     
     [self.view bringSubviewToFront:self.footerView];
     [self.view bringSubviewToFront:self.headerView];
-    
-    [self setupCurtain];
 }
 
 /*
@@ -214,18 +211,6 @@ static CGSize margin() {
     [self.footerView addSubview:ds];
     
     [self.view addSubview:self.footerView];
-}
-
-- (void)setupCurtain {
-    if (!self.shouldShowCurtain) return;
-    
-    self.curtainController = [[CurtainController alloc] initWithNibName:nil bundle:nil];
-    [self.curtainController setDelegate:self];
-    NSArray *items = [NSArray arrayWithObjects:[[(PSSpringboardController *)self.parentViewController.parentViewController viewControllers] valueForKey:@"topViewController"], nil];
-    [self.curtainController setItems:items];
-    self.curtainController.view.frame = self.contentView.frame;
-    self.curtainController.view.height += self.footerView.height;
-    [self.view insertSubview:self.curtainController.view belowSubview:self.headerView];
 }
 
 - (void)setupNullView {
@@ -341,11 +326,11 @@ static CGSize margin() {
     }
 }
 
-#pragma mark - CurtainControllerDelegate
-
-- (void)curtainController:(CurtainController *)curtainController selectedRowAtIndex:(NSInteger)index {
-    [(PSSpringboardController *)self.parentViewController.parentViewController setSelectedIndex:index];
-}
+//#pragma mark - CurtainControllerDelegate
+//
+//- (void)curtainController:(CurtainController *)curtainController selectedRowAtIndex:(NSInteger)index {
+//    [(PSSpringboardController *)self.parentViewController.parentViewController setSelectedIndex:index];
+//}
 
 #pragma mark - Keyboard Notifications
 

@@ -47,7 +47,7 @@ separatorColor = _separatorColor;
         self.contentOffset = CGPointZero;
         
         // Config
-        self.shouldShowNullView = YES;
+        self.shouldShowNullView = NO;
         self.shouldPullRefresh = NO;
         self.pullRefreshStyle = PSPullRefreshStyleBlack;
     }
