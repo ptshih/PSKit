@@ -6,11 +6,11 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "PSTableViewController.h"
+#import <UIKit/UIKit.h>
 
 @protocol PSCurtainControllerDelegate;
 
-@interface PSCurtainController : PSTableViewController
+@interface PSCurtainController : UIViewController
 
 @property (nonatomic, unsafe_unretained) id <PSCurtainControllerDelegate> delegate;
 

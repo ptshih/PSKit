@@ -8,8 +8,9 @@
 
 #import "PSCurtainController.h"
 
-@interface PSCurtainController ()
+@interface PSCurtainController () <UITableViewDataSource, UITableViewDelegate>
 
+@property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *overlayView;
 @property (nonatomic, assign) UIView *activeView;
 @property (nonatomic, assign) CGFloat topOffset;
@@ -21,9 +22,6 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.tableViewStyle = UITableViewStylePlain;
-        self.tableViewCellSeparatorStyle = UITableViewCellSeparatorStyleNone;
-        self.separatorColor = [UIColor lightGrayColor];
     }
     return self;
 }
@@ -45,8 +43,18 @@
     
     self.overlayView = [[UIView alloc] initWithFrame:CGRectZero];
     self.overlayView.backgroundColor = [UIColor blackColor];
-
-    [self loadDataSource];
+    
+    UITableView *tv = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    self.tableView = tv;
+    tv.delegate = self;
+    tv.dataSource = self;
+    tv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    tv.scrollEnabled = NO;
+    tv.backgroundColor = [UIColor clearColor];
+    tv.backgroundView = nil;
+    [self.view addSubview:tv];
+    [tv reloadData];
+    
     
 //    if ([[FBSession activeSession] state] != FBSessionStateOpen) {
 //        UIView *userView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.curtainView.width, 52)];
@@ -70,29 +78,6 @@
 //    [self.view addSubview:self.curtainView];
 //    
 //    [self.overlayView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideCurtainFromTap:)]];
-}
-
-#pragma mark - Config Subviews
-
-- (void)setupSubviews {
-    [super setupSubviews];
-    
-    self.tableView.scrollEnabled = NO;
-    self.tableView.backgroundColor = [UIColor clearColor];
-    self.tableView.backgroundView = nil;
-}
-
-#pragma mark - Data Source
-
-- (void)loadDataSource {
-    [super loadDataSource];
-    
-    [self.tableView reloadData];
-}
-
-- (void)reloadDataSource {
-    [super reloadDataSource];
-    [self dataSourceDidLoad];
 }
 
 #pragma mark - Facebook
@@ -218,6 +203,10 @@
 //    v.backgroundColor = [UIColor darkGrayColor];
 //    return v;
 //}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    cell.backgroundColor = CELL_BG_COLOR;
+}
 
 - (void)tableView:(UITableView *)tableView configureCell:(PSCell *)cell atIndexPath:(NSIndexPath *)indexPath {
     id item = [self.delegate curtainController:self rowAtIndex:indexPath.row];

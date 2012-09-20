@@ -71,6 +71,8 @@ separatorColor = _separatorColor;
     self.searchBar.delegate = nil;
     
     self.pullRefreshView.delegate = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - View
