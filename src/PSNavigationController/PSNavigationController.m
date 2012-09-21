@@ -247,6 +247,10 @@ const CGFloat kAnimationDuration = 0.35;
 }
 
 - (NSArray *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated {
+    return [self popToViewController:viewController direction:PSNavigationControllerDirectionRight animated:animated];
+}
+
+- (NSArray *)popToViewController:(UIViewController *)viewController direction:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
     // Make sure the view controller is in the stack
     BOOL isInStack = [self.viewControllers containsObject:viewController];
     if (!isInStack) return nil;
@@ -266,13 +270,17 @@ const CGFloat kAnimationDuration = 0.35;
     [self.viewControllers addObject:[poppedViewControllers firstObject]];
     
     // Pop the top view controller with or without animation
-    [self popViewControllerAnimated:animated];
+    [self popViewControllerWithDirection:direction animated:animated];
     
     return poppedViewControllers;
 }
 
 - (NSArray *)popToRootViewControllerAnimated:(BOOL)animated {
-    return [self popToViewController:[self.viewControllers firstObject] animated:animated];
+    return [self popToRootViewControllerWithDirection:PSNavigationControllerDirectionRight animated:animated];
+}
+
+- (NSArray *)popToRootViewControllerWithDirection:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
+    return [self popToViewController:[self.viewControllers firstObject] direction:direction animated:animated];
 }
 
 - (UIViewController *)removeViewController:(UIViewController *)viewController {

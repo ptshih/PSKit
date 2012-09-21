@@ -43,6 +43,7 @@
 @property (nonatomic, assign) BOOL shouldShowFooter;
 @property (nonatomic, assign) BOOL shouldShowNullView;
 @property (nonatomic, assign) BOOL shouldAddRoundedCorners;
+@property (nonatomic, assign) BOOL shouldAdjustViewForKeyboard;
 
 @property (nonatomic, assign) CGFloat headerHeight;
 @property (nonatomic, assign) CGFloat footerHeight;

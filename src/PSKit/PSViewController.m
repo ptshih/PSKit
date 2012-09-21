@@ -59,6 +59,7 @@ static CGSize margin() {
         self.shouldShowFooter = NO;
         self.shouldShowNullView = NO;
         self.shouldAddRoundedCorners = NO;
+        self.shouldAdjustViewForKeyboard = NO;
         
         self.headerHeight = 44.0;
         self.footerHeight = 44.0;
@@ -329,6 +330,8 @@ static CGSize margin() {
 #pragma mark - Keyboard Notifications
 
 - (void)keyboardWillShow:(NSNotification *)notification {
+    if (!self.shouldAdjustViewForKeyboard) return;
+    
     // Get animation info from userInfo
     NSTimeInterval animationDuration;
     UIViewAnimationCurve animationCurve;
@@ -347,6 +350,8 @@ static CGSize margin() {
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification {
+    if (!self.shouldAdjustViewForKeyboard) return;
+    
     // Get animation info from userInfo
     NSTimeInterval animationDuration;
     UIViewAnimationCurve animationCurve;

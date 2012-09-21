@@ -56,7 +56,9 @@ typedef enum {
 - (UIViewController *)popViewControllerWithDirection:(PSNavigationControllerDirection)direction animated:(BOOL)animated;
 
 - (NSArray *)popToViewController:(UIViewController *)viewController animated:(BOOL)animated;
+- (NSArray *)popToViewController:(UIViewController *)viewController direction:(PSNavigationControllerDirection)direction animated:(BOOL)animated;
 - (NSArray *)popToRootViewControllerAnimated:(BOOL)animated;
+- (NSArray *)popToRootViewControllerWithDirection:(PSNavigationControllerDirection)direction animated:(BOOL)animated;
 
 - (UIViewController *)removeViewController:(UIViewController *)viewController;
 
