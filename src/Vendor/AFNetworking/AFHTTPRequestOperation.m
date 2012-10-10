@@ -23,40 +23,35 @@
 #import "AFHTTPRequestOperation.h"
 #import <objc/runtime.h>
 
+// Workaround for change in imp_implementationWithBlock() with Xcode 4.5
+#if defined(__IPHONE_6_0) || defined(__MAC_10_8)
+#define AF_CAST_TO_BLOCK id
+#else
+#define AF_CAST_TO_BLOCK __bridge void *
+#endif
+
 NSSet * AFContentTypesFromHTTPHeader(NSString *string) {
-    static NSCharacterSet *_skippedCharacterSet = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _skippedCharacterSet = [[NSCharacterSet characterSetWithCharactersInString:@" ,"] retain];
-    });
-    
     if (!string) {
         return nil;
     }
-    
-    NSScanner *scanner = [NSScanner scannerWithString:string];
-    scanner.charactersToBeSkipped = _skippedCharacterSet;
-    
-    NSMutableSet *mutableContentTypes = [NSMutableSet set];
-    while (![scanner isAtEnd]) {
-        NSString *contentType = nil;
-        if ([scanner scanUpToString:@";" intoString:&contentType]) {
-            [scanner scanUpToString:@"," intoString:nil];
+
+    NSArray *mediaRanges = [string componentsSeparatedByString:@","];
+    NSMutableSet *mutableContentTypes = [NSMutableSet setWithCapacity:mediaRanges.count];
+
+    [mediaRanges enumerateObjectsUsingBlock:^(NSString *mediaRange, NSUInteger idx, BOOL *stop) {
+        NSRange parametersRange = [mediaRange rangeOfString:@";"];
+        if (parametersRange.location != NSNotFound) {
+            mediaRange = [mediaRange substringToIndex:parametersRange.location];
         }
         
-        if (contentType) {
-            [mutableContentTypes addObject:contentType];
+        mediaRange = [mediaRange stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        
+        if (mediaRange.length > 0) {
+            [mutableContentTypes addObject:mediaRange];
         }
-    }
-    
-    return [NSSet setWithSet:mutableContentTypes];
-}
+    }];
 
-static void AFSwizzleClassMethodWithImplementation(Class klass, SEL selector, IMP implementation) {
-    Method originalMethod = class_getClassMethod(klass, selector);
-	if (method_getImplementation(originalMethod) != implementation) {
-		class_replaceMethod(objc_getMetaClass([NSStringFromClass(klass) UTF8String]), selector, implementation, method_getTypeEncoding(originalMethod));
-    }
+    return [NSSet setWithSet:mutableContentTypes];
 }
 
 static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
@@ -89,12 +84,18 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
     return string;
 }
 
+static void AFSwizzleClassMethodWithClassAndSelectorUsingBlock(Class klass, SEL selector, id block) {
+    Method originalMethod = class_getClassMethod(klass, selector);
+    IMP implementation = imp_implementationWithBlock((AF_CAST_TO_BLOCK)block);
+    class_replaceMethod(objc_getMetaClass([NSStringFromClass(klass) UTF8String]), selector, implementation, method_getTypeEncoding(originalMethod));
+}
+
 #pragma mark -
 
 @interface AFHTTPRequestOperation ()
-@property (readwrite, nonatomic, retain) NSURLRequest *request;
-@property (readwrite, nonatomic, retain) NSHTTPURLResponse *response;
-@property (readwrite, nonatomic, retain) NSError *HTTPError;
+@property (readwrite, nonatomic, strong) NSURLRequest *request;
+@property (readwrite, nonatomic, strong) NSHTTPURLResponse *response;
+@property (readwrite, nonatomic, strong) NSError *HTTPError;
 @property (assign) long long totalContentLength;
 @property (assign) long long offsetContentLength;
 @end
@@ -109,19 +110,19 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
 @dynamic response;
 
 - (void)dealloc {
-    [_HTTPError release];
-    
-    if (_successCallbackQueue) { 
+    if (_successCallbackQueue) {
+#if !OS_OBJECT_USE_OBJC
         dispatch_release(_successCallbackQueue);
+#endif
         _successCallbackQueue = NULL;
     }
     
-    if (_failureCallbackQueue) { 
-        dispatch_release(_failureCallbackQueue); 
+    if (_failureCallbackQueue) {
+#if !OS_OBJECT_USE_OBJC
+        dispatch_release(_failureCallbackQueue);
+#endif
         _failureCallbackQueue = NULL;
     }
-
-    [super dealloc];
 }
 
 - (NSError *)error {
@@ -136,12 +137,12 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
             if (![self hasAcceptableStatusCode]) {
                 NSUInteger statusCode = ([self.response isKindOfClass:[NSHTTPURLResponse class]]) ? (NSUInteger)[self.response statusCode] : 200;
                 [userInfo setValue:[NSString stringWithFormat:NSLocalizedString(@"Expected status code in (%@), got %d", nil), AFStringFromIndexSet([[self class] acceptableStatusCodes]), statusCode] forKey:NSLocalizedDescriptionKey];
-                self.HTTPError = [[[NSError alloc] initWithDomain:AFNetworkingErrorDomain code:NSURLErrorBadServerResponse userInfo:userInfo] autorelease];
+                self.HTTPError = [[NSError alloc] initWithDomain:AFNetworkingErrorDomain code:NSURLErrorBadServerResponse userInfo:userInfo];
             } else if (![self hasAcceptableContentType]) {
                 // Don't invalidate content type if there is no content
                 if ([self.responseData length] > 0) {
                     [userInfo setValue:[NSString stringWithFormat:NSLocalizedString(@"Expected content type %@, got %@", nil), [[self class] acceptableContentTypes], [self.response MIMEType]] forKey:NSLocalizedDescriptionKey];
-                    self.HTTPError = [[[NSError alloc] initWithDomain:AFNetworkingErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:userInfo] autorelease];
+                    self.HTTPError = [[NSError alloc] initWithDomain:AFNetworkingErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:userInfo];
                 }
             }
         }
@@ -162,7 +163,7 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
         offset = [[self.outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey] length];
     }
 
-    NSMutableURLRequest *mutableURLRequest = [[self.request mutableCopy] autorelease];
+    NSMutableURLRequest *mutableURLRequest = [self.request mutableCopy];
     if ([[self.response allHeaderFields] valueForKey:@"ETag"]) {
         [mutableURLRequest setValue:[[self.response allHeaderFields] valueForKey:@"ETag"] forHTTPHeaderField:@"If-Range"];
     }
@@ -200,12 +201,16 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
 - (void)setSuccessCallbackQueue:(dispatch_queue_t)successCallbackQueue {
     if (successCallbackQueue != _successCallbackQueue) {
         if (_successCallbackQueue) {
+#if !OS_OBJECT_USE_OBJC
             dispatch_release(_successCallbackQueue);
+#endif
             _successCallbackQueue = NULL;
         }
 
         if (successCallbackQueue) {
+#if !OS_OBJECT_USE_OBJC
             dispatch_retain(successCallbackQueue);
+#endif
             _successCallbackQueue = successCallbackQueue;
         }
     }    
@@ -214,12 +219,16 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
 - (void)setFailureCallbackQueue:(dispatch_queue_t)failureCallbackQueue {
     if (failureCallbackQueue != _failureCallbackQueue) {
         if (_failureCallbackQueue) {
+#if !OS_OBJECT_USE_OBJC
             dispatch_release(_failureCallbackQueue);
+#endif
             _failureCallbackQueue = NULL;
         }
         
         if (failureCallbackQueue) {
+#if !OS_OBJECT_USE_OBJC
             dispatch_retain(failureCallbackQueue);
+#endif
             _failureCallbackQueue = failureCallbackQueue;
         }
     }    
@@ -228,7 +237,10 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
 - (void)setCompletionBlockWithSuccess:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
                               failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure
 {
-    self.completionBlock = ^ {
+    // completionBlock is manually nilled out in AFURLConnectionOperation to break the retain cycle.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+    self.completionBlock = ^{
         if ([self isCancelled]) {
             return;
         }
@@ -247,24 +259,21 @@ static NSString * AFStringFromIndexSet(NSIndexSet *indexSet) {
             }
         }
     };
+#pragma clang diagnostic pop
 }
 
 #pragma mark - AFHTTPRequestOperation
-
-static id AFStaticClassValueImplementation(id self, SEL _cmd) {
-	return objc_getAssociatedObject([self class], _cmd);
-}
 
 + (NSIndexSet *)acceptableStatusCodes {
     return [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(200, 100)];
 }
 
 + (void)addAcceptableStatusCodes:(NSIndexSet *)statusCodes {
-    NSMutableIndexSet *mutableStatusCodes = [[[NSMutableIndexSet alloc] initWithIndexSet:[self acceptableStatusCodes]] autorelease];
+    NSMutableIndexSet *mutableStatusCodes = [[NSMutableIndexSet alloc] initWithIndexSet:[self acceptableStatusCodes]];
     [mutableStatusCodes addIndexes:statusCodes];
-	SEL selector = @selector(acceptableStatusCodes);
-	AFSwizzleClassMethodWithImplementation([self class], selector, (IMP)AFStaticClassValueImplementation);
-	objc_setAssociatedObject([self class], selector, mutableStatusCodes, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    AFSwizzleClassMethodWithClassAndSelectorUsingBlock([self class], @selector(acceptableStatusCodes), ^(id _self) {
+        return mutableStatusCodes;
+    });
 }
 
 + (NSSet *)acceptableContentTypes {
@@ -272,11 +281,11 @@ static id AFStaticClassValueImplementation(id self, SEL _cmd) {
 }
 
 + (void)addAcceptableContentTypes:(NSSet *)contentTypes {
-    NSMutableSet *mutableContentTypes = [[[NSMutableSet alloc] initWithSet:[self acceptableContentTypes] copyItems:YES] autorelease];
+    NSMutableSet *mutableContentTypes = [[NSMutableSet alloc] initWithSet:[self acceptableContentTypes] copyItems:YES];
     [mutableContentTypes unionSet:contentTypes];
-	SEL selector = @selector(acceptableContentTypes);
-	AFSwizzleClassMethodWithImplementation([self class], selector, (IMP)AFStaticClassValueImplementation);
-	objc_setAssociatedObject([self class], selector, mutableContentTypes, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    AFSwizzleClassMethodWithClassAndSelectorUsingBlock([self class], @selector(acceptableContentTypes), ^(id _self) {
+        return mutableContentTypes;
+    });
 }
 
 + (BOOL)canProcessRequest:(NSURLRequest *)request {
@@ -314,6 +323,11 @@ didReceiveResponse:(NSURLResponse *)response
         } else {
             if ([[self.outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey] length] > 0) {
                 self.outputStream = [NSOutputStream outputStreamToMemory];
+                
+                NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+                for (NSString *runLoopMode in self.runLoopModes) {
+                    [self.outputStream scheduleInRunLoop:runLoop forMode:runLoopMode];
+                }
             }
         }
     }

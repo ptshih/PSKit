@@ -42,7 +42,7 @@ textView = _textView;
         self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         [self addSubview:self.titleLabel];
         
-        self.textView = [[NewspaperTextView alloc] initWithFrame:CGRectZero];
+        self.textView = [[PSNewspaperTextView alloc] initWithFrame:CGRectZero];
         [self addSubview:self.textView];
     }
     return self;

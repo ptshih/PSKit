@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "NewspaperTextView.h"
+#import "PSNewspaperTextView.h"
 
 enum {
     PSNewspaperCellSmall = 0,
@@ -29,7 +29,7 @@ typedef uint32_t PSNewspaperCellOrientation;
 
 @property (nonatomic, strong) PSCachedImageView *imageView;
 @property (nonatomic, strong) UILabel *titleLabel;
-@property (nonatomic, strong) NewspaperTextView *textView;
+@property (nonatomic, strong) PSNewspaperTextView *textView;
 
 - (id)initWithFrame:(CGRect)frame;
 

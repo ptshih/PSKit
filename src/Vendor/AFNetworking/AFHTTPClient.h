@@ -22,8 +22,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class AFHTTPRequestOperation;
-
 /**
  `AFHTTPClient` captures the common patterns of communicating with an web application over HTTP. It encapsulates information like base URL, authorization credentials, and HTTP headers, and uses them to construct and manage the execution of HTTP request operations.
  
@@ -80,6 +78,12 @@ typedef enum {
     AFNetworkReachabilityStatusReachableViaWWAN = 1,
     AFNetworkReachabilityStatusReachableViaWiFi = 2,
 } AFNetworkReachabilityStatus;
+#else
+#warning "SystemConfiguration framework not found in project, or not included in precompiled header. Network reachability functionality will not be available."
+#endif
+
+#ifndef __UTTYPE__
+#warning "CoreServices framework not found in project, or not included in precompiled header. Automatic MIME type detection when uploading files in multipart requests will not be available."
 #endif
 
 typedef enum {
@@ -88,6 +92,7 @@ typedef enum {
     AFPropertyListParameterEncoding,
 } AFHTTPClientParameterEncoding;
 
+@class AFHTTPRequestOperation;
 @protocol AFMultipartFormData;
 
 @interface AFHTTPClient : NSObject <NSCoding, NSCopying>
@@ -99,7 +104,7 @@ typedef enum {
 /**
  The url used as the base for paths specified in methods such as `getPath:parameters:success:failure`
  */
-@property (readonly, nonatomic, retain) NSURL *baseURL;
+@property (readonly, nonatomic) NSURL *baseURL;
 
 /**
  The string encoding used in constructing url requests. This is `NSUTF8StringEncoding` by default.
@@ -108,15 +113,13 @@ typedef enum {
 
 /**
  The `AFHTTPClientParameterEncoding` value corresponding to how parameters are encoded into a request body. This is `AFFormURLParameterEncoding` by default.
-
- @warning JSON encoding will automatically use JSONKit, SBJSON, YAJL, or NextiveJSON, if provided. Otherwise, the built-in `NSJSONSerialization` class is used, if available (iOS 5.0 and Mac OS 10.7). If the build target does not either support `NSJSONSerialization` or include a third-party JSON library, a runtime exception will be thrown when attempting to encode parameters as JSON.
  */
 @property (nonatomic, assign) AFHTTPClientParameterEncoding parameterEncoding;
 
 /**
  The operation queue which manages operations enqueued by the HTTP client.
  */
-@property (readonly, nonatomic, retain) NSOperationQueue *operationQueue;
+@property (readonly, nonatomic) NSOperationQueue *operationQueue;
 
 /**
  The reachability status from the device to the current `baseURL` of the `AFHTTPClient`.
@@ -134,7 +137,7 @@ typedef enum {
 /**
  Creates and initializes an `AFHTTPClient` object with the specified base URL.
  
- @param url The base URL for the HTTP client. This argument must not be nil.
+ @param url The base URL for the HTTP client. This argument must not be `nil`.
   
  @return The newly-initialized HTTP client
  */
@@ -143,10 +146,10 @@ typedef enum {
 /**
  Initializes an `AFHTTPClient` object with the specified base URL.
  
- @param url The base URL for the HTTP client. This argument must not be nil.
+ @param url The base URL for the HTTP client. This argument must not be `nil`.
  
  @discussion This is the designated initializer.
- 
+  
  @return The newly-initialized HTTP client
  */
 - (id)initWithBaseURL:(NSURL *)url;
@@ -236,10 +239,10 @@ typedef enum {
 /**
  Creates an `NSMutableURLRequest` object with the specified HTTP method and path.
  
- If the HTTP method is `GET`, the parameters will be used to construct a url-encoded query string that is appended to the request's URL. Otherwise, the parameters will be encoded according to the value of the `parameterEncoding` property, and set as the request body.
+ If the HTTP method is `GET`, `HEAD`, or `DELETE`, the parameters will be used to construct a url-encoded query string that is appended to the request's URL. Otherwise, the parameters will be encoded according to the value of the `parameterEncoding` property, and set as the request body.
  
- @param method The HTTP method for the request, such as `GET`, `POST`, `PUT`, or `DELETE`.
- @param path The path to be appended to the HTTP client's base URL and used as the request URL.
+ @param method The HTTP method for the request, such as `GET`, `POST`, `PUT`, or `DELETE`. This parameter must not be `nil`.
+ @param path The path to be appended to the HTTP client's base URL and used as the request URL. If `nil`, no path will be appended to the base URL.
  @param parameters The parameters to be either set as a query string for `GET` requests, or the request HTTP body.
   
  @return An `NSMutableURLRequest` object 
@@ -251,15 +254,13 @@ typedef enum {
 /**
  Creates an `NSMutableURLRequest` object with the specified HTTP method and path, and constructs a `multipart/form-data` HTTP body, using the specified parameters and multipart form data block. See http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4.2
  
- @param method The HTTP method for the request. Must be either `POST`, `PUT`, or `DELETE`.
+ @param method The HTTP method for the request. This parameter must not be `GET` or `HEAD`, or `nil`.
  @param path The path to be appended to the HTTP client's base URL and used as the request URL.
  @param parameters The parameters to be encoded and set in the request HTTP body.
  @param block A block that takes a single argument and appends data to the HTTP body. The block argument is an object adopting the `AFMultipartFormData` protocol. This can be used to upload files, encode HTTP body as JSON or XML, or specify multiple values for the same parameter, as one might for array values.
   
- @discussion The multipart form data is constructed synchronously in the specified block, so in cases where large amounts of data are being added to the request, you should consider performing this method in the background. Likewise, the form data is constructed in-memory, so it may be advantageous to instead write parts of the form data to a file and stream the request body using the `HTTPBodyStream` property of `NSURLRequest`.
- 
- @warning An exception will be raised if the specified method is not `POST`, `PUT` or `DELETE`.
- 
+ @discussion Multipart form requests are automatically streamed, reading files directly from disk along with in-memory data in a single HTTP body. The resulting `NSMutableURLRequest` object has an `HTTPBodyStream` property, so refrain from setting `HTTPBodyStream` or `HTTPBody` on this request object, as it will clear out the multipart form body stream.
+  
  @return An `NSMutableURLRequest` object
  */
 - (NSMutableURLRequest *)multipartFormRequestWithMethod:(NSString *)method
@@ -299,7 +300,9 @@ typedef enum {
  Cancels all operations in the HTTP client's operation queue whose URLs match the specified HTTP method and path.
  
  @param method The HTTP method to match for the cancelled requests, such as `GET`, `POST`, `PUT`, or `DELETE`. If `nil`, all request operations with URLs matching the path will be cancelled. 
- @param path The path to match for the cancelled requests.
+ @param path The path appended to the HTTP client base URL to match against the cancelled requests. If `nil`, no path will be appended to the base URL.
+ 
+ @discussion This method only cancels `AFHTTPRequestOperations` whose request URL matches the HTTP client base URL with the path appended. For complete control over the lifecycle of enqueued operations, you can access the `operationQueue` property directly, which allows you to, for instance, cancel operations filtered by a predicate, or simply use `-cancelAllRequests`. Note that the operation queue may include non-HTTP operations, so be sure to check the type before attempting to directly introspect an operation's `request` property.
  */
 - (void)cancelAllHTTPOperationsWithMethod:(NSString *)method path:(NSString *)path;
 
@@ -502,10 +505,51 @@ extern NSString * const AFNetworkingReachabilityNotificationStatusItem;
 
 #pragma mark -
 
+extern NSUInteger const kAFUploadStream3GSuggestedPacketSize;
+extern NSTimeInterval const kAFUploadStream3GSuggestedDelay;
+
 /**
- The `AFMultipartFormData` protocol defines the methods supported by the parameter in the block argument of `-multipartFormRequestWithMethod:path:parameters:constructingBodyWithBlock:`.
+ The `AFMultipartFormData` protocol defines the methods supported by the parameter in the block argument of `AFHTTPClient -multipartFormRequestWithMethod:path:parameters:constructingBodyWithBlock:`.
  */
 @protocol AFMultipartFormData
+
+/**
+ Appends the HTTP header `Content-Disposition: file; filename=#{generated filename}; name=#{name}"` and `Content-Type: #{generated mimeType}`, followed by the encoded file data and the multipart form boundary.
+ 
+ @param fileURL The URL corresponding to the file whose content will be appended to the form. This parameter must not be `nil`.
+ @param name The name to be associated with the specified data. This parameter must not be `nil`.
+ @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
+ 
+ @return `YES` if the file data was successfully appended, otherwise `NO`.
+ 
+ @discussion The filename and MIME type for this data in the form will be automatically generated, using `NSURLResponse` `-suggestedFilename` and `-MIMEType`, respectively.
+ */
+- (BOOL)appendPartWithFileURL:(NSURL *)fileURL
+                         name:(NSString *)name
+                        error:(NSError * __autoreleasing *)error;
+
+/**
+ Appends the HTTP header `Content-Disposition: file; filename=#{filename}; name=#{name}"` and `Content-Type: #{mimeType}`, followed by the encoded file data and the multipart form boundary.
+ 
+ @param data The data to be encoded and appended to the form data.
+ @param name The name to be associated with the specified data. This parameter must not be `nil`.
+ @param filename The filename to be associated with the specified data. This parameter must not be `nil`.
+ @param mimeType The MIME type of the specified data. (For example, the MIME type for a JPEG image is image/jpeg.) For a list of valid MIME types, see http://www.iana.org/assignments/media-types/. This parameter must not be `nil`.
+ */
+- (void)appendPartWithFileData:(NSData *)data
+                          name:(NSString *)name
+                      fileName:(NSString *)fileName
+                      mimeType:(NSString *)mimeType;
+
+/**
+ Appends the HTTP headers `Content-Disposition: form-data; name=#{name}"`, followed by the encoded data and the multipart form boundary.
+ 
+ @param data The data to be encoded and appended to the form data.
+ @param name The name to be associated with the specified data. This parameter must not be `nil`.
+ */
+
+- (void)appendPartWithFormData:(NSData *)data
+                          name:(NSString *)name;
 
 /**
  Appends HTTP headers, followed by the encoded data and the multipart form boundary.
@@ -517,54 +561,14 @@ extern NSString * const AFNetworkingReachabilityNotificationStatusItem;
                          body:(NSData *)body;
 
 /**
- Appends the HTTP headers `Content-Disposition: form-data; name=#{name}"`, followed by the encoded data and the multipart form boundary.
+ Throttles request bandwidth by limiting the packet size and adding a delay for each chunk read from the upload stream.
  
- @param data The data to be encoded and appended to the form data.
- @param name The name to be associated with the specified data. This parameter must not be `nil`.
+ @param numberOfBytes Maximum packet size, in number of bytes. The default packet size for an input stream is 32kb.
+ @param delay Duration of delay each time a packet is read. By default, no delay is set.
+ 
+ @discussion When uploading over a 3G or EDGE connection, requests may fail with "request body stream exhausted". Setting a maximum packet size and delay according to the recommended values (`kAFUploadStream3GSuggestedPacketSize` and `kAFUploadStream3GSuggestedDelay`) lowers the risk of the input stream exceeding its allocated bandwidth. Unfortunately, as of iOS 6, there is no definite way to distinguish between a 3G, EDGE, or LTE connection. As such, it is not recommended that you throttle bandwidth based solely on network reachability. Instead, you should consider checking for the "request body stream exhausted" in a failure block, and then retrying the request with throttled bandwidth.
  */
-- (void)appendPartWithFormData:(NSData *)data
-                          name:(NSString *)name;
-
-/**
- Appends the HTTP header `Content-Disposition: file; filename=#{filename}; name=#{name}"` and `Content-Type: #{mimeType}`, followed by the encoded file data and the multipart form boundary.
- 
- @param data The data to be encoded and appended to the form data.
- @param name The name to be associated with the specified data. This parameter must not be `nil`.
- @param fileName The filename to be associated with the specified data. This parameter must not be `nil`.
- @param mimeType The MIME type of the specified data. (For example, the MIME type for a JPEG image is image/jpeg.) For a list of valid MIME types, see http://www.iana.org/assignments/media-types/. This parameter must not be `nil`.
- */
-- (void)appendPartWithFileData:(NSData *)data
-                          name:(NSString *)name
-                      fileName:(NSString *)fileName
-                      mimeType:(NSString *)mimeType;
-
-/**
- Appends the HTTP header `Content-Disposition: file; filename=#{generated filename}; name=#{name}"` and `Content-Type: #{generated mimeType}`, followed by the encoded file data and the multipart form boundary.
- 
- @param fileURL The URL corresponding to the file whose content will be appended to the form.
- @param name The name to be associated with the specified data. This parameter must not be `nil`.
- @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
- 
- @return `YES` if the file data was successfully appended, otherwise `NO`.
- 
- @discussion The filename and MIME type for this data in the form will be automatically generated, using `NSURLResponse` `-suggestedFilename` and `-MIMEType`, respectively.
- */
-- (BOOL)appendPartWithFileURL:(NSURL *)fileURL
-                         name:(NSString *)name
-                        error:(NSError **)error;
-
-/**
- Appends encoded data to the form data.
- 
- @param data The data to be encoded and appended to the form data.
- */
-- (void)appendData:(NSData *)data;
-
-/**
- Appends a string to the form data.
- 
- @param string The string to be encoded and appended to the form data.
- */
-- (void)appendString:(NSString *)string;
+- (void)throttleBandwidthWithPacketSize:(NSUInteger)numberOfBytes
+                                  delay:(NSTimeInterval)delay;
 
 @end
