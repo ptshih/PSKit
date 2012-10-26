@@ -210,7 +210,7 @@
     
     self.nullView = [[PSNullView alloc] initWithFrame:self.contentView.bounds];
     self.nullView.autoresizingMask = self.contentView.autoresizingMask;
-    self.nullView.backgroundColor = BASE_BG_COLOR;
+//    self.nullView.backgroundColor = NULLVIEW_BG_COLOR;
     [self.contentView addSubview:self.nullView];
     
     [self.nullView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(reloadDataSource)]];

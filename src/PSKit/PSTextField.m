@@ -32,7 +32,7 @@
     CGFloat rightWidth = self.margins.width;
     if (self.rightView) {
         rightWidth += self.rightView.width;
-    } else if ([self clearButtonRectForBounds:[self bounds]].size.width > 0 && self.editing) {
+    } else if ([self clearButtonRectForBounds:[self bounds]].size.width > 0 && self.hasText) {
         rightWidth += [self clearButtonRectForBounds:[self bounds]].size.width;
     }
     
