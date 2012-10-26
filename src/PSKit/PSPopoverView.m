@@ -24,16 +24,6 @@
 
 @implementation PSPopoverView
 
-@synthesize
-containerController = _containerController,
-containerView = _containerView,
-arrowView = _arrowView,
-titleLabel = _titleLabel,
-popoverSize = _popoverSize,
-overlayView = _overlayView,
-contentView = _contentView,
-delegate = _delegate;
-
 - (id)initWithTitle:(NSString *)title contentController:(UIViewController *)contentController {
     self = [self initWithTitle:title contentView:contentController.view];
     if (self) {
@@ -67,7 +57,7 @@ delegate = _delegate;
         bgImageView.frame = self.containerView.bounds;
         [self.containerView addSubview:bgImageView];
         
-        self.titleLabel = [UILabel labelWithText:title style:@"popoverTitleLabel"];
+        self.titleLabel = [UILabel labelWithText:title style:@"leadLightLabel"];
         [self.containerView addSubview:self.titleLabel];
 
         // ContentView

@@ -11,8 +11,6 @@
 
 @interface PSTextField : UITextField
 
-@property (nonatomic, assign) UIEdgeInsets inset;
-
-- (id)initWithFrame:(CGRect)frame withInset:(UIEdgeInsets)inset;
+- (id)initWithFrame:(CGRect)frame withMargins:(CGSize)margins;
 
 @end

@@ -10,54 +10,73 @@
 
 @interface PSTextField ()
 
-- (CGRect)rectWithInset:(UIEdgeInsets)inset;
+@property (nonatomic, assign) CGSize margins;
+
+- (CGRect)fieldRectWithMargins:(CGSize)margins;
 
 @end
 
 @implementation PSTextField
 
-@synthesize
-inset = _inset;
-
-- (id)initWithFrame:(CGRect)frame withInset:(UIEdgeInsets)inset {
-    self.inset = inset;
+- (id)initWithFrame:(CGRect)frame withMargins:(CGSize)margins {
+    self.margins = margins;
     return [self initWithFrame:frame];
 }
 
-- (CGRect)rectWithInset:(UIEdgeInsets)inset {
-    CGFloat leftWidth = self.leftView.width;
-    CGFloat rightWidth = self.rightView.width + [self clearButtonRectForBounds:[self bounds]].size.width;
+- (CGRect)fieldRectWithMargins:(CGSize)margins {
+    CGFloat leftWidth = self.margins.width;
+    if (self.leftView) {
+        leftWidth += self.leftView.width;
+    }
     
-    CGFloat width = self.width - leftWidth - rightWidth - self.inset.left - self.inset.right;
-    CGRect frame = CGRectMake(leftWidth + self.inset.left, self.inset.top, width, self.height - self.inset.top - self.inset.bottom);
+    CGFloat rightWidth = self.margins.width;
+    if (self.rightView) {
+        rightWidth += self.rightView.width;
+    } else if ([self clearButtonRectForBounds:[self bounds]].size.width > 0 && self.editing) {
+        rightWidth += [self clearButtonRectForBounds:[self bounds]].size.width;
+    }
     
+    CGFloat textWidth = self.width - leftWidth - rightWidth - margins.width * 2;
+    CGFloat textHeight = self.height - margins.height * 2;
+    CGFloat left = leftWidth + margins.width;
+    CGFloat top = self.margins.height;
+    
+    CGRect frame = CGRectMake(left, top, textWidth, textHeight);
+    
+    NSLog(@"%@", NSStringFromCGRect(frame));
     return frame;
 }
 
 // placeholder position
 - (CGRect)textRectForBounds:(CGRect)bounds {
-    return [self rectWithInset:self.inset];
+    return [self fieldRectWithMargins:self.margins];
 }
 
 - (CGRect)placeholderRectForBounds:(CGRect)bounds {
-    return [self rectWithInset:self.inset];
+    return [self fieldRectWithMargins:self.margins];
 }
 
 // text position
 - (CGRect)editingRectForBounds:(CGRect)bounds {
-    return [self rectWithInset:self.inset];
+    return [self fieldRectWithMargins:self.margins];
 }
 
 - (CGRect)leftViewRectForBounds:(CGRect)bounds {
-    CGRect frame = UIEdgeInsetsInsetRect(self.leftView.bounds, self.inset);
+    CGFloat width = self.leftView.width;
+    CGFloat height = self.leftView.height;
     
-    return frame;
+    CGRect leftFrame = CGRectMake(self.margins.width, self.margins.height, width, height);
+
+    return leftFrame;
 }
 
 - (CGRect)rightViewRectForBounds:(CGRect)bounds {
-    CGRect frame = UIEdgeInsetsInsetRect(self.rightView.bounds, self.inset);
+    CGFloat width = self.rightView.width;
+    CGFloat height = self.rightView.height;
     
-    return frame;
+    CGRect rightFrame = CGRectMake(self.width - self.margins.width, self.margins.height, width, height);
+    
+    return rightFrame;
 }
 
 // This overrides the default image for a clear button

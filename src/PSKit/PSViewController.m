@@ -6,15 +6,6 @@
 //  Copyright (c) 2011 Peter Shih.. All rights reserved.
 //
 
-// Margins
-static CGSize margin() {
-    if (isDeviceIPad()) {
-        return CGSizeMake(8.0, 6.0);
-    } else {
-        return CGSizeMake(8.0, 6.0);
-    }
-}
-
 #define kNullViewAnimationDuration 0.3
 
 // PSNullView
@@ -181,7 +172,7 @@ static CGSize margin() {
     self.centerButton.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     //    [self.centerButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonCenterBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
-    [self layoutHeaderWithLeftWidth:32.0 rightWidth:32.0];
+    [self layoutHeaderWithLeftWidth:44.0 rightWidth:44.0];
 
     [self.headerView addSubview:self.leftButton];
     [self.headerView addSubview:self.centerButton];
@@ -195,9 +186,9 @@ static CGSize margin() {
 }
 
 - (void)layoutHeaderWithLeftWidth:(CGFloat)leftWidth rightWidth:(CGFloat)rightWidth {
-    self.leftButton.frame = CGRectMake(margin().width, margin().height, leftWidth, 32.0);
-    self.rightButton.frame = CGRectMake(self.headerView.width - rightWidth - margin().width, margin().height, rightWidth, 32.0);
-    self.centerButton.frame = CGRectMake(self.leftButton.right + margin().width, margin().height, self.headerView.width - leftWidth - rightWidth - margin().width * 4, 32.0);
+    self.leftButton.frame = CGRectMake(0, 0, leftWidth, self.headerView.height);
+    self.rightButton.frame = CGRectMake(self.headerView.width - rightWidth, 0, rightWidth, self.headerView.height);
+    self.centerButton.frame = CGRectMake(self.leftButton.right, 0, self.headerView.width - leftWidth - rightWidth, self.headerView.height);
 }
 
 - (void)setupFooter {
@@ -228,6 +219,7 @@ static CGSize margin() {
 #pragma mark - Post View Config
 
 - (void)addRoundedCorners {
+#warning BROKEN
     // iPad doesn't need rounded corners
     if (!isDeviceIPad()) {
         UIImageView *topCorners = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/MaskCornersTop"] stretchableImageWithLeftCapWidth:160 topCapHeight:0]];
