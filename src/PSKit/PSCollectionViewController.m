@@ -130,6 +130,11 @@ pullRefreshStyle = _pullRefreshStyle;
 }
 
 #pragma mark - PSCollectionViewDelegate
+
+- (Class)cellClassForRowAtIndex:(NSInteger)index {
+    return [PSCollectionViewCell class];
+}
+
 - (NSInteger)numberOfRowsInCollectionView:(PSCollectionView *)collectionView {
     return [self.items count];
 }
@@ -143,6 +148,7 @@ pullRefreshStyle = _pullRefreshStyle;
 }
 
 #pragma mark - UIScrollViewDelegate
+
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if (self.pullRefreshView) {
         [self.pullRefreshView pullRefreshScrollViewDidEndDragging:scrollView willDecelerate:decelerate];
