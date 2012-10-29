@@ -9,11 +9,9 @@
 #import <UIKit/UIKit.h>
 
 @interface PSStarView : PSView {
-  CGFloat _rating;
+
 }
 
-@property (nonatomic, assign) CGFloat rating;
-
-- (id)initWithFrame:(CGRect)frame rating:(CGFloat)rating;
+- (id)initWithRating:(CGFloat)rating;
 
 @end
