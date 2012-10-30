@@ -55,7 +55,7 @@
         self.headerHeight = 44.0;
         self.footerHeight = 44.0;
         
-        self.limit = 5;
+        self.limit = 10;
         self.offset = 0;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];

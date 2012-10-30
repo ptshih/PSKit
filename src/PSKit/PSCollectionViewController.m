@@ -90,7 +90,11 @@
         self.pullRefreshView = [[PSPullRefreshView alloc] initWithFrame:CGRectMake(0.0, 0.0 - 48.0, self.collectionView.frame.size.width, 48.0) style:self.pullRefreshStyle];
         self.pullRefreshView.scrollView = self.collectionView;
         self.pullRefreshView.delegate = self;
-        [self.collectionView addSubview:self.pullRefreshView];		
+        [self.collectionView addSubview:self.pullRefreshView];
+        
+        UIImageView *ds = [[UIImageView alloc] initWithFrame:CGRectMake(0, self.pullRefreshView.height, self.pullRefreshView.width, 8.0) image:[[UIImage imageNamed:@"DropShadow"] stretchableImageWithLeftCapWidth:1 topCapHeight:0]];
+        ds.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        [self.pullRefreshView addSubview:ds];
     }
 }
 
@@ -100,6 +104,10 @@
         self.pullLoadMoreView.scrollView = self.collectionView;
         self.pullLoadMoreView.delegate = self;
         [self.collectionView addSubview:self.pullLoadMoreView];
+        
+        UIImageView *ds = [[UIImageView alloc] initWithFrame:CGRectMake(0, -8.0, self.pullLoadMoreView.width, 8.0) image:[[UIImage imageNamed:@"DropShadowInverted"] stretchableImageWithLeftCapWidth:1 topCapHeight:0]];
+        ds.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        [self.pullLoadMoreView addSubview:ds];
     }
 }
 
