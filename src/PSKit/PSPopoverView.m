@@ -57,7 +57,8 @@
         bgImageView.frame = self.containerView.bounds;
         [self.containerView addSubview:bgImageView];
         
-        self.titleLabel = [UILabel labelWithText:title style:@"leadLightLabel"];
+        self.titleLabel = [UILabel labelWithText:title style:@"h5BoldLightLabel"];
+        self.titleLabel.textAlignment = UITextAlignmentCenter;
         [self.containerView addSubview:self.titleLabel];
 
         // ContentView

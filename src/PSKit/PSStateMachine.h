@@ -16,6 +16,7 @@
 // Data Source
 - (void)loadDataSource; // Loads from local if exists, else from remote
 - (void)reloadDataSource; // Attempts to reload from remote only
+- (void)loadMoreDataSource; // Loads more from remote and appends to data source
 - (void)loadDataSourceFromRemoteUsingCache:(BOOL)usingCache;
 - (void)loadDataSourceFromFixtures;
 
@@ -30,6 +31,7 @@
 //- (void)dataSourceShouldLoadMoreObjects:(id)objects forSection:(NSInteger)section shouldAnimate:(BOOL)shouldAnimate;
 
 - (void)dataSourceDidLoad;
+- (void)dataSourceDidLoadMore;
 - (void)dataSourceDidError;
 - (BOOL)dataSourceIsEmpty;
 
@@ -44,6 +46,10 @@
 // Refresh
 - (void)beginRefresh;
 - (void)endRefresh;
+
+// Load More
+- (void)beginLoadMore;
+- (void)endLoadMore;
 
 // Views
 - (void)setupSubviews;

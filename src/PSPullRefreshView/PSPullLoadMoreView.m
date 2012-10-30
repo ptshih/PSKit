@@ -1,33 +1,33 @@
 //
-//  PSPullRefreshView.m
-//  PSKit
+//  PSPullLoadMoreView.m
+//  Lunchbox
 //
-//  Created by Peter on 2/12/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Created by Peter Shih on 10/29/12.
+//
 //
 
-#import "PSPullRefreshView.h"
+#import "PSPullLoadMoreView.h"
 #import "UIView+PSKit.h"
 
-static NSString * const PSPullRefreshIdleStatus = @"Pull Down to Refresh";
-static NSString * const PSPullRefreshTriggeredStatus = @"Release to Refresh";
-static NSString * const PSPullRefreshRefreshingStatus = @"Loading...";
+static NSString * const PSPullLoadMoreIdleStatus = @"Pull Up to Load More";
+static NSString * const PSPullLoadMoreTriggeredStatus = @"Release to Load More";
+static NSString * const PSPullLoadMoreRefreshingStatus = @"Loading...";
 
-@implementation PSPullRefreshView
+@implementation PSPullLoadMoreView
 
-- (id)initWithFrame:(CGRect)frame style:(PSPullRefreshStyle)style {
+- (id)initWithFrame:(CGRect)frame style:(PSPullLoadMoreStyle)style {
     self = [super initWithFrame:frame];
     if (self) {
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         self.backgroundColor = [UIColor clearColor];
         
-        self.state = PSPullRefreshStateIdle;
+        self.state = PSPullLoadMoreStateIdle;
         
         self.style = style;
         
         UIImage *icon = nil;
         NSString *labelStyle = nil;
-        if (self.style == PSPullRefreshStyleWhite) {
+        if (self.style == PSPullLoadMoreStyleWhite) {
             icon = [UIImage imageNamed:@"PSPullRefreshView.bundle/IconRefreshWhite.png"];
             labelStyle = @"pullRefreshWhiteLabel";
         } else {
@@ -43,7 +43,7 @@ static NSString * const PSPullRefreshRefreshingStatus = @"Loading...";
         left = self.iconView.width;
         width = self.width - self.iconView.width * 2;
         
-        self.statusLabel = [UILabel labelWithText:@"PSPullRefreshView Status" style:labelStyle];
+        self.statusLabel = [UILabel labelWithText:@"PSPullLoadMoreView Status" style:labelStyle];
         self.statusLabel.frame = CGRectMake(left, 0, width, self.height);
         self.statusLabel.autoresizingMask = self.autoresizingMask;
         self.statusLabel.textAlignment = UITextAlignmentCenter;
@@ -55,22 +55,21 @@ static NSString * const PSPullRefreshRefreshingStatus = @"Loading...";
 }
 
 - (id)initWithFrame:(CGRect)frame {
-    self = [self initWithFrame:frame style:PSPullRefreshStyleWhite];
+    self = [self initWithFrame:frame style:PSPullLoadMoreStyleWhite];
     if (self) {
     }
     return self;
 }
 
-
-- (void)setState:(PSPullRefreshState)state {
+- (void)setState:(PSPullLoadMoreState)state {
     BOOL stateChanged = state != _state;
     _state = state;
     
     if (stateChanged) {
         switch (state) {
-            case PSPullRefreshStateIdle:
+            case PSPullLoadMoreStateIdle:
             {
-                self.statusLabel.text = PSPullRefreshIdleStatus;
+                self.statusLabel.text = PSPullLoadMoreIdleStatus;
                 [self stopSpinning];
                 
                 if (!self.scrollView) return;
@@ -87,10 +86,10 @@ static NSString * const PSPullRefreshRefreshingStatus = @"Loading...";
                                  }];
                 break;
             }
-            case PSPullRefreshStateRefreshing:
+            case PSPullLoadMoreStateRefreshing:
             {
                 [self startSpinning];
-                self.statusLabel.text = PSPullRefreshRefreshingStatus;
+                self.statusLabel.text = PSPullLoadMoreRefreshingStatus;
                 break;
             }
             default:
@@ -103,25 +102,25 @@ static NSString * const PSPullRefreshRefreshingStatus = @"Loading...";
 
 #pragma mark - Pass-thru UIScrollViewDelegate methods
 
-- (void)pullRefreshScrollViewDidScroll:(UIScrollView *)scrollView {
-    CGFloat yOffset = scrollView.contentOffset.y;
+- (void)pullLoadMoreScrollViewDidScroll:(UIScrollView *)scrollView {
+    CGFloat yOffset = scrollView.contentOffset.y + scrollView.height;
     
     // We update the visual/textual state of the view here
     // This gets called whenever the user is dragging the scrollView
     
-    if (self.state == PSPullRefreshStateRefreshing) {
+    if (self.state == PSPullLoadMoreStateRefreshing) {
         // Currently actively refreshing, maintain a slight contentInset
         
         // This is a fix for section headers getting stuck during scrolling
-        CGFloat offset = MAX(yOffset * -1, 0);
-        offset = MIN(offset, self.height);
-        scrollView.contentInset = UIEdgeInsetsMake(offset, 0.0, 0.0, 0.0);
+//        CGFloat offset = MAX(yOffset * -1, 0);
+//        offset = MIN(offset, self.height);
+//        scrollView.contentInset = UIEdgeInsetsMake(offset, 0.0, 0.0, 0.0);
     } else if (scrollView.isDragging) {
         // The user is actively dragging the scroll view
-        if (yOffset < 0) {
-            if (yOffset <= -self.height) {
+        if (yOffset > scrollView.contentSize.height) {
+            if (yOffset >= scrollView.contentSize.height + self.height) {
                 // Update status to show threshold has been triggered
-                self.statusLabel.text = PSPullRefreshTriggeredStatus;
+                self.statusLabel.text = PSPullLoadMoreTriggeredStatus;
                 [UIView animateWithDuration:0.3
                                       delay:0.0
                                     options:UIViewAnimationOptionCurveEaseInOut
@@ -132,7 +131,7 @@ static NSString * const PSPullRefreshRefreshingStatus = @"Loading...";
                                  }];
             } else {
                 // Update status to show threshold has not been triggered
-                self.statusLabel.text = PSPullRefreshIdleStatus;
+                self.statusLabel.text = PSPullLoadMoreIdleStatus;
                 [UIView animateWithDuration:0.3
                                       delay:0.0
                                     options:UIViewAnimationOptionCurveEaseInOut
@@ -144,22 +143,22 @@ static NSString * const PSPullRefreshRefreshingStatus = @"Loading...";
                                  }];
             }
         } else {
-            self.state = PSPullRefreshStateIdle;
+            self.state = PSPullLoadMoreStateIdle;
         }
     }
 }
 
-- (void)pullRefreshScrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+- (void)pullLoadMoreScrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if (!decelerate) return;
     
-    CGFloat yOffset = scrollView.contentOffset.y;
+    CGFloat yOffset = scrollView.contentOffset.y + scrollView.height;
     
     // We detect to see if the user dragged enough to trigger a refresh here
-    if (yOffset <= -self.height && self.state == PSPullRefreshStateIdle) {
-        self.state = PSPullRefreshStateRefreshing;
+    if (yOffset >= (scrollView.contentSize.height + self.height) && self.state == PSPullLoadMoreStateIdle) {
+        self.state = PSPullLoadMoreStateRefreshing;
         
-        if (self.delegate && [self.delegate respondsToSelector:@selector(pullRefreshViewDidBeginRefreshing:)]) {
-            [self.delegate pullRefreshViewDidBeginRefreshing:self];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(pullLoadMoreViewDidBeginRefreshing:)]) {
+            [self.delegate pullLoadMoreViewDidBeginRefreshing:self];
         }
         
         if (!self.scrollView) return;
@@ -168,7 +167,7 @@ static NSString * const PSPullRefreshRefreshingStatus = @"Loading...";
                               delay:0.0
                             options:UIViewAnimationOptionCurveEaseInOut
                          animations:^{
-                             self.scrollView.contentInset = UIEdgeInsetsMake(self.height, 0.0, 0.0, 0.0);
+                             self.scrollView.contentInset = UIEdgeInsetsMake(0.0, 0.0, self.height, 0.0);
                          }
                          completion:^(BOOL finished){
                              
@@ -192,5 +191,6 @@ static NSString * const PSPullRefreshRefreshingStatus = @"Loading...";
     [self.iconView.layer removeAllAnimations];
     self.iconView.transform = CGAffineTransformIdentity;
 }
+
 
 @end

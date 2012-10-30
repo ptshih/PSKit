@@ -37,7 +37,7 @@
 
 // Config
 @property (nonatomic, assign) BOOL reloading;
-@property (nonatomic, assign) BOOL isReload;
+@property (nonatomic, assign) BOOL loadingMore;
 
 @property (nonatomic, assign) BOOL shouldShowHeader;
 @property (nonatomic, assign) BOOL shouldShowFooter;
@@ -47,6 +47,9 @@
 
 @property (nonatomic, assign) CGFloat headerHeight;
 @property (nonatomic, assign) CGFloat footerHeight;
+
+@property (nonatomic, assign) NSInteger limit;
+@property (nonatomic, assign) NSInteger offset;
 
 /**
  Used to update the view when the orientation changes

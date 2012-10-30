@@ -16,15 +16,6 @@
 
 @implementation PSCollectionViewController
 
-@synthesize
-items = _items,
-collectionView = _collectionView,
-pullRefreshView = _pullRefreshView;
-
-@synthesize
-shouldPullRefresh = _shouldPullRefresh,
-pullRefreshStyle = _pullRefreshStyle;
-
 #pragma mark - Init
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -35,6 +26,7 @@ pullRefreshStyle = _pullRefreshStyle;
         // Config
         self.shouldShowNullView = YES;
         self.shouldPullRefresh = NO;
+        self.shouldPullLoadMore = NO;
         self.pullRefreshStyle = PSPullRefreshStyleBlack;
     }
     return self;
@@ -87,6 +79,10 @@ pullRefreshStyle = _pullRefreshStyle;
     if (self.shouldPullRefresh) {
         [self setupPullRefresh];
     }
+    
+    if (self.shouldPullLoadMore) {
+        [self setupPullLoadMore];
+    }
 }
 
 - (void)setupPullRefresh {
@@ -95,6 +91,15 @@ pullRefreshStyle = _pullRefreshStyle;
         self.pullRefreshView.scrollView = self.collectionView;
         self.pullRefreshView.delegate = self;
         [self.collectionView addSubview:self.pullRefreshView];		
+    }
+}
+
+- (void)setupPullLoadMore {
+    if (self.pullLoadMoreView == nil) {
+        self.pullLoadMoreView = [[PSPullLoadMoreView alloc] initWithFrame:CGRectMake(0.0, self.collectionView.height, self.collectionView.frame.size.width, 48.0) style:self.pullRefreshStyle];
+        self.pullLoadMoreView.scrollView = self.collectionView;
+        self.pullLoadMoreView.delegate = self;
+        [self.collectionView addSubview:self.pullLoadMoreView];
     }
 }
 
@@ -111,17 +116,31 @@ pullRefreshStyle = _pullRefreshStyle;
     self.contentOffset = CGPointZero;
 }
 
+- (void)loadMoreDataSource {
+    [super loadMoreDataSource];
+    [self beginLoadMore];
+}
+
 - (void)dataSourceDidLoad {
     [super dataSourceDidLoad];
     [self.collectionView reloadData];
     self.collectionView.contentOffset = self.contentOffset;
+    self.pullLoadMoreView.top = self.collectionView.contentSize.height;
     [self endRefresh];
+}
+
+- (void)dataSourceDidLoadMore {
+    [super dataSourceDidLoadMore];
+    [self.collectionView reloadData];
+    self.pullLoadMoreView.top = self.collectionView.contentSize.height;
+    [self endLoadMore];
 }
 
 - (void)dataSourceDidError {
     [super dataSourceDidError];
     [self.collectionView reloadData];
     self.collectionView.contentOffset = CGPointZero;
+    self.pullLoadMoreView.top = self.collectionView.contentSize.height;
     [self endRefresh];
 }
 
@@ -153,6 +172,9 @@ pullRefreshStyle = _pullRefreshStyle;
     if (self.pullRefreshView) {
         [self.pullRefreshView pullRefreshScrollViewDidEndDragging:scrollView willDecelerate:decelerate];
     }
+    if (self.pullLoadMoreView) {
+        [self.pullLoadMoreView pullLoadMoreScrollViewDidEndDragging:scrollView willDecelerate:decelerate];
+    }
 }
 
 - (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
@@ -168,14 +190,25 @@ pullRefreshStyle = _pullRefreshStyle;
     if (self.pullRefreshView) {
         [self.pullRefreshView pullRefreshScrollViewDidScroll:scrollView];
     }
+    if (self.pullLoadMoreView) {
+        [self.pullLoadMoreView pullLoadMoreScrollViewDidScroll:scrollView];
+    }
 }
 
 #pragma mark - PSPullRefreshViewDelegate
+
 - (void)pullRefreshViewDidBeginRefreshing:(PSPullRefreshView *)pullRefreshView {
     [self reloadDataSource];
 }
 
+#pragma mark - PSPullLoadMoreViewDelegate
+
+- (void)pullLoadMoreViewDidBeginRefreshing:(PSPullLoadMoreView *)pullLoadMoreView {
+    [self loadMoreDataSource];
+}
+
 #pragma mark - Refresh
+
 - (void)beginRefresh {
     [super beginRefresh];
     [self.pullRefreshView setState:PSPullRefreshStateRefreshing];
@@ -184,6 +217,18 @@ pullRefreshStyle = _pullRefreshStyle;
 - (void)endRefresh {
     [super endRefresh];
     [self.pullRefreshView setState:PSPullRefreshStateIdle];
+}
+
+#pragma mark - Load More
+
+- (void)beginLoadMore {
+    [super beginLoadMore];
+    [self.pullLoadMoreView setState:PSPullLoadMoreStateRefreshing];
+}
+
+- (void)endLoadMore {
+    [super endLoadMore];
+    [self.pullLoadMoreView setState:PSPullLoadMoreStateIdle];
 }
 
 @end

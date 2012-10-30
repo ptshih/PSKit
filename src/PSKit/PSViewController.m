@@ -43,7 +43,7 @@
     if (self) {
         //  VLog(@"#%@", [self class]);
         self.reloading = NO;
-        self.isReload = NO;
+        self.loadingMore = NO;
         
         self.contentOffset = CGPointZero;
         self.shouldShowHeader = NO;
@@ -54,6 +54,9 @@
         
         self.headerHeight = 44.0;
         self.footerHeight = 44.0;
+        
+        self.limit = 5;
+        self.offset = 0;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
@@ -237,7 +240,7 @@
 - (void)loadDataSource {
     ASSERT_MAIN_THREAD;
     [self beginRefresh];
-    self.isReload = NO;
+    self.offset = 0;
     
     if (self.shouldShowNullView) {
         [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
@@ -250,7 +253,13 @@
 - (void)reloadDataSource {
     ASSERT_MAIN_THREAD;
     [self beginRefresh];
-    self.isReload = YES;
+    self.offset = 0;
+}
+
+- (void)loadMoreDataSource {
+    ASSERT_MAIN_THREAD;
+    [self beginLoadMore];
+    self.offset += self.limit;
 }
 
 - (void)dataSourceDidLoad {
@@ -272,6 +281,11 @@
             }];
         }
     }
+}
+
+- (void)dataSourceDidLoadMore {
+    ASSERT_MAIN_THREAD;
+    [self endLoadMore];
 }
 
 - (void)dataSourceDidError {
@@ -298,6 +312,16 @@
 - (void)endRefresh {
     ASSERT_MAIN_THREAD;
     self.reloading = NO;
+}
+
+- (void)beginLoadMore {
+    ASSERT_MAIN_THREAD;
+    self.loadingMore = YES;
+}
+
+- (void)endLoadMore {
+    ASSERT_MAIN_THREAD;
+    self.loadingMore = NO;
 }
 
 #pragma mark - Rotation
