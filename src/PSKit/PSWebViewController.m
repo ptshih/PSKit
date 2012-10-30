@@ -61,6 +61,7 @@
     
     // WebView
     self.webView = [[UIWebView alloc] initWithFrame:self.contentView.bounds];
+    self.webView.autoresizingMask = self.contentView.autoresizingMask;
     self.webView.delegate = self;
     self.webView.scalesPageToFit = YES;
     [self.contentView insertSubview:self.webView belowSubview:self.headerView];
@@ -114,7 +115,7 @@
     
     if (navigationType == UIWebViewNavigationTypeLinkClicked || navigationType == UIWebViewNavigationTypeFormSubmitted || navigationType == UIWebViewNavigationTypeFormResubmitted) {
         id vc = [[[self class] alloc] initWithURLPath:[req.URL absoluteString] title:nil];
-        [(PSNavigationController *)self.parentViewController pushViewController:vc animated:YES];
+        [self.navigationController pushViewController:vc animated:YES];
         return NO;
     } else {
         return YES;
