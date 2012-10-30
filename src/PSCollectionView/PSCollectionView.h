@@ -64,6 +64,7 @@
 
 @optional
 - (void)collectionView:(PSCollectionView *)collectionView didSelectCell:(PSCollectionViewCell *)cell atIndex:(NSInteger)index;
+- (Class)collectionView:(PSCollectionView *)collectionView cellClassForRowAtIndex:(NSInteger)index;
 
 @end
 
@@ -74,6 +75,6 @@
 @required
 - (NSInteger)numberOfRowsInCollectionView:(PSCollectionView *)collectionView;
 - (PSCollectionViewCell *)collectionView:(PSCollectionView *)collectionView cellForRowAtIndex:(NSInteger)index;
-- (CGFloat)heightForRowAtIndex:(NSInteger)index;
+- (CGFloat)collectionView:(PSCollectionView *)collectionView heightForRowAtIndex:(NSInteger)index;
 
 @end

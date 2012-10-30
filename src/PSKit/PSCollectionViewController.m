@@ -158,7 +158,7 @@
 
 #pragma mark - PSCollectionViewDelegate
 
-- (Class)cellClassForRowAtIndex:(NSInteger)index {
+- (Class)collectionView:(PSCollectionView *)collectionView cellClassForRowAtIndex:(NSInteger)index {
     return [PSCollectionViewCell class];
 }
 
@@ -170,7 +170,7 @@
     return nil;
 }
 
-- (CGFloat)heightForRowAtIndex:(NSInteger)index {
+- (CGFloat)collectionView:(PSCollectionView *)collectionView heightForRowAtIndex:(NSInteger)index {
     return 0.0;
 }
 

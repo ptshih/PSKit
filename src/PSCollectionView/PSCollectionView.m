@@ -261,7 +261,7 @@ indexToRectMap = _indexToRectMap;
             
             CGFloat left = kMargin + (col * kMargin) + (col * self.colWidth);
             CGFloat top = [[colOffsets objectAtIndex:col] floatValue];
-            CGFloat colHeight = [self.collectionViewDataSource heightForRowAtIndex:i];
+            CGFloat colHeight = [self.collectionViewDataSource collectionView:self heightForRowAtIndex:i];
             
             CGRect viewRect = CGRectMake(left, top, self.colWidth, colHeight);
             

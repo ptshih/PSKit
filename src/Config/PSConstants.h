@@ -27,7 +27,6 @@
 #import "PSRandomSortDescriptor.h"
 //#import "PSNavigationBar.h"
 #import "PSAlertView.h"
-#import "PSErrorView.h"
 #import "PSTextField.h"
 #import "PSTextView.h"
 #import "PSSearchField.h"
