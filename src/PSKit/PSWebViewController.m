@@ -69,12 +69,16 @@
 - (void)setupHeader {
     [super setupHeader];
     
-    [self.leftButton setImage:[UIImage imageNamed:@"IconBackBlack"] forState:UIControlStateNormal];
+    [self.leftButton setImage:[UIImage imageNamed:@"IconBackWhite"] forState:UIControlStateNormal];
+    [self.leftButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonLeftBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
     NSString *title = self.webTitle ? self.webTitle : @"Loading...";
+    [PSStyleSheet applyStyle:@"navigationTitleLightLabel" forButton:self.centerButton];
     [self.centerButton setTitle:title forState:UIControlStateNormal];
+    [self.centerButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonCenterBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
-    self.spinnerView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [self.rightButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonRightBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    self.spinnerView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     self.spinnerView.frame = self.rightButton.bounds;
     self.spinnerView.hidesWhenStopped = YES;
     [self.rightButton addSubview:self.spinnerView];
@@ -82,7 +86,7 @@
 
 #pragma mark - Actions
 - (void)leftAction {
-    [(PSNavigationController *)self.parentViewController popViewControllerWithDirection:PSNavigationControllerDirectionRight animated:YES];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)centerAction {
