@@ -28,17 +28,6 @@
 
 @implementation PSZoomView
 
-@synthesize
-delegate = _delegate,
-superView = _superView,
-zoomedView = _zoomedView,
-backgroundView = _backgroundView,
-convertedFrame = _convertedFrame,
-originalFrame = _originalFrame,
-oldMapRegion = _oldMapRegion,
-shouldRotate = _shouldRotate,
-isZooming = _isZooming;
-
 + (id)sharedView {
     static id sharedView = nil;
     if (!sharedView) {
@@ -108,6 +97,26 @@ isZooming = _isZooming;
     self.convertedFrame = frame;
     self.originalFrame = view.frame;
     
+    if (isDeviceIPad()) {
+        CGFloat rotateAngle;
+        UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+        switch (orientation) {
+            case UIInterfaceOrientationPortraitUpsideDown:
+                rotateAngle = M_PI;
+                break;
+            case UIInterfaceOrientationLandscapeLeft:
+                rotateAngle = -M_PI / 2.0f;
+                break;
+            case UIInterfaceOrientationLandscapeRight:
+                rotateAngle = M_PI / 2.0f;
+                break;
+            default: // as UIInterfaceOrientationPortrait
+                rotateAngle = 0.0;
+                break;
+        }
+        self.zoomedView.transform = CGAffineTransformMakeRotation(rotateAngle);
+    }
+    
     for (UIGestureRecognizer *gr in self.zoomedView.gestureRecognizers) {
         gr.enabled = NO;
     }
@@ -136,13 +145,12 @@ isZooming = _isZooming;
     }
     
     if (newWidth > newHeight && ![view isKindOfClass:[MKMapView class]]) {
-        self.shouldRotate = YES;
+        self.shouldRotate = isDeviceIPad() ? NO : YES;
     } else {
         self.shouldRotate = NO;
     }
     
-    
-    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
+//    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     
     [UIView animateWithDuration:ZOOM_DURATION delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
@@ -180,7 +188,7 @@ isZooming = _isZooming;
 - (void)dismissWithAnimation:(BOOL)animated {
     [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     
-    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
+//    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
     
     CGFloat animationDuration = animated ? ZOOM_DURATION : 0.0;
     
@@ -228,7 +236,7 @@ isZooming = _isZooming;
     // This causes a crash with setFrame:
 //    [self dismissWithAnimation:NO];
     
-    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
+//    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
     [self.zoomedView removeFromSuperview];
     [self removeFromSuperview];
     self.isZooming = NO;
@@ -236,8 +244,85 @@ isZooming = _isZooming;
 
 #pragma mark - Orientation
 - (void)orientationDidChange:(NSNotification *)notification {
+
+}
+
+#pragma mark - Positioning (Rotation and Keyboard)
+- (void)positionSelf:(NSNotification*)notification {
+    CGFloat keyboardHeight;
+    NSTimeInterval animationDuration;
+    UIViewAnimationCurve animationCurve;
+    
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    
+    NSDictionary *keyboardInfo = [notification userInfo];
+    CGRect keyboardFrame = [[keyboardInfo valueForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue];
+    
+    [[keyboardInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
+    [[keyboardInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
+    
+    if (notification.name == UIKeyboardWillShowNotification || notification.name == UIKeyboardDidShowNotification) {
+        if (UIInterfaceOrientationIsPortrait(orientation)) {
+            keyboardHeight = keyboardFrame.size.height;
+        } else {
+            keyboardHeight = keyboardFrame.size.width;
+        }
+    } else {
+        keyboardHeight = 0;
+    }
+    
+    CGRect orientationFrame = [UIScreen mainScreen].bounds;
+    CGRect statusBarFrame = [UIApplication sharedApplication].statusBarFrame;
+    
+    if (UIInterfaceOrientationIsLandscape(orientation)) {
+        CGFloat temp = orientationFrame.size.width;
+        orientationFrame.size.width = orientationFrame.size.height;
+        orientationFrame.size.height = temp;
+        
+        temp = statusBarFrame.size.width;
+        statusBarFrame.size.width = statusBarFrame.size.height;
+        statusBarFrame.size.height = temp;
+    }
+    
+    CGFloat activeHeight = orientationFrame.size.height;
+    
+    activeHeight -= keyboardHeight;
+    CGFloat posY = floorf(activeHeight * 0.5);
+    CGFloat posX = orientationFrame.size.width / 2;
+    
+    CGPoint newCenter;
+    CGFloat rotateAngle;
+    
+    switch (orientation) {
+        case UIInterfaceOrientationPortraitUpsideDown:
+            rotateAngle = M_PI;
+            newCenter = CGPointMake(posX, orientationFrame.size.height - posY);
+            break;
+        case UIInterfaceOrientationLandscapeLeft:
+            rotateAngle = -M_PI / 2.0f;
+            newCenter = CGPointMake(posY, posX);
+            break;
+        case UIInterfaceOrientationLandscapeRight:
+            rotateAngle = M_PI / 2.0f;
+            newCenter = CGPointMake(orientationFrame.size.height - posY, posX);
+            break;
+        default: // as UIInterfaceOrientationPortrait
+            rotateAngle = 0.0;
+            newCenter = CGPointMake(posX, posY);
+            break;
+    }
+    
+    [UIView animateWithDuration:animationDuration delay:0.0 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+        [self moveToPoint:newCenter rotateAngle:rotateAngle];
+    } completion:NULL];
     
 }
+
+- (void)moveToPoint:(CGPoint)newCenter rotateAngle:(CGFloat)angle {
+    self.transform = CGAffineTransformMakeRotation(angle);
+    self.center = newCenter;
+}
+
 
 
 @end

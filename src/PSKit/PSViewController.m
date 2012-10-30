@@ -301,6 +301,16 @@
 }
 
 #pragma mark - Rotation
+
+// iOS6
+- (NSUInteger)supportedInterfaceOrientations {
+    if (isDeviceIPad()) {
+        return UIInterfaceOrientationMaskAll;
+    } else {
+        return UIInterfaceOrientationMaskAllButUpsideDown;
+    }
+}
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     if (isDeviceIPad()) {
         return YES;
