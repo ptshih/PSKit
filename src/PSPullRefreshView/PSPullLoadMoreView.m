@@ -103,6 +103,7 @@ static NSString * const PSPullLoadMoreRefreshingStatus = @"Loading...";
 #pragma mark - Pass-thru UIScrollViewDelegate methods
 
 - (void)pullLoadMoreScrollViewDidScroll:(UIScrollView *)scrollView {
+    CGFloat contentHeight = MAX(scrollView.contentSize.height, scrollView.height);
     CGFloat yOffset = scrollView.contentOffset.y + scrollView.height;
     
     // We update the visual/textual state of the view here
@@ -115,10 +116,10 @@ static NSString * const PSPullLoadMoreRefreshingStatus = @"Loading...";
 //        CGFloat offset = MAX(yOffset * -1, 0);
 //        offset = MIN(offset, self.height);
 //        scrollView.contentInset = UIEdgeInsetsMake(offset, 0.0, 0.0, 0.0);
-    } else if (scrollView.isDragging) {
+    } else if (scrollView.isDragging && self.state == PSPullLoadMoreStateIdle) {
         // The user is actively dragging the scroll view
-        if (yOffset > scrollView.contentSize.height) {
-            if (yOffset >= scrollView.contentSize.height + self.height) {
+        if (yOffset > contentHeight) {
+            if (yOffset >= (contentHeight + self.height)) {
                 // Update status to show threshold has been triggered
                 self.statusLabel.text = PSPullLoadMoreTriggeredStatus;
                 [UIView animateWithDuration:0.3
@@ -150,11 +151,11 @@ static NSString * const PSPullLoadMoreRefreshingStatus = @"Loading...";
 
 - (void)pullLoadMoreScrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if (!decelerate) return;
-    
+    CGFloat contentHeight = MAX(scrollView.contentSize.height, scrollView.height);
     CGFloat yOffset = scrollView.contentOffset.y + scrollView.height;
     
     // We detect to see if the user dragged enough to trigger a refresh here
-    if (yOffset >= (scrollView.contentSize.height + self.height) && self.state == PSPullLoadMoreStateIdle) {
+    if (yOffset >= (contentHeight + self.height) && self.state == PSPullLoadMoreStateIdle) {
         self.state = PSPullLoadMoreStateRefreshing;
         
         if (self.delegate && [self.delegate respondsToSelector:@selector(pullLoadMoreViewDidBeginRefreshing:)]) {

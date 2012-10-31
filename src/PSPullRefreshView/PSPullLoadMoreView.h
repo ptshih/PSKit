@@ -18,7 +18,8 @@ typedef enum {
 
 typedef enum {
     PSPullLoadMoreStateIdle = 0,
-    PSPullLoadMoreStateRefreshing
+    PSPullLoadMoreStateRefreshing,
+    PSPullLoadMoreStateDisabled
 } PSPullLoadMoreState;
 
 

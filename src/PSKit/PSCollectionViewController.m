@@ -133,14 +133,32 @@
     [super dataSourceDidLoad];
     [self.collectionView reloadData];
     self.collectionView.contentOffset = self.contentOffset;
-    self.pullLoadMoreView.top = self.collectionView.contentSize.height;
+    
+    if (self.collectionView.contentSize.height < self.collectionView.height) {
+        self.pullLoadMoreView.state = PSPullLoadMoreStateDisabled;
+        self.pullLoadMoreView.hidden = YES;
+    } else {
+        self.pullLoadMoreView.state = PSPullLoadMoreStateIdle;
+        self.pullLoadMoreView.top = self.collectionView.contentSize.height;
+        self.pullLoadMoreView.hidden = NO;
+    }
+    
     [self endRefresh];
 }
 
 - (void)dataSourceDidLoadMore {
     [super dataSourceDidLoadMore];
     [self.collectionView reloadData];
-    self.pullLoadMoreView.top = self.collectionView.contentSize.height;
+    
+    if (self.collectionView.contentSize.height < self.collectionView.height) {
+        self.pullLoadMoreView.state = PSPullLoadMoreStateDisabled;
+        self.pullLoadMoreView.hidden = YES;
+    } else {
+        self.pullLoadMoreView.state = PSPullLoadMoreStateIdle;
+        self.pullLoadMoreView.top = self.collectionView.contentSize.height;
+        self.pullLoadMoreView.hidden = NO;
+    }
+    
     [self endLoadMore];
 }
 
@@ -148,7 +166,16 @@
     [super dataSourceDidError];
     [self.collectionView reloadData];
     self.collectionView.contentOffset = CGPointZero;
-    self.pullLoadMoreView.top = self.collectionView.contentSize.height;
+
+    if (self.collectionView.contentSize.height < self.collectionView.height) {
+        self.pullLoadMoreView.state = PSPullLoadMoreStateDisabled;
+        self.pullLoadMoreView.hidden = YES;
+    } else {
+        self.pullLoadMoreView.state = PSPullLoadMoreStateIdle;
+        self.pullLoadMoreView.top = self.collectionView.contentSize.height;
+        self.pullLoadMoreView.hidden = NO;
+    }
+    
     [self endRefresh];
 }
 
