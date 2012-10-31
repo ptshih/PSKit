@@ -17,6 +17,11 @@
 
 @property (nonatomic, strong) UIActivityIndicatorView *spinnerView;
 
+@property (nonatomic, strong) UIButton *backButton;
+@property (nonatomic, strong) UIButton *forwardButton;
+
+@property (nonatomic, assign) NSInteger frameCount;
+
 - (void)loadWebView;
 
 @end
@@ -27,9 +32,15 @@
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         self.shouldShowHeader = YES;
+        self.shouldShowFooter = YES;
+        
+        self.headerHeight = 44.0;
+        self.footerHeight = 44.0;
         
         self.URLPath = URLPath;
-        self.webTitle = title;
+        self.webTitle = title ? title : @"Loading...";
+        
+        self.frameCount = 0;
     }
     return self;
 }
@@ -78,14 +89,42 @@
     [self.centerButton setTitle:title forState:UIControlStateNormal];
     [self.centerButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonCenterBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
+    [self.rightButton setImage:[UIImage imageNamed:@"IconRefreshWhite"] forState:UIControlStateNormal];
     [self.rightButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonRightBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     self.spinnerView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     self.spinnerView.frame = self.rightButton.bounds;
     self.spinnerView.hidesWhenStopped = YES;
     [self.rightButton addSubview:self.spinnerView];
+    
+    self.rightButton.enabled = NO;
+}
+
+- (void)setupFooter {
+    [super setupFooter];
+    
+    UIButton *backButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navButton" target:self action:@selector(back)];
+    backButton.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
+    [backButton setBackgroundImage:[UIImage stretchableImageNamed:@"ToolbarLeft" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    [backButton setImage:[UIImage imageNamed:@"IconBackWhite"] forState:UIControlStateNormal];
+    self.backButton = backButton;
+    
+    UIButton *forwardButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navButton" target:self action:@selector(forward)];
+    forwardButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+    [forwardButton setBackgroundImage:[UIImage stretchableImageNamed:@"ToolbarRight" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    [forwardButton setImage:[UIImage imageNamed:@"IconNextWhite"] forState:UIControlStateNormal];
+    
+    backButton.frame = CGRectMake(0, 0, self.footerView.width / 2.0, self.footerView.height);
+    forwardButton.frame = CGRectMake(self.footerView.width / 2.0, 0, self.footerView.width / 2.0, self.footerView.height);
+    self.forwardButton = forwardButton;
+    
+    [self updateButtons];
+    
+    [self.footerView addSubview:backButton];
+    [self.footerView addSubview:forwardButton];
 }
 
 #pragma mark - Actions
+
 - (void)leftAction {
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -95,8 +134,27 @@
 }
 
 - (void)rightAction {
+    [self.webView reload];
 }
 
+- (void)back {
+    if (self.webView.canGoBack) {
+        [self.webView goBack];
+    }
+}
+
+- (void)forward {
+    if (self.webView.canGoForward) {
+        [self.webView goForward];
+    }
+}
+
+- (void)updateButtons {
+    self.backButton.enabled = self.webView.canGoBack;
+    self.forwardButton.enabled = self.webView.canGoForward;
+}
+
+#pragma mark - State Machine
 
 - (void)loadWebView {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self.URLPath]];
@@ -104,31 +162,51 @@
 }
 
 #pragma mark - UIWebViewDelegate
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)req navigationType:(UIWebViewNavigationType)navigationType {
-    [self.spinnerView startAnimating];
-    
+
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)req navigationType:(UIWebViewNavigationType)navigationType {    
     NSMutableURLRequest *request = (NSMutableURLRequest *)req;
     
     if ([request respondsToSelector:@selector(setValue:forHTTPHeaderField:)]) {
         //        [request setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"];
     }
     
-    if (navigationType == UIWebViewNavigationTypeLinkClicked || navigationType == UIWebViewNavigationTypeFormSubmitted || navigationType == UIWebViewNavigationTypeFormResubmitted) {
-        id vc = [[[self class] alloc] initWithURLPath:[req.URL absoluteString] title:nil];
-        [self.navigationController pushViewController:vc animated:YES];
-        return NO;
-    } else {
-        return YES;
+    return YES;
+    
+//    if (navigationType == UIWebViewNavigationTypeLinkClicked || navigationType == UIWebViewNavigationTypeFormSubmitted || navigationType == UIWebViewNavigationTypeFormResubmitted) {
+//        id vc = [[[self class] alloc] initWithURLPath:[req.URL absoluteString] title:nil];
+//        [self.navigationController pushViewController:vc animated:YES];
+//        return NO;
+//    } else {
+//        return YES;
+//    }
+}
+
+- (void)webViewDidStartLoad:(UIWebView *)webView {
+    if (self.frameCount == 0) {
+        [self.spinnerView startAnimating];
+        self.rightButton.enabled = NO;
+    }
+    self.frameCount++;
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
+    self.frameCount--;
+    
+    if (self.frameCount == 0) {
+        [self.spinnerView stopAnimating];
+        self.rightButton.enabled = YES;
+        
+        [self updateButtons];
+        
+        if (!self.webTitle) {
+            [self.centerButton setTitle:[[webView stringByEvaluatingJavaScriptFromString:@"document.title"] stringByUnescapingHTML] forState:UIControlStateNormal];
+        }
     }
 }
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView{
-    [self.spinnerView stopAnimating];
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
+    self.frameCount--;
     
-    if (!self.webTitle) {
-        [self.centerButton setTitle:[[webView stringByEvaluatingJavaScriptFromString:@"document.title"] stringByUnescapingHTML] forState:UIControlStateNormal];
-    }
-    //    self.title = [[webView stringByEvaluatingJavaScriptFromString:@"document.title"] stringByUnescapingHTML];
 }
 
 @end
