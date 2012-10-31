@@ -14,16 +14,18 @@
 
 @property (nonatomic, strong) UILabel *messageLabel;
 
+- (id)initWithFrame:(CGRect)frame style:(NSString *)style;
+
 @end
 
 @implementation PSNullView
 
-- (id)initWithFrame:(CGRect)frame {
+- (id)initWithFrame:(CGRect)frame style:(NSString *)style {
     self = [super initWithFrame:frame];
     if (self) {
         self.messageLabel = [[UILabel alloc] initWithFrame:self.bounds];
         self.messageLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        [PSStyleSheet applyStyle:@"loadingDarkLabel" forLabel:self.messageLabel];
+        [PSStyleSheet applyStyle:style forLabel:self.messageLabel];
         self.messageLabel.text = @"Loading...";
         [self addSubview:self.messageLabel];
     }
@@ -57,6 +59,9 @@
         
         self.limit = 10;
         self.offset = 0;
+        
+        self.nullBackgroundColor = BASE_BG_COLOR;
+        self.nullLabelStyle = @"loadingDarkLabel";
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
@@ -211,9 +216,9 @@
 - (void)setupNullView {
     if (!self.shouldShowNullView) return;
     
-    self.nullView = [[PSNullView alloc] initWithFrame:self.contentView.bounds];
+    self.nullView = [[PSNullView alloc] initWithFrame:self.contentView.bounds style:self.nullLabelStyle];
     self.nullView.autoresizingMask = self.contentView.autoresizingMask;
-    self.nullView.backgroundColor = BASE_BG_COLOR;
+    self.nullView.backgroundColor = self.nullBackgroundColor;
     [self.contentView addSubview:self.nullView];
     
     [self.nullView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(reloadDataSource)]];

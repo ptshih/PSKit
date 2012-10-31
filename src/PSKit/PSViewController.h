@@ -45,6 +45,9 @@
 @property (nonatomic, assign) BOOL shouldAddRoundedCorners;
 @property (nonatomic, assign) BOOL shouldAdjustViewForKeyboard;
 
+@property (nonatomic, strong) UIColor *nullBackgroundColor;
+@property (nonatomic, strong) NSString *nullLabelStyle;
+
 @property (nonatomic, assign) CGFloat headerHeight;
 @property (nonatomic, assign) CGFloat footerHeight;
 
