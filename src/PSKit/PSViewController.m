@@ -57,6 +57,9 @@
         self.headerHeight = 44.0;
         self.footerHeight = 44.0;
         
+        self.headerLeftWidth = 44.0;
+        self.headerRightWidth = 44.0;
+        
         self.limit = 10;
         self.offset = 0;
         
@@ -180,7 +183,7 @@
     self.centerButton.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     //    [self.centerButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonCenterBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
-    [self layoutHeaderWithLeftWidth:44.0 rightWidth:44.0];
+    [self layoutHeaderWithLeftWidth:self.headerLeftWidth rightWidth:self.headerRightWidth];
 
     [self.headerView addSubview:self.leftButton];
     [self.headerView addSubview:self.centerButton];

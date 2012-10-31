@@ -51,6 +51,9 @@
 @property (nonatomic, assign) CGFloat headerHeight;
 @property (nonatomic, assign) CGFloat footerHeight;
 
+@property (nonatomic, assign) CGFloat headerLeftWidth;
+@property (nonatomic, assign) CGFloat headerRightWidth;
+
 @property (nonatomic, assign) NSInteger limit;
 @property (nonatomic, assign) NSInteger offset;
 
