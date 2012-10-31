@@ -91,12 +91,13 @@
     
     [self.rightButton setImage:[UIImage imageNamed:@"IconRefreshWhite"] forState:UIControlStateNormal];
     [self.rightButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonRightBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
-    self.spinnerView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    self.spinnerView.frame = self.rightButton.bounds;
-    self.spinnerView.hidesWhenStopped = YES;
-    [self.rightButton addSubview:self.spinnerView];
     
-    self.rightButton.enabled = NO;
+    self.spinnerView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    self.spinnerView.frame = self.rightButton.frame;
+    self.spinnerView.hidesWhenStopped = YES;
+    [self.headerView addSubview:self.spinnerView];
+    
+    self.rightButton.hidden = YES;
 }
 
 - (void)setupFooter {
@@ -184,7 +185,7 @@
 - (void)webViewDidStartLoad:(UIWebView *)webView {
     if (self.frameCount == 0) {
         [self.spinnerView startAnimating];
-        self.rightButton.enabled = NO;
+        self.rightButton.hidden = YES;
     }
     self.frameCount++;
 }
@@ -194,7 +195,7 @@
     
     if (self.frameCount == 0) {
         [self.spinnerView stopAnimating];
-        self.rightButton.enabled = YES;
+        self.rightButton.hidden = NO;
         
         [self updateButtons];
         
@@ -207,6 +208,12 @@
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     self.frameCount--;
     
+    if (self.frameCount == 0) {
+        [self.spinnerView stopAnimating];
+        self.rightButton.hidden = NO;
+        
+        [self updateButtons];
+    }
 }
 
 @end

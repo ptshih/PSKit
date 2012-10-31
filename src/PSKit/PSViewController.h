@@ -47,6 +47,7 @@
 
 @property (nonatomic, strong) UIColor *nullBackgroundColor;
 @property (nonatomic, strong) NSString *nullLabelStyle;
+@property (nonatomic, assign) UIActivityIndicatorViewStyle nullIndicatorStyle;
 
 @property (nonatomic, assign) CGFloat headerHeight;
 @property (nonatomic, assign) CGFloat footerHeight;

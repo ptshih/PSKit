@@ -23,6 +23,8 @@ typedef enum {
 
 @interface PSURLCache : NSObject
 
+@property (nonatomic, assign) BOOL noCache;
+
 // Singleton access
 + (id)sharedCache;
 

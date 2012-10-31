@@ -13,21 +13,44 @@
 @interface PSNullView : UIView
 
 @property (nonatomic, strong) UILabel *messageLabel;
+@property (nonatomic, strong) UIActivityIndicatorView *spinnerView;
 
-- (id)initWithFrame:(CGRect)frame style:(NSString *)style;
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor labelStyle:(NSString *)labelStyle indicatorStyle:(UIActivityIndicatorViewStyle)indicatorStyle;
 
 @end
 
 @implementation PSNullView
 
-- (id)initWithFrame:(CGRect)frame style:(NSString *)style {
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor labelStyle:(NSString *)labelStyle indicatorStyle:(UIActivityIndicatorViewStyle)indicatorStyle {
     self = [super initWithFrame:frame];
     if (self) {
-        self.messageLabel = [[UILabel alloc] initWithFrame:self.bounds];
-        self.messageLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        [PSStyleSheet applyStyle:style forLabel:self.messageLabel];
+        self.backgroundColor = backgroundColor;
+        
+        CGFloat midX = CGRectGetMidX(self.bounds);
+        CGFloat midY = CGRectGetMidY(self.bounds);
+        
+        UIView *v = [[UIView alloc] initWithFrame:CGRectZero];
+        v.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        
+        self.spinnerView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:indicatorStyle];
+        self.spinnerView.hidesWhenStopped = YES;
+        [v addSubview:self.spinnerView];
+        
+        self.messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        [PSStyleSheet applyStyle:labelStyle forLabel:self.messageLabel];
         self.messageLabel.text = @"Loading...";
-        [self addSubview:self.messageLabel];
+        [self.messageLabel sizeToFit];
+        self.messageLabel.left += self.spinnerView.width + 8.0;
+        [v addSubview:self.messageLabel];
+        
+        v.width = self.spinnerView.width + self.messageLabel.width + 8.0;
+        v.height = MAX(self.spinnerView.height, self.messageLabel.height);
+        
+        self.spinnerView.height = self.messageLabel.height;
+        
+        v.center = CGPointMake(midX, midY);
+        
+        [self addSubview:v];
     }
     return self;
 }
@@ -65,6 +88,7 @@
         
         self.nullBackgroundColor = BASE_BG_COLOR;
         self.nullLabelStyle = @"loadingDarkLabel";
+        self.nullIndicatorStyle = UIActivityIndicatorViewStyleGray;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
@@ -219,9 +243,8 @@
 - (void)setupNullView {
     if (!self.shouldShowNullView) return;
     
-    self.nullView = [[PSNullView alloc] initWithFrame:self.contentView.bounds style:self.nullLabelStyle];
+    self.nullView = [[PSNullView alloc] initWithFrame:self.contentView.bounds backgroundColor:self.nullBackgroundColor labelStyle:self.nullLabelStyle indicatorStyle:self.nullIndicatorStyle];
     self.nullView.autoresizingMask = self.contentView.autoresizingMask;
-    self.nullView.backgroundColor = self.nullBackgroundColor;
     [self.contentView addSubview:self.nullView];
     
     [self.nullView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(reloadDataSource)]];
@@ -251,6 +274,7 @@
     self.offset = 0;
     
     if (self.shouldShowNullView) {
+        [self.nullView.spinnerView startAnimating];
         [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
             self.nullView.messageLabel.text = @"Loading...";
             self.nullView.alpha = 1.0;
@@ -276,6 +300,7 @@
     
     if ([self dataSourceIsEmpty]) {
         if (self.shouldShowNullView) {
+            [self.nullView.spinnerView stopAnimating];
             [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
                 self.nullView.messageLabel.text = @"Empty...";
                 self.nullView.alpha = 1.0;
@@ -283,6 +308,7 @@
         }
     } else {
         if (self.shouldShowNullView) {
+            [self.nullView.spinnerView stopAnimating];
             [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
                 self.nullView.messageLabel.text = nil;
                 self.nullView.alpha = 0.0;
@@ -301,6 +327,7 @@
     [self endRefresh];
     
     if (self.shouldShowNullView) {
+        [self.nullView.spinnerView stopAnimating];
         [UIView animateWithDuration:kNullViewAnimationDuration animations:^{
             self.nullView.messageLabel.text = @"Error...";
             self.nullView.alpha = 1.0;

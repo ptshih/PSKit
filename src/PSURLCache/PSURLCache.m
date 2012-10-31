@@ -40,12 +40,6 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
 
 @implementation PSURLCache
 
-@synthesize
-priorityQueue = _priorityQueue,
-networkQueue = _networkQueue,
-pendingURLs = _pendingURLs,
-pendingOperations = _pendingOperations;
-
 + (id)sharedCache {
     static id sharedCache;
     if (!sharedCache) {
@@ -57,6 +51,8 @@ pendingOperations = _pendingOperations;
 - (id)init {
     self = [super init];
     if (self) {
+        self.noCache = NO;
+        
         self.priorityQueue = [[NSOperationQueue alloc] init];
         self.priorityQueue.maxConcurrentOperationCount = 1;
         
@@ -137,7 +133,7 @@ pendingOperations = _pendingOperations;
     NSString *cachePath = [self cachePathForURL:cachedURL cacheType:cacheType];
     NSData *data = [NSData dataWithContentsOfFile:cachePath];
     
-    if (data && usingCache) {
+    if (data && usingCache && !self.noCache) {
         NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[cachedURL copy], @"cachedURL", [NSNumber numberWithInteger:cacheType], @"cacheType", nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:kPSURLCacheDidCache object:self userInfo:userInfo];
         
