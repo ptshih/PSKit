@@ -203,7 +203,7 @@
     
     self.centerButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navigationTitleDarkLabel" target:self action:@selector(centerAction)];
     self.centerButton.titleLabel.adjustsFontSizeToFitWidth = YES;
-    self.centerButton.titleEdgeInsets = UIEdgeInsetsMake(0, 8, 0, 8);
+    self.centerButton.titleEdgeInsets = UIEdgeInsetsMake(0, 12, 0, 12);
     self.centerButton.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     //    [self.centerButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonCenterBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
