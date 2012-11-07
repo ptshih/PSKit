@@ -12,6 +12,7 @@
 
 @interface PSNullView : UIView
 
+@property (nonatomic, strong) UIView *containerView;
 @property (nonatomic, strong) UILabel *messageLabel;
 @property (nonatomic, strong) UIActivityIndicatorView *spinnerView;
 
@@ -25,9 +26,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = backgroundColor;
-        
-        CGFloat midX = CGRectGetMidX(self.bounds);
-        CGFloat midY = CGRectGetMidY(self.bounds);
+        self.autoresizingMask = ~UIViewAutoresizingNone;
         
         UIView *v = [[UIView alloc] initWithFrame:CGRectZero];
         v.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -40,19 +39,28 @@
         [PSStyleSheet applyStyle:labelStyle forLabel:self.messageLabel];
         self.messageLabel.text = @"Loading...";
         [self.messageLabel sizeToFit];
-        self.messageLabel.left += self.spinnerView.width + 8.0;
         [v addSubview:self.messageLabel];
         
-        v.width = self.spinnerView.width + self.messageLabel.width + 8.0;
-        v.height = MAX(self.spinnerView.height, self.messageLabel.height);
-        
-        self.spinnerView.height = self.messageLabel.height;
-        
-        v.center = CGPointMake(midX, midY);
-        
         [self addSubview:v];
+        self.containerView = v;
     }
     return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    CGFloat midX = CGRectGetMidX(self.bounds);
+    CGFloat midY = CGRectGetMidY(self.bounds);
+    
+    self.messageLabel.left += self.spinnerView.width + 8.0;
+    
+    self.containerView.width = self.spinnerView.width + self.messageLabel.width + 8.0;
+    self.containerView.height = MAX(self.spinnerView.height, self.messageLabel.height);
+    
+    self.spinnerView.height = self.messageLabel.height;
+    
+    self.containerView.center = CGPointMake(midX, midY);
 }
 
 @end
@@ -244,7 +252,6 @@
     if (!self.shouldShowNullView) return;
     
     self.nullView = [[PSNullView alloc] initWithFrame:self.contentView.bounds backgroundColor:self.nullBackgroundColor labelStyle:self.nullLabelStyle indicatorStyle:self.nullIndicatorStyle];
-    self.nullView.autoresizingMask = self.contentView.autoresizingMask;
     [self.contentView addSubview:self.nullView];
     
     [self.nullView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(reloadDataSource)]];

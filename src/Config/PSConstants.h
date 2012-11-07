@@ -218,6 +218,17 @@ static BOOL isDeviceIPad() {
 }
 
 /**
+ Detect iPhone 5
+ */
+static BOOL isDeviceIPhone5() {
+    if ([UIScreen mainScreen].bounds.size.height == 568.0) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
+/**
  Is Yelp installed?
  */
 static BOOL isYelpInstalled() {
