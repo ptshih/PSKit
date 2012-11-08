@@ -110,6 +110,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @interface PSCollectionView () <UIGestureRecognizerDelegate>
 
+@property (nonatomic, assign, readwrite) CGFloat lastWidth;
 @property (nonatomic, assign, readwrite) CGFloat colWidth;
 @property (nonatomic, assign, readwrite) NSInteger numCols;
 @property (nonatomic, assign) UIInterfaceOrientation orientation;
@@ -202,15 +203,25 @@ indexToRectMap = _indexToRectMap;
     [super layoutSubviews];
     
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    
     if (self.orientation != orientation) {
         self.orientation = orientation;
+        // Recalculates layout
+        [self relayoutViews];
+    } else if(self.lastWidth != self.width) {
+        // Recalculates layout
         [self relayoutViews];
     } else {
+        // Recycles cells
         [self removeAndAddCellsIfNecessary];
     }
+    
+    self.lastWidth = self.width;
 }
 
 - (void)relayoutViews {
+    DLog(@"CollectionView Relayout");
+    
     self.numCols = UIInterfaceOrientationIsPortrait(self.orientation) ? self.numColsPortrait : self.numColsLandscape;
     
     // Reset all state
@@ -231,6 +242,7 @@ indexToRectMap = _indexToRectMap;
     // Add headerView if it exists
     if (self.headerView) {
         top = self.headerView.top;
+        self.headerView.width = self.width;
         [self addSubview:self.headerView];
         top += self.headerView.height;
     }
@@ -284,6 +296,7 @@ indexToRectMap = _indexToRectMap;
     // Add footerView if exists
     if (self.footerView) {
         self.footerView.top = totalHeight;
+        self.footerView.width = self.width;
         [self addSubview:self.footerView];
         totalHeight += self.footerView.height;
     }

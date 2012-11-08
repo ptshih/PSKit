@@ -64,7 +64,7 @@
     self.collectionView.collectionViewDelegate = self;
     self.collectionView.collectionViewDataSource = self;
     self.collectionView.backgroundColor = [UIColor clearColor];
-    self.collectionView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.collectionView.autoresizingMask = ~UIViewAutoresizingNone;
     
     [self.contentView addSubview:self.collectionView];
     
@@ -131,20 +131,21 @@
 
 - (void)dataSourceDidLoad {
     [super dataSourceDidLoad];
+    
+    [self.collectionView reloadData];
+    self.collectionView.contentOffset = self.contentOffset;
+    
+    if (self.collectionView.contentSize.height < self.collectionView.height) {
+        self.pullLoadMoreView.state = PSPullLoadMoreStateDisabled;
+        self.pullLoadMoreView.hidden = YES;
+    } else {
+        self.pullLoadMoreView.state = PSPullLoadMoreStateIdle;
+        self.pullLoadMoreView.top = self.collectionView.contentSize.height;
+        self.pullLoadMoreView.hidden = NO;
+    }
 
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [self.collectionView reloadData];
-        self.collectionView.contentOffset = self.contentOffset;
-        
-        if (self.collectionView.contentSize.height < self.collectionView.height) {
-            self.pullLoadMoreView.state = PSPullLoadMoreStateDisabled;
-            self.pullLoadMoreView.hidden = YES;
-        } else {
-            self.pullLoadMoreView.state = PSPullLoadMoreStateIdle;
-            self.pullLoadMoreView.top = self.collectionView.contentSize.height;
-            self.pullLoadMoreView.hidden = NO;
-        }
-    }];
+//    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+//    }];
     
     [self endRefresh];
 }

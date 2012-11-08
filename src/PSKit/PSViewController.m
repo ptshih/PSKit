@@ -12,7 +12,6 @@
 
 @interface PSNullView : UIView
 
-@property (nonatomic, strong) UIView *containerView;
 @property (nonatomic, strong) UILabel *messageLabel;
 @property (nonatomic, strong) UIActivityIndicatorView *spinnerView;
 
@@ -28,21 +27,15 @@
         self.backgroundColor = backgroundColor;
         self.autoresizingMask = ~UIViewAutoresizingNone;
         
-        UIView *v = [[UIView alloc] initWithFrame:CGRectZero];
-        v.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        
         self.spinnerView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:indicatorStyle];
         self.spinnerView.hidesWhenStopped = YES;
-        [v addSubview:self.spinnerView];
+        [self addSubview:self.spinnerView];
         
         self.messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         [PSStyleSheet applyStyle:labelStyle forLabel:self.messageLabel];
         self.messageLabel.text = @"Loading...";
         [self.messageLabel sizeToFit];
-        [v addSubview:self.messageLabel];
-        
-        [self addSubview:v];
-        self.containerView = v;
+        [self addSubview:self.messageLabel];
     }
     return self;
 }
@@ -53,14 +46,10 @@
     CGFloat midX = CGRectGetMidX(self.bounds);
     CGFloat midY = CGRectGetMidY(self.bounds);
     
-    self.messageLabel.left += self.spinnerView.width + 8.0;
-    
-    self.containerView.width = self.spinnerView.width + self.messageLabel.width + 8.0;
-    self.containerView.height = MAX(self.spinnerView.height, self.messageLabel.height);
-    
-    self.spinnerView.height = self.messageLabel.height;
-    
-    self.containerView.center = CGPointMake(midX, midY);
+    CGFloat totalWidth = self.messageLabel.width + self.spinnerView.width + 8.0;
+
+    self.spinnerView.frame = CGRectMake(midX - floorf(totalWidth / 2.0), midY - floorf(self.spinnerView.height / 2.0), self.spinnerView.width, self.spinnerView.height);
+    self.messageLabel.frame = CGRectMake(self.spinnerView.right + 8.0, midY - floorf(self.messageLabel.height / 2.0), self.messageLabel.width, self.messageLabel.height);
 }
 
 @end
