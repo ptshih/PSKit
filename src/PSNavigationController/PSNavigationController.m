@@ -1,9 +1,9 @@
 //
 //  PSNavigationController.m
-//  OSnap
+//  PSKit
 //
 //  Created by Peter Shih on 12/19/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 Peter Shih. All rights reserved.
 //
 
 #import "PSNavigationController.h"

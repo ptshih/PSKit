@@ -3,7 +3,7 @@
 //  Lunchbox
 //
 //  Created by Peter Shih on 5/15/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Peter Shih. All rights reserved.
 //
 
 #import "PSFacepileView.h"

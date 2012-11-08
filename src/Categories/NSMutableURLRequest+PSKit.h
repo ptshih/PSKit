@@ -3,7 +3,7 @@
 //  PSKit
 //
 //  Created by Peter on 2/3/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Peter Shih. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

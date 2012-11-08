@@ -3,7 +3,7 @@
 //  PSKit
 //
 //  Created by Peter Shih on 8/26/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 Peter Shih. All rights reserved.
 //
 
 #import "PSWebViewController.h"
@@ -38,7 +38,7 @@
         self.footerHeight = 44.0;
         
         self.URLPath = URLPath;
-        self.webTitle = title ? title : @"Loading...";
+        self.webTitle = title;
         
         self.frameCount = 0;
     }
@@ -188,6 +188,8 @@
         self.rightButton.hidden = YES;
     }
     self.frameCount++;
+    
+    [self.centerButton setTitle:@"Loading..." forState:UIControlStateNormal];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
@@ -201,6 +203,10 @@
         
         if (!self.webTitle) {
             [self.centerButton setTitle:[[webView stringByEvaluatingJavaScriptFromString:@"document.title"] stringByUnescapingHTML] forState:UIControlStateNormal];
+        } else if ([self.webTitle isEqualToString:@"Loading..."]) {
+            [self.centerButton setTitle:[[webView stringByEvaluatingJavaScriptFromString:@"document.title"] stringByUnescapingHTML] forState:UIControlStateNormal];
+        } else {
+            [self.centerButton setTitle:self.webTitle forState:UIControlStateNormal];
         }
     }
 }

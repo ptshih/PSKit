@@ -1,9 +1,9 @@
 //
 //  CoreGraphics-PSKit.h
-//  OSnap
+//  PSKit
 //
 //  Created by Peter Shih on 1/2/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Peter Shih. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

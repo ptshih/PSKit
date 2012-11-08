@@ -220,8 +220,6 @@ indexToRectMap = _indexToRectMap;
 }
 
 - (void)relayoutViews {
-    DLog(@"CollectionView Relayout");
-    
     self.numCols = UIInterfaceOrientationIsPortrait(self.orientation) ? self.numColsPortrait : self.numColsLandscape;
     
     // Reset all state
