@@ -131,17 +131,20 @@
 
 - (void)dataSourceDidLoad {
     [super dataSourceDidLoad];
-    [self.collectionView reloadData];
-    self.collectionView.contentOffset = self.contentOffset;
-    
-    if (self.collectionView.contentSize.height < self.collectionView.height) {
-        self.pullLoadMoreView.state = PSPullLoadMoreStateDisabled;
-        self.pullLoadMoreView.hidden = YES;
-    } else {
-        self.pullLoadMoreView.state = PSPullLoadMoreStateIdle;
-        self.pullLoadMoreView.top = self.collectionView.contentSize.height;
-        self.pullLoadMoreView.hidden = NO;
-    }
+
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self.collectionView reloadData];
+        self.collectionView.contentOffset = self.contentOffset;
+        
+        if (self.collectionView.contentSize.height < self.collectionView.height) {
+            self.pullLoadMoreView.state = PSPullLoadMoreStateDisabled;
+            self.pullLoadMoreView.hidden = YES;
+        } else {
+            self.pullLoadMoreView.state = PSPullLoadMoreStateIdle;
+            self.pullLoadMoreView.top = self.collectionView.contentSize.height;
+            self.pullLoadMoreView.hidden = NO;
+        }
+    }];
     
     [self endRefresh];
 }

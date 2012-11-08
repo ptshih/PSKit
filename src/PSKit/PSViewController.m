@@ -147,8 +147,20 @@
     }
 }
 
+- (void)viewWillLayoutSubviews {
+    
+}
+
+- (void)viewDidLayoutSubviews {
+    
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    if (self.isBeingPresented || self.isMovingToParentViewController) {
+        
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
