@@ -27,8 +27,6 @@ typedef enum {
 
 @protocol PSNavigationControllerDelegate;
 
-@class PSViewController;
-
 @interface PSNavigationController : UIViewController <UIGestureRecognizerDelegate> {
 }
 

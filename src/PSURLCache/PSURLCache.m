@@ -148,8 +148,8 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
             
             [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:self];
             
-            NSLog(@"### Request: %@", request.URL.absoluteString);
-            NSLog(@"### Request: %d remaining in low priority queue", self.networkQueue.operationCount);
+            DLog(@"### Request: %@", request.URL.absoluteString);
+            DLog(@"### Request: %d remaining in low priority queue", self.networkQueue.operationCount);
             
             NSError *error = nil;
             NSHTTPURLResponse *response = nil;

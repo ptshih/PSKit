@@ -33,14 +33,6 @@ static const NSTimeInterval __pollDuration = 30;
 
 @implementation PSLocationCenter
 
-@synthesize
-locationManager = _locationManager,
-location = _location,
-geocoder = _geocoder,
-backgroundDate = _backgroundDate,
-foregroundDate = _foregroundDate,
-shouldDisableAfterLocationFix = _shouldDisableAfterLocationFix;
-
 + (id)defaultCenter {
     static id defaultCenter = nil;
     if (!defaultCenter) {

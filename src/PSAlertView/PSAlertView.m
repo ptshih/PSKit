@@ -150,19 +150,6 @@
 
 @implementation PSAlertView
 
-@synthesize
-completionBlock = _completionBlock,
-backgroundView = _backgroundView,
-titleLabel = _titleLabel,
-messageLabel = _messageLabel,
-textField = _textField,
-emailButton = _emailButton,
-buttons = _buttons;
-
-@synthesize
-alertWindow = _alertWindow,
-oldKeyWindow = _oldKeyWindow;
-
 #pragma mark - Show with block
 + (void)showWithTitle:(NSString *)title message:(NSString *)message buttonTitles:(NSArray *)buttonTitles textFieldPlaceholder:(NSString *)textFieldPlaceholder completionBlock:(PSAlertViewCompletionBlock)completionBlock {
     

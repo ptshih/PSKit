@@ -81,6 +81,8 @@
     
     self.overlayView.frame = self.bounds;
     
+    self.popoverSize = CGSizeMake(self.bounds.size.width - 32.0, self.bounds.size.height - 104.0);
+    
     // Container
     CGSize containerSize = CGSizeMake(self.popoverSize.width + MARGIN * 2, self.popoverSize.height + MARGIN * 3 + 24);
     

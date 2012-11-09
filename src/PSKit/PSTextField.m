@@ -43,7 +43,6 @@
     
     CGRect frame = CGRectMake(left, top, textWidth, textHeight);
     
-    NSLog(@"%@", NSStringFromCGRect(frame));
     return frame;
 }
 

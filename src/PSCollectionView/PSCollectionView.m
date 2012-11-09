@@ -141,28 +141,6 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @implementation PSCollectionView
 
-// Public Views
-@synthesize
-headerView = _headerView,
-footerView = _footerView;
-
-// Public
-@synthesize
-colWidth = _colWidth,
-numCols = _numCols,
-numColsLandscape = _numColsLandscape,
-numColsPortrait = _numColsPortrait,
-collectionViewDelegate = _collectionViewDelegate,
-collectionViewDataSource = _collectionViewDataSource;
-
-// Private
-@synthesize
-orientation = _orientation,
-reuseableViews = _reuseableViews,
-visibleViews = _visibleViews,
-viewKeysToRemove = _viewKeysToRemove,
-indexToRectMap = _indexToRectMap;
-
 #pragma mark - Init/Memory
 
 - (id)initWithFrame:(CGRect)frame {

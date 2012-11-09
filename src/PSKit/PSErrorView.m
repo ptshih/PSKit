@@ -10,10 +10,6 @@
 
 @implementation PSErrorView
 
-@synthesize
-messageLabel = _messageLabel,
-delegate = _delegate;
-
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {

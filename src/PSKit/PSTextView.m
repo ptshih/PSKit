@@ -20,13 +20,6 @@
 
 @implementation PSTextView
 
-@synthesize
-insets = _insets,
-paddedInsets = _paddedInsets;
-
-@synthesize placeholder = _placeholder;
-@synthesize placeholderColor = _placeholderColor;
-
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {

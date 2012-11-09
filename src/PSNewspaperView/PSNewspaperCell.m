@@ -16,18 +16,6 @@
 
 @implementation PSNewspaperCell
 
-@synthesize
-cellType = _cellType,
-cellOrientation = _cellOrientation;
-
-@synthesize
-object = _object;
-
-@synthesize
-imageView = _imageView,
-titleLabel = _titleLabel,
-textView = _textView;
-
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {

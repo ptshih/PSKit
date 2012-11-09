@@ -16,13 +16,6 @@
 
 @implementation PSCachedImageView
 
-@synthesize
-imageQueue = _imageQueue,
-URL = _URL,
-originalURL = _originalURL,
-thumbnailURL = _thumbnailURL,
-loadingIndicator = _loadingIndicator;
-
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -70,7 +63,7 @@ loadingIndicator = _loadingIndicator;
         ASSERT_MAIN_THREAD;
         if (error) {
             [self.loadingIndicator stopAnimating];
-            NSLog(@"eror loading image: %@", cachedURL);
+            DLog(@"eror loading image: %@", cachedURL);
             self.image = self.placeholderImage;
         } else {
             // use notification

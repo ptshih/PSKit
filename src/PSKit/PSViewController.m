@@ -265,14 +265,15 @@
 #pragma mark - Post View Config
 
 - (void)addRoundedCorners {
-#warning BROKEN
     // iPad doesn't need rounded corners
     if (!isDeviceIPad()) {
         UIImageView *topCorners = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/MaskCornersTop"] stretchableImageWithLeftCapWidth:160 topCapHeight:0]];
-        topCorners.top = self.view.top;
+        topCorners.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin;
+        topCorners.top = 0.0;
         [self.view addSubview:topCorners];
         
         UIImageView *bottomCorners = [[UIImageView alloc] initWithImage:[[UIImage imageNamed:@"PSKit.bundle/MaskCornersBottom"] stretchableImageWithLeftCapWidth:160 topCapHeight:0]];
+        bottomCorners.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
         bottomCorners.top = self.view.height - bottomCorners.height;
         [self.view addSubview:bottomCorners];
     }

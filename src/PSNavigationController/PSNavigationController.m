@@ -17,17 +17,6 @@
 
 @implementation PSNavigationController
 
-@synthesize
-isTransitioning = _isTransitioning;
-
-@synthesize
-overlayView = _overlayView,
-delegate = _delegate,
-disappearingViewController = _disappearingViewController,
-topViewController = _topViewController,
-rootViewController = _rootViewController,
-viewControllers = _viewControllers;
-
 #pragma mark - Init
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];

@@ -14,10 +14,6 @@
 
 @implementation PSNewspaperViewController
 
-@synthesize
-items = _items,
-newspaperView = _newspaperView;
-
 #pragma mark - Init
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {

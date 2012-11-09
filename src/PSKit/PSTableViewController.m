@@ -16,25 +16,6 @@
 
 @implementation PSTableViewController
 
-@synthesize
-items = _items,
-searchItems = _searchItems,
-sectionTitles = _sectionTitles,
-selectedIndexes = _selectedIndexes,
-contentOffset = _contentOffset,
-
-tableView = _tableView,
-pullRefreshView = _pullRefreshView,
-searchBar = _searchBar,
-loadMoreView = _loadMoreView;
-
-@synthesize
-shouldPullRefresh = _shouldPullRefresh,
-pullRefreshStyle = _pullRefreshStyle,
-tableViewStyle = _tableViewStyle,
-tableViewCellSeparatorStyle = _tableViewCellSeparatorStyle,
-separatorColor = _separatorColor;
-
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
@@ -222,19 +203,7 @@ separatorColor = _separatorColor;
 }
 
 - (void)dataSourceShouldLoadObjects:(id)objects animated:(BOOL)animated {
-    self.items = objects;
-    
-    BOOL hasData = NO;
-    for (NSArray *rows in self.items) {
-        if ([rows count] > 0) {
-            hasData = YES;
-            break;
-        }
-    }
-    
-#warning animated is broken
-    if (animated) animated = NO;
-    if (hasData && animated) {
+    if (animated) {
         // Delete all existing data
         NSIndexSet *newSectionIndexSet = nil;
         NSIndexSet *deleteSectionIndexSet = nil;
@@ -296,6 +265,7 @@ separatorColor = _separatorColor;
         // END TABLEVIEW ANIMATION BLOCK
         //
     } else {
+        self.items = objects;
         [self.tableView reloadData];
     }
 }

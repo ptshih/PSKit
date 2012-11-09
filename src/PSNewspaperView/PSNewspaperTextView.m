@@ -10,12 +10,6 @@
 
 @implementation PSNewspaperTextView
 
-@synthesize
-text = _text,
-font = _font,
-fontColor = _fontColor,
-flowAroundRect = _flowAroundRect;
-
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {

@@ -10,9 +10,9 @@
 #import <QuartzCore/QuartzCore.h>
 #import "PSStateMachine.h"
 
-//@class PSNavigationController;
-//@class PSSpringboardController;
-//@class PSCurtainController;
+@class PSNavigationController;
+@class PSSpringboardController;
+@class PSCurtainController;
 @class PSNullView;
 
 @interface PSViewController : UIViewController <PSStateMachine>

@@ -22,11 +22,6 @@
 
 @implementation PSFacepileView
 
-@synthesize
-faces = _faces,
-faceViews = _faceViews,
-nameLabel = _nameLabel;
-
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {

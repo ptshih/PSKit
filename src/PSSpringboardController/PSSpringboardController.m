@@ -14,14 +14,6 @@
 
 @implementation PSSpringboardController
 
-@synthesize
-delegate = _delegate;
-
-@synthesize
-viewControllers = _viewControllers,
-selectedViewController = _selectedViewController,
-selectedIndex = _selectedIndex;
-
 #pragma mark - Init
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {

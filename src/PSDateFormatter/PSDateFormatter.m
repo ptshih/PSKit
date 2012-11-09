@@ -17,15 +17,6 @@
 
 @implementation PSDateFormatter
 
-@synthesize
-autoupdatingCurrentCalendar = _autoupdatingCurrentCalendar,
-timeFormatter = _timeFormatter,
-weekdayFormatter = _weekdayFormatter,
-monthDayFormatter = _monthDayFormatter,
-monthDayShortFormatter = _monthDayShortFormatter,
-monthDayYearFormatter = _monthDayYearFormatter,
-monthDayYearShortFormatter = _monthDayYearShortFormatter;
-
 + (id)sharedDateFormatter {
     static id sharedDateFormatter;
     if (!sharedDateFormatter) {

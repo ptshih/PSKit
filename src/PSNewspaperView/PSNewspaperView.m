@@ -29,21 +29,6 @@
 
 @implementation PSNewspaperView
 
-@synthesize
-newspaperViewDelegate = _newspaperViewDelegate,
-newspaperViewDataSource = _newspaperViewDataSource;
-
-@synthesize
-cellsPerPage = _cellsPerPage;
-
-@synthesize
-scrollView = _scrollView,
-pageControl = _pageControl;
-
-@synthesize
-cells = cells,
-dividers = _dividers;
-
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
