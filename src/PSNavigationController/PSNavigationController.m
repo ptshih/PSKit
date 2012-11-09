@@ -172,6 +172,8 @@ const CGFloat kAnimationDuration = 0.35;
 }
 
 - (UIViewController *)popViewControllerWithDirection:(PSNavigationControllerDirection)direction animated:(BOOL)animated {
+    // Don't pop if at root
+    if ([self.viewControllers count] == 1) return nil;
     
     if (!self.isTransitioning) {
         self.isTransitioning = YES;
@@ -179,12 +181,7 @@ const CGFloat kAnimationDuration = 0.35;
         return nil;
     }
     
-    UIViewController *poppedViewController = nil;
-    
-    // Don't pop if at root
-    if ([self.viewControllers count] == 1) return nil;
-    
-    poppedViewController = self.topViewController;
+    UIViewController *poppedViewController = self.topViewController;
     [self.viewControllers removeObject:poppedViewController];
     
     [poppedViewController willMoveToParentViewController:nil];

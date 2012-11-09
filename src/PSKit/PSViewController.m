@@ -110,6 +110,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    UISwipeGestureRecognizer *popGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipePopController:)];
+    popGesture.direction = UISwipeGestureRecognizerDirectionRight;
+    [self.view addGestureRecognizer:popGesture];
+    
     self.view.autoresizingMask = ~UIViewAutoresizingNone;
     
     // Background
@@ -274,6 +278,12 @@
     }
 }
 
+#pragma mark - Gestures
+
+- (void)swipePopController:(UISwipeGestureRecognizer *)gr {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
 #pragma mark - DataSource
 
 - (void)loadDataSource {
@@ -395,6 +405,7 @@
 
 #pragma mark - Scroll State
 - (void)updateScrollsToTop:(BOOL)isEnabled {
+
     if (self.activeScrollView) {
         self.activeScrollView.scrollsToTop = isEnabled;
     }
