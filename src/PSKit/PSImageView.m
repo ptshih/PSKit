@@ -10,12 +10,6 @@
 
 @implementation PSImageView
 
-@synthesize
-placeholderImage = _placeholderImage,
-bgColor = _bgColor,
-shouldResize = _shouldResize,
-shouldAnimate = _shouldAnimate;
-
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -27,8 +21,8 @@ shouldAnimate = _shouldAnimate;
         self.clipsToBounds = YES;
         self.contentMode = UIViewContentModeScaleAspectFill;
         self.contentScaleFactor = [UIScreen mainScreen].scale;
-        
-        self.backgroundColor = RGBACOLOR(230, 230, 230, 1.0);
+        self.loadingColor = RGBACOLOR(220, 220, 220, 1.0);
+        self.backgroundColor = self.loadingColor;
         self.bgColor = [UIColor clearColor];
     }
     return self;
@@ -41,6 +35,12 @@ shouldAnimate = _shouldAnimate;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+}
+
+- (void)setLoadingColor:(UIColor *)loadingColor {
+    ASSERT_MAIN_THREAD;
+    _loadingColor = loadingColor;
+    self.backgroundColor = loadingColor;
 }
 
 - (void)setImage:(UIImage *)image {
@@ -58,7 +58,7 @@ shouldAnimate = _shouldAnimate;
             [super setImage:image];
         }
     } else {
-        self.backgroundColor = RGBACOLOR(230, 230, 230, 1.0);
+        self.backgroundColor = self.loadingColor;
         [super setImage:self.placeholderImage];
     }
 }

@@ -13,6 +13,7 @@
 
 @property (nonatomic, strong) UIImage *placeholderImage;
 @property (nonatomic, strong) UIColor *bgColor;
+@property (nonatomic, strong) UIColor *loadingColor;
 @property (nonatomic, assign) BOOL shouldResize;
 @property (nonatomic, assign) BOOL shouldAnimate;
 
