@@ -105,14 +105,14 @@
     
     UIButton *backButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navButton" target:self action:@selector(back)];
     backButton.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
-    [backButton setBackgroundImage:[UIImage stretchableImageNamed:@"ToolbarLeft" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
-    [backButton setImage:[UIImage imageNamed:@"IconBackWhite"] forState:UIControlStateNormal];
+    [backButton setBackgroundImage:[UIImage stretchableImageNamed:@"ToolbarDarkLeft" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    [backButton setImage:[UIImage imageNamed:@"IconLeftWhite"] forState:UIControlStateNormal];
     self.backButton = backButton;
     
     UIButton *forwardButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navButton" target:self action:@selector(forward)];
     forwardButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
-    [forwardButton setBackgroundImage:[UIImage stretchableImageNamed:@"ToolbarRight" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
-    [forwardButton setImage:[UIImage imageNamed:@"IconNextWhite"] forState:UIControlStateNormal];
+    [forwardButton setBackgroundImage:[UIImage stretchableImageNamed:@"ToolbarDarkRight" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
+    [forwardButton setImage:[UIImage imageNamed:@"IconRightWhite"] forState:UIControlStateNormal];
     
     backButton.frame = CGRectMake(0, 0, self.footerView.width / 2.0, self.footerView.height);
     forwardButton.frame = CGRectMake(self.footerView.width / 2.0, 0, self.footerView.width / 2.0, self.footerView.height);
