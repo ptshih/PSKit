@@ -104,6 +104,13 @@ NSAssert(![NSThread isMainThread], @"Must be called from a background thread")
 #define IS_DEVICE_RETINA ([[UIScreen mainScreen] respondsToSelector:@selector(scale)] && [[UIScreen mainScreen] scale] == 2)
 #define IS_DEVICE_MULTITASKING ([[UIDevice currentDevice] multitaskingSupported])
 
+// Convenience
+#define kTimeInterval6Months 15552000
+#define kTimeInterval3Months 7776000
+#define kTimeInterval1Month 2592000
+#define kTimeInterval1Day 86400
+#define kTimeInterval5Seconds 5
+
 /**
  Alert Tags
  */
