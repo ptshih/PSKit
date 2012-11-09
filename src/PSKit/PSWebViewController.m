@@ -93,6 +93,7 @@
     [self.rightButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonRightBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
     self.spinnerView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    self.spinnerView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     self.spinnerView.frame = self.rightButton.frame;
     self.spinnerView.hidesWhenStopped = YES;
     [self.headerView addSubview:self.spinnerView];

@@ -134,12 +134,15 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
     NSData *data = [NSData dataWithContentsOfFile:cachePath];
     
     if (data && usingCache && !self.noCache) {
+        [self.pendingURLs removeObject:PSURLCacheKeyWithURL(cachedURL)];
+        
         NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[cachedURL copy], @"cachedURL", [NSNumber numberWithInteger:cacheType], @"cacheType", nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:kPSURLCacheDidCache object:self userInfo:userInfo];
         
-        completionBlock(data, cachedURL, YES, nil);
-        
-        [self.pendingURLs removeObject:PSURLCacheKeyWithURL(cachedURL)];
+        // This is a hack to force data to be loaded one UI cycle later so that the view is properly oriented before data is loaded
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            completionBlock(data, cachedURL, YES, nil);
+        }];
     } else {
         BLOCK_SELF;
         

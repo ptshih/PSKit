@@ -143,9 +143,6 @@
         self.pullLoadMoreView.top = self.collectionView.contentSize.height;
         self.pullLoadMoreView.hidden = NO;
     }
-
-//    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-//    }];
     
     [self endRefresh];
 }
