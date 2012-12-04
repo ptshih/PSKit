@@ -203,76 +203,78 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
         int i = 0;
         int row = 0;
         NSArray *lastRow = nil;
-        for (NSArray *tileRow in template) {
-            int col = 0;
-            NSString *lastType = nil;
-//            PSTileViewCell *lastCell = nil;
-            NSMutableDictionary *lastCell = nil;
-            
-            NSMutableArray *tilesInRow = [NSMutableArray array];
-            
-            for (NSString *tileType in tileRow) {
-                if ([lastType isEqualToString:tileType]) {
-                    // Repeat from same row
-                    CGFloat height = [[lastCell objectForKey:@"height"] floatValue];
-                    
-                    if (height == dim - border || height == dim) {
-                        CGFloat width = [[lastCell objectForKey:@"width"] floatValue];
-                        width += dim;
-                        [lastCell setObject:[NSNumber numberWithFloat:width] forKey:@"width"];
-                    }
-                    [tilesInRow addObject:lastCell];
-                } else if ([[lastRow objectAtIndex:col] isEqualToString:tileType]) {
-                    // Repeat from last row
-                    NSMutableDictionary *lastRowCell = [[tiles objectAtIndex:row-1] objectAtIndex:col];
-                    
-                    CGFloat height = [[lastRowCell objectForKey:@"height"] floatValue] + dim;
-                    [lastRowCell setObject:[NSNumber numberWithFloat:height] forKey:@"height"];
-
-                    lastCell = lastRowCell;
-                    [tilesInRow addObject:lastRowCell];
-                } else {
-                    // Generate a new cell
-                    CGRect cellFrame;
-                    
-                    if (i == numTiles) {
-                        // Finished tiling
-                        break;
-                    } else if (i == numTiles - 1) {
-                        // Last tile
-                        // Fill the entire row
-                        cellFrame = CGRectMake(col * dim, row * dim, self.width - (col * dim), dim);
+        while (i < numTiles) {
+            for (NSArray *tileRow in template) {
+                int col = 0;
+                NSString *lastType = nil;
+                //            PSTileViewCell *lastCell = nil;
+                NSMutableDictionary *lastCell = nil;
+                
+                NSMutableArray *tilesInRow = [NSMutableArray array];
+                
+                for (NSString *tileType in tileRow) {
+                    if ([lastType isEqualToString:tileType]) {
+                        // Repeat from same row
+                        CGFloat height = [[lastCell objectForKey:@"height"] floatValue];
+                        
+                        if (height == dim - border || height == dim) {
+                            CGFloat width = [[lastCell objectForKey:@"width"] floatValue];
+                            width += dim;
+                            [lastCell setObject:[NSNumber numberWithFloat:width] forKey:@"width"];
+                        }
+                        [tilesInRow addObject:lastCell];
+                    } else if ([[lastRow objectAtIndex:col] isEqualToString:tileType]) {
+                        // Repeat from last row
+                        NSMutableDictionary *lastRowCell = [[tiles objectAtIndex:row-1] objectAtIndex:col];
+                        
+                        CGFloat height = [[lastRowCell objectForKey:@"height"] floatValue] + dim;
+                        [lastRowCell setObject:[NSNumber numberWithFloat:height] forKey:@"height"];
+                        
+                        lastCell = lastRowCell;
+                        [tilesInRow addObject:lastRowCell];
                     } else {
-                        cellFrame = CGRectMake(col * dim, row * dim, dim, dim);
+                        // Generate a new cell
+                        CGRect cellFrame;
+                        
+                        if (i == numTiles) {
+                            // Finished tiling
+                            break;
+                        } else if (i == numTiles - 1) {
+                            // Last tile
+                            // Fill the entire row
+                            cellFrame = CGRectMake(col * dim, row * dim, self.width - (col * dim), dim);
+                        } else {
+                            cellFrame = CGRectMake(col * dim, row * dim, dim, dim);
+                        }
+                        
+                        if (col > 0) {
+                            cellFrame = UIEdgeInsetsInsetRect(cellFrame, UIEdgeInsetsMake(0, border, 0, 0));
+                        }
+                        if (row > 0) {
+                            cellFrame = UIEdgeInsetsInsetRect(cellFrame, UIEdgeInsetsMake(border, 0, 0, 0));
+                        }
+                        
+                        NSMutableDictionary *cell = PSTileViewCellForRect(cellFrame);
+                        
+                        [cells addObject:cell];
+                        
+                        lastCell = cell;
+                        [tilesInRow addObject:cell];
+                        i++;
                     }
                     
-                    if (col > 0) {
-                        cellFrame = UIEdgeInsetsInsetRect(cellFrame, UIEdgeInsetsMake(0, border, 0, 0));
-                    }
-                    if (row > 0) {
-                        cellFrame = UIEdgeInsetsInsetRect(cellFrame, UIEdgeInsetsMake(border, 0, 0, 0));
-                    }
-
-                    NSMutableDictionary *cell = PSTileViewCellForRect(cellFrame);
-                    
-                    [cells addObject:cell];
-                    
-                    lastCell = cell;
-                    [tilesInRow addObject:cell];
-                    i++;
+                    lastType = tileType;
+                    col++;
                 }
                 
-                lastType = tileType;
-                col++;
+                [tiles addObject:tilesInRow];
+                lastRow = tileRow;
+                row++;
+                
+                height += dim;
+                
+                if (i == numTiles) break;
             }
-            
-            [tiles addObject:tilesInRow];
-            lastRow = tileRow;
-            row++;
-            
-            height += dim;
-            
-            if (i == numTiles) break;
         }
         
         // DEBUG

@@ -10,8 +10,6 @@
 
 @interface PSCollectionViewController ()
 
-- (void)setupPullRefresh;
-
 @end
 
 @implementation PSCollectionViewController
