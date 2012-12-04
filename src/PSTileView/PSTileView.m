@@ -8,6 +8,14 @@
 
 #import "PSTileView.h"
 
+static inline NSMutableDictionary * PSTileViewCellForRect(CGRect rect) {
+    return [NSMutableDictionary dictionaryWithDictionary:@{@"x" : [NSNumber numberWithFloat:rect.origin.x], @"y" : [NSNumber numberWithFloat:rect.origin.y], @"width" : [NSNumber numberWithFloat:rect.size.width], @"height" : [NSNumber numberWithFloat:rect.size.height]}];
+}
+
+static inline CGRect PSTileViewRectForCell(NSMutableDictionary *dict) {
+    return CGRectMake([[dict objectForKey:@"x"] floatValue], [[dict objectForKey:@"y"] floatValue], [[dict objectForKey:@"width"] floatValue], [[dict objectForKey:@"height"] floatValue]);
+}
+
 static inline NSString * PSTileViewKeyForIndex(NSInteger index) {
     return [NSString stringWithFormat:@"%d", index];
 }
@@ -185,35 +193,49 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
         for (NSArray *tileRow in template) {
             int col = 0;
             NSString *lastType = nil;
-            PSTileViewCell *lastCell = nil;
+//            PSTileViewCell *lastCell = nil;
+            NSMutableDictionary *lastCell = nil;
             
             NSMutableArray *tilesInRow = [NSMutableArray array];
             
             for (NSString *tileType in tileRow) {
                 if ([lastType isEqualToString:tileType]) {
-                    // Repeat
-                    NSLog(@"repeat: %@, lastCell = %@", tileType, lastCell);
-                    if (lastCell.height == dim) {
-                        lastCell.width += dim;
+                    // Repeat from same row
+                    CGFloat height = [[lastCell objectForKey:@"height"] floatValue];
+                    
+                    if (height == dim) {
+                        CGFloat width = [[lastCell objectForKey:@"width"] floatValue];
+                        width += dim;
+                        [lastCell setObject:[NSNumber numberWithFloat:width] forKey:@"width"];
                     }
                     [tilesInRow addObject:lastCell];
                 } else if ([[lastRow objectAtIndex:col] isEqualToString:tileType]) {
                     // Repeat from last row
-                    PSTileViewCell *lastRowCell = [[tiles objectAtIndex:row-1] objectAtIndex:col];
-                    NSLog(@"repeat from last row: %@", tileType);
-                    if (![lastRowCell isEqual:[NSNull null]]) {
-                        lastRowCell.height += dim;
-                    }
+                    NSMutableDictionary *lastRowCell = [[tiles objectAtIndex:row-1] objectAtIndex:col];
+                    
+                    CGFloat height = [[lastRowCell objectForKey:@"height"] floatValue] + dim;
+                    [lastRowCell setObject:[NSNumber numberWithFloat:height] forKey:@"height"];
+
                     lastCell = lastRowCell;
                     [tilesInRow addObject:lastRowCell];
                 } else {
-                    PSTileViewCell *cell = [self.tileViewDataSource tileView:self cellForItemAtIndex:i];
+                    // Generate a new cell
+                    CGRect cellFrame;
+                    
+                    if (i == numTiles) {
+                        // Finished tiling
+                        break;
+                    } else if (i == numTiles - 1) {
+                        // Last tile
+                        // Fill the entire row
+                        cellFrame = CGRectMake(col * dim, row * dim, self.width - (col * dim), dim);
+                    } else {
+                        cellFrame = CGRectMake(col * dim, row * dim, dim, dim);
+                    }
+
+                    NSMutableDictionary *cell = PSTileViewCellForRect(cellFrame);
+                    
                     [cells addObject:cell];
-                    cell.frame = CGRectMake(col * dim, row * dim, dim, dim);
-                    
-                    //                cell.backgroundColor = RGBCOLOR(arc4random() % 255, arc4random() % 255, arc4random() % 255);
-                    
-                    [self addSubview:cell];
                     
                     lastCell = cell;
                     [tilesInRow addObject:cell];
@@ -229,24 +251,28 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
             row++;
             
             height += dim;
+            
+            if (i == numTiles) break;
         }
         
         // DEBUG
-        NSLog(@"%@", tiles);
-        NSLog(@"%@", cells);
+//        NSLog(@"%@", tiles);
+//        NSLog(@"%@", cells);
         
         int index = 0;
-        for (PSTileViewCell *cell in cells) {
-            NSLog(@"name: %@", [cell.object objectForKey:@"name"]);
+        for (NSMutableDictionary *cellDict in cells) {
+//           cell.backgroundColor = RGBCOLOR(arc4random() % 255, arc4random() % 255, arc4random() % 255);
+            
+            CGRect cellFrame = PSTileViewRectForCell(cellDict);
             
             NSString *key = PSTileViewKeyForIndex(index);
             // Add to index rect map
-            [self.indexToRectMap setObject:NSStringFromCGRect(cell.frame) forKey:key];
+            [self.indexToRectMap setObject:NSStringFromCGRect(cellFrame) forKey:key];
             
             index++;
         }
         
-        NSLog(@"%@", self.indexToRectMap);
+//        NSLog(@"%@", self.indexToRectMap);
         
     } else {
         height = self.height;
@@ -258,10 +284,68 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
 }
 
 - (void)removeAndAddCellsIfNecessary {
+    static NSInteger bufferViewFactor = 5;
+    static NSInteger topIndex = 0;
+    static NSInteger bottomIndex = 0;
+    
+    NSInteger numTiles = [self.tileViewDataSource numberOfTilesInTileView:self];
+    
+    if (numTiles == 0) return;
+    
+    
     // Find out what rows are visible
     CGRect visibleRect = CGRectMake(self.contentOffset.x, self.contentOffset.y, self.width, self.height);
     
-    NSLog(@"%@", NSStringFromCGRect(visibleRect));
+//    NSLog(@"%@", NSStringFromCGRect(visibleRect));
+    
+    // Remove all rows that are not inside the visible rect
+    [self.visibleCells enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        PSTileViewCell *cell = (PSTileViewCell *)obj;
+        CGRect cellRect = cell.frame;
+        if (!CGRectIntersectsRect(visibleRect, cellRect)) {
+            [self enqueueReusableCell:cell];
+            [self.cellKeysToRemove addObject:key];
+        }
+    }];
+    
+    [self.visibleCells removeObjectsForKeys:self.cellKeysToRemove];
+    [self.cellKeysToRemove removeAllObjects];
+    
+    if ([self.visibleCells count] == 0) {
+        topIndex = 0;
+        bottomIndex = numTiles;
+    } else {
+        NSArray *sortedKeys = [[self.visibleCells allKeys] sortedArrayUsingComparator:^(id obj1, id obj2) {
+            if ([obj1 integerValue] < [obj2 integerValue]) {
+                return (NSComparisonResult)NSOrderedAscending;
+            } else if ([obj1 integerValue] > [obj2 integerValue]) {
+                return (NSComparisonResult)NSOrderedDescending;
+            } else {
+                return (NSComparisonResult)NSOrderedSame;
+            }
+        }];
+        topIndex = [[sortedKeys objectAtIndex:0] integerValue];
+        bottomIndex = [[sortedKeys lastObject] integerValue];
+        
+        topIndex = MAX(0, topIndex - (bufferViewFactor * 4));
+        bottomIndex = MIN(numTiles, bottomIndex + (bufferViewFactor * 4));
+    }
+    
+    // Add views
+    for (NSInteger i = topIndex; i < bottomIndex; i++) {
+        NSString *key = PSTileViewKeyForIndex(i);
+        CGRect rect = CGRectFromString([self.indexToRectMap objectForKey:key]);
+        
+        // If view is within visible rect and is not already shown
+        if (![self.visibleCells objectForKey:key] && CGRectIntersectsRect(visibleRect, rect)) {
+            // Only add views if not visible
+            PSTileViewCell *newCell = [self.tileViewDataSource tileView:self cellForItemAtIndex:i];
+            newCell.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
+            [self addSubview:newCell];
+            
+            [self.visibleCells setObject:newCell forKey:key];
+        }
+    }
 }
 
 #pragma mark - Reusing Views
