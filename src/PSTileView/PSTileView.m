@@ -89,9 +89,21 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
 
 @end
 
-@interface PSTileView ()
+
+#pragma mark - Gesture Recognizer
+
+// This is just so we know that we sent this tap gesture recognizer in the delegate
+@interface PSTileViewTapGestureRecognizer : UITapGestureRecognizer
+@end
+
+@implementation PSTileViewTapGestureRecognizer
+@end
+
+
+@interface PSTileView () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, assign, readwrite) CGFloat lastWidth;
+@property (nonatomic, assign, readwrite) NSInteger numCols;
 @property (nonatomic, assign) UIInterfaceOrientation orientation;
 
 @property (nonatomic, strong) NSMutableDictionary *reuseableCells;
@@ -165,12 +177,6 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
 }
 
 - (void)relayoutTiles {
-    NSInteger numTiles = [self.tileViewDataSource numberOfTilesInTileView:self];
-    
-    CGFloat dim = self.width / 4.0;
-    CGFloat height = 0.0;
-    
-    // Reset all state
     // Reset all state
     [self.visibleCells enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         PSTileViewCell *cell = (PSTileViewCell *)obj;
@@ -180,9 +186,16 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     [self.cellKeysToRemove removeAllObjects];
     [self.indexToRectMap removeAllObjects];
     
+    NSInteger numTiles = [self.tileViewDataSource numberOfTilesInTileView:self];
+    NSArray *template = [self.tileViewDataSource templateForTileView:self];
+    self.numCols = [[template objectAtIndex:0] count];
+    
+    CGFloat dim = self.width / self.numCols;
+    CGFloat height = 0.0;
+    CGFloat border = 4.0;
+    
     // If no tiles, don't relayout
     if (numTiles > 0) {
-        NSArray *template = [self.tileViewDataSource templateForTileView:self];
         
         NSMutableArray *cells = [NSMutableArray array];
         NSMutableArray *tiles = [NSMutableArray array];
@@ -203,7 +216,7 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
                     // Repeat from same row
                     CGFloat height = [[lastCell objectForKey:@"height"] floatValue];
                     
-                    if (height == dim) {
+                    if (height == dim - border || height == dim) {
                         CGFloat width = [[lastCell objectForKey:@"width"] floatValue];
                         width += dim;
                         [lastCell setObject:[NSNumber numberWithFloat:width] forKey:@"width"];
@@ -231,6 +244,13 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
                         cellFrame = CGRectMake(col * dim, row * dim, self.width - (col * dim), dim);
                     } else {
                         cellFrame = CGRectMake(col * dim, row * dim, dim, dim);
+                    }
+                    
+                    if (col > 0) {
+                        cellFrame = UIEdgeInsetsInsetRect(cellFrame, UIEdgeInsetsMake(0, border, 0, 0));
+                    }
+                    if (row > 0) {
+                        cellFrame = UIEdgeInsetsInsetRect(cellFrame, UIEdgeInsetsMake(border, 0, 0, 0));
                     }
 
                     NSMutableDictionary *cell = PSTileViewCellForRect(cellFrame);
@@ -327,8 +347,8 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
         topIndex = [[sortedKeys objectAtIndex:0] integerValue];
         bottomIndex = [[sortedKeys lastObject] integerValue];
         
-        topIndex = MAX(0, topIndex - (bufferViewFactor * 4));
-        bottomIndex = MIN(numTiles, bottomIndex + (bufferViewFactor * 4));
+        topIndex = MAX(0, topIndex - (bufferViewFactor * self.numCols));
+        bottomIndex = MIN(numTiles, bottomIndex + (bufferViewFactor * self.numCols));
     }
     
     // Add views
@@ -342,6 +362,14 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
             PSTileViewCell *newCell = [self.tileViewDataSource tileView:self cellForItemAtIndex:i];
             newCell.frame = CGRectFromString([self.indexToRectMap objectForKey:key]);
             [self addSubview:newCell];
+            
+            // Setup gesture recognizer
+            if ([newCell.gestureRecognizers count] == 0) {
+                PSTileViewTapGestureRecognizer *gr = [[PSTileViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectCell:)];
+                gr.delegate = self;
+                [newCell addGestureRecognizer:gr];
+                newCell.userInteractionEnabled = YES;
+            }
             
             [self.visibleCells setObject:newCell forKey:key];
         }
@@ -380,6 +408,34 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     [[self.reuseableCells objectForKey:identifier] addObject:cell];
     
     [cell removeFromSuperview];
+}
+
+#pragma mark - Gesture Recognizer
+
+- (void)didSelectCell:(UITapGestureRecognizer *)gestureRecognizer {
+    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
+    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
+    NSString *key = [matchingKeys lastObject];
+    if ([gestureRecognizer.view isMemberOfClass:[[self.visibleCells objectForKey:key] class]]) {
+        if (self.tileViewDelegate && [self.tileViewDelegate respondsToSelector:@selector(tileView:didSelectCell:atIndex:)]) {
+            NSInteger matchingIndex = PSTileViewIndexForKey([matchingKeys lastObject]);
+            [self.tileViewDelegate tileView:self didSelectCell:(PSTileViewCell *)gestureRecognizer.view atIndex:matchingIndex];
+        }
+    }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if (![gestureRecognizer isMemberOfClass:[PSTileViewTapGestureRecognizer class]]) return YES;
+    
+    NSString *rectString = NSStringFromCGRect(gestureRecognizer.view.frame);
+    NSArray *matchingKeys = [self.indexToRectMap allKeysForObject:rectString];
+    NSString *key = [matchingKeys lastObject];
+    
+    if ([touch.view isMemberOfClass:[[self.visibleCells objectForKey:key] class]]) {
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 @end
