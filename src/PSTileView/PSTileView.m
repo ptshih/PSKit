@@ -306,7 +306,7 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
 }
 
 - (void)removeAndAddCellsIfNecessary {
-    static NSInteger bufferViewFactor = 5;
+    static NSInteger bufferViewFactor = 3;
     static NSInteger topIndex = 0;
     static NSInteger bottomIndex = 0;
     
