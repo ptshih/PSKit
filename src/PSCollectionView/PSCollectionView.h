@@ -24,6 +24,8 @@
 #import <UIKit/UIKit.h>
 #import "PSCollectionViewCell.h"
 
+#define kPSCollectionViewDidRelayoutNotification @"kPSCollectionViewDidRelayoutNotification"
+
 @class PSCollectionViewCell;
 
 @protocol PSCollectionViewDelegate, PSCollectionViewDataSource;

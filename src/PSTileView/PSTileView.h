@@ -10,6 +10,8 @@
 
 #import "PSTileViewCell.h"
 
+#define kPSTileViewDidRelayoutNotification @"kPSTileViewDidRelayoutNotification"
+
 @protocol PSTileViewDelegate, PSTileViewDataSource;
 
 @interface PSTileView : UIScrollView

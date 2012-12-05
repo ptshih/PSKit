@@ -280,6 +280,8 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     self.contentSize = CGSizeMake(self.width, totalHeight);
     
     [self removeAndAddCellsIfNecessary];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPSCollectionViewDidRelayoutNotification object:self];
 }
 
 - (void)removeAndAddCellsIfNecessary {

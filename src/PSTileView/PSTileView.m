@@ -303,6 +303,8 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     self.contentSize = CGSizeMake(self.width, height);
     
     [self removeAndAddCellsIfNecessary];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPSTileViewDidRelayoutNotification object:self];
 }
 
 - (void)removeAndAddCellsIfNecessary {

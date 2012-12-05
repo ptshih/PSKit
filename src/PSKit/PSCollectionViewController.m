@@ -26,6 +26,8 @@
         self.shouldPullRefresh = NO;
         self.shouldPullLoadMore = NO;
         self.pullRefreshStyle = PSPullRefreshStyleBlack;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(collectionViewDidRelayout:) name:kPSCollectionViewDidRelayoutNotification object:nil];
     }
     return self;
 }
@@ -46,6 +48,8 @@
     self.collectionView.collectionViewDataSource = nil;
     
     self.pullRefreshView.delegate = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - View
@@ -106,6 +110,12 @@
         UIImageView *ds = [[UIImageView alloc] initWithFrame:CGRectMake(0, -8.0, self.pullLoadMoreView.width, 8.0) image:[[UIImage imageNamed:@"DropShadowInverted"] stretchableImageWithLeftCapWidth:1 topCapHeight:0]];
         ds.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [self.pullLoadMoreView addSubview:ds];
+    }
+}
+
+- (void)collectionViewDidRelayout:(NSNotification *)notification {
+    if (self.pullLoadMoreView) {
+        self.pullLoadMoreView.top = self.collectionView.contentSize.height;
     }
 }
 

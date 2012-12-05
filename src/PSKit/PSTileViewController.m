@@ -26,6 +26,8 @@
         self.shouldPullRefresh = NO;
         self.shouldPullLoadMore = NO;
         self.pullRefreshStyle = PSPullRefreshStyleBlack;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tileViewDidRelayout:) name:kPSTileViewDidRelayoutNotification object:nil];
     }
     return self;
 }
@@ -42,6 +44,8 @@
     self.tileView.delegate = nil;
     self.tileView.tileViewDelegate = nil;
     self.tileView.tileViewDataSource = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - View
@@ -94,6 +98,12 @@
         UIImageView *ds = [[UIImageView alloc] initWithFrame:CGRectMake(0, -8.0, self.pullLoadMoreView.width, 8.0) image:[[UIImage imageNamed:@"DropShadowInverted"] stretchableImageWithLeftCapWidth:1 topCapHeight:0]];
         ds.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [self.pullLoadMoreView addSubview:ds];
+    }
+}
+
+- (void)tileViewDidRelayout:(NSNotification *)notification {
+    if (self.pullLoadMoreView) {
+        self.pullLoadMoreView.top = self.tileView.contentSize.height;
     }
 }
 
