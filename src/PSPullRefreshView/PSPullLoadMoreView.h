@@ -1,6 +1,6 @@
 //
 //  PSPullLoadMoreView.h
-//  Lunchbox
+//  PSKit
 //
 //  Created by Peter Shih on 10/29/12.
 //

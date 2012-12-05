@@ -1,6 +1,6 @@
 //
 //  MKMapView+PSKit.h
-//  Lunchbox
+//  PSKit
 //
 //  Created by Peter Shih on 11/7/12.
 //

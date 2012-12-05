@@ -1,6 +1,6 @@
 //
 //  PSFacepileView.h
-//  Lunchbox
+//  PSKit
 //
 //  Created by Peter Shih on 5/15/12.
 //  Copyright (c) 2012 Peter Shih. All rights reserved.

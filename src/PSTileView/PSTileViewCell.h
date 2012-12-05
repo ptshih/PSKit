@@ -1,6 +1,6 @@
 //
 //  PSTileViewCell.h
-//  Lunchbox
+//  PSKit
 //
 //  Created by Peter Shih on 12/3/12.
 //

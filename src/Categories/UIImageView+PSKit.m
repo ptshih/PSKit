@@ -1,6 +1,6 @@
 //
 //  UIImageView+PSKit.m
-//  Lunchbox
+//  Mosaic
 //
 //  Created by Peter Shih on 5/19/12.
 //  Copyright (c) 2012 Peter Shih. All rights reserved.
