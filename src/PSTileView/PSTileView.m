@@ -102,6 +102,8 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
 
 @interface PSTileView () <UIGestureRecognizerDelegate>
 
+@property (nonatomic, assign, readwrite) CGFloat lastOffset;
+@property (nonatomic, assign, readwrite) CGFloat offsetThreshold;
 @property (nonatomic, assign, readwrite) CGFloat lastWidth;
 @property (nonatomic, assign, readwrite) NSInteger numCols;
 @property (nonatomic, assign) UIInterfaceOrientation orientation;
@@ -118,7 +120,7 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
 /**
  Magic!
  */
-- (void)removeAndAddCellsIfNecessary;
+- (void)removeAndAddCellsIfNecessary:(BOOL)force;
 
 @end
 
@@ -131,6 +133,9 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     self = [super initWithFrame:frame];
     if (self) {
         self.alwaysBounceVertical = YES;
+        
+        self.lastOffset = 0.0;
+        self.offsetThreshold = floorf(self.height / 4.0);
         
         self.reuseableCells = [NSMutableDictionary dictionary];
         self.visibleCells = [NSMutableDictionary dictionary];
@@ -170,7 +175,7 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
         [self relayoutTiles];
     } else {
         // Recycles cells
-        [self removeAndAddCellsIfNecessary];
+        [self removeAndAddCellsIfNecessary:NO];
     }
     
     self.lastWidth = self.width;
@@ -193,6 +198,7 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     CGFloat dim = self.width / self.numCols;
     CGFloat height = 0.0;
     CGFloat border = 4.0;
+//    self.offsetThreshold = dim;
     
     // If no tiles, don't relayout
     if (numTiles > 0) {
@@ -302,13 +308,13 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     
     self.contentSize = CGSizeMake(self.width, height);
     
-    [self removeAndAddCellsIfNecessary];
+    [self removeAndAddCellsIfNecessary:YES];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPSTileViewDidRelayoutNotification object:self];
 }
 
-- (void)removeAndAddCellsIfNecessary {
-    static NSInteger bufferViewFactor = 3;
+- (void)removeAndAddCellsIfNecessary:(BOOL)force {
+    static NSInteger bufferViewFactor = 2;
     static NSInteger topIndex = 0;
     static NSInteger bottomIndex = 0;
     
@@ -316,9 +322,18 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     
     if (numTiles == 0) return;
     
+    CGFloat diff = fabsf(self.lastOffset - self.contentOffset.y);
+    
+    if ((diff < self.offsetThreshold) && !force) return;
+    
+    self.lastOffset = self.contentOffset.y;
+    
+//    NSLog(@"diff: %f, lastOffset: %f", diff, self.lastOffset);
+    
     
     // Find out what rows are visible
     CGRect visibleRect = CGRectMake(self.contentOffset.x, self.contentOffset.y, self.width, self.height);
+    visibleRect = CGRectInset(visibleRect, 0, -1.0 * self.offsetThreshold);
     
 //    NSLog(@"%@", NSStringFromCGRect(visibleRect));
     

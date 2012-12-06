@@ -110,6 +110,8 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 
 @interface PSCollectionView () <UIGestureRecognizerDelegate>
 
+@property (nonatomic, assign, readwrite) CGFloat lastOffset;
+@property (nonatomic, assign, readwrite) CGFloat offsetThreshold;
 @property (nonatomic, assign, readwrite) CGFloat lastWidth;
 @property (nonatomic, assign, readwrite) CGFloat colWidth;
 @property (nonatomic, assign, readwrite) NSInteger numCols;
@@ -135,7 +137,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 /**
  Magic!
  */
-- (void)removeAndAddCellsIfNecessary;
+- (void)removeAndAddCellsIfNecessary:(BOOL)force;
 
 @end
 
@@ -147,6 +149,9 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     self = [super initWithFrame:frame];
     if (self) {
         self.alwaysBounceVertical = YES;
+        
+        self.lastOffset = 0.0;
+        self.offsetThreshold = floorf(self.height / 4.0);
         
         self.colWidth = 0.0;
         self.numCols = 0;
@@ -191,7 +196,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
         [self relayoutViews];
     } else {
         // Recycles cells
-        [self removeAndAddCellsIfNecessary];
+        [self removeAndAddCellsIfNecessary:NO];
     }
     
     self.lastWidth = self.width;
@@ -279,13 +284,13 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     
     self.contentSize = CGSizeMake(self.width, totalHeight);
     
-    [self removeAndAddCellsIfNecessary];
+    [self removeAndAddCellsIfNecessary:YES];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPSCollectionViewDidRelayoutNotification object:self];
 }
 
-- (void)removeAndAddCellsIfNecessary {
-    static NSInteger bufferViewFactor = 5;
+- (void)removeAndAddCellsIfNecessary:(BOOL)force {
+    static NSInteger bufferViewFactor = 2;
     static NSInteger topIndex = 0;
     static NSInteger bottomIndex = 0;
     
@@ -293,8 +298,17 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     
     if (numViews == 0) return;
     
+    CGFloat diff = fabsf(self.lastOffset - self.contentOffset.y);
+    
+    if ((diff < self.offsetThreshold) && !force) return;
+    
+    self.lastOffset = self.contentOffset.y;
+    
+    //    NSLog(@"diff: %f, lastOffset: %f", diff, self.lastOffset);
+    
     // Find out what rows are visible
     CGRect visibleRect = CGRectMake(self.contentOffset.x, self.contentOffset.y, self.width, self.height);
+    visibleRect = CGRectInset(visibleRect, 0, -1.0 * self.offsetThreshold);
     
     // Remove all rows that are not inside the visible rect
     [self.visibleViews enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
