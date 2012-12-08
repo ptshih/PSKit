@@ -8,6 +8,8 @@
 
 #import "PSCachedImageView.h"
 
+static NSOperationQueue *__loadQueue = nil;
+
 @interface PSCachedImageView ()
 
 @property (nonatomic, strong) NSOperationQueue *imageQueue;
@@ -15,6 +17,11 @@
 @end
 
 @implementation PSCachedImageView
+
++ (void)initialize {
+    __loadQueue = [[NSOperationQueue alloc] init];
+    __loadQueue.maxConcurrentOperationCount = 1;
+}
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
@@ -77,14 +84,21 @@
     
     if ([self.URL isEqual:cachedURL]) {
 //        DLog(@"local URL: %@, remote URL: %@", self.URL, cachedURL);
-
-        [self.loadingIndicator stopAnimating];
+        
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             NSData *cachedData = [[PSURLCache sharedCache] dataForCachedURL:cachedURL cacheType:cacheType];
             UIImage *image = [UIImage imageWithData:cachedData];
             dispatch_async(dispatch_get_main_queue(), ^{
-                ASSERT_MAIN_THREAD;
-                self.image = image;
+                [__loadQueue addOperationWithBlock:^{
+                    
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        ASSERT_MAIN_THREAD;
+                        if ([self.URL isEqual:cachedURL]) {
+                            [self.loadingIndicator stopAnimating];
+                            self.image = image;
+                        }
+                    }];
+                }];
             });
         });
     }

@@ -122,6 +122,12 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
 - (void)loadRequest:(NSMutableURLRequest *)request cacheType:(PSURLCacheType)cacheType cachePriority:(PSURLCachePriority)cachePriority usingCache:(BOOL)usingCache completionBlock:(void (^)(NSData *cachedData, NSURL *cachedURL, BOOL isCached, NSError *error))completionBlock {
     ASSERT_MAIN_THREAD;
     
+    if (!request || !request.URL) {
+        NSError *error = [NSError errorWithDomain:@"PSURLCacheErrorDomain" code:500 userInfo:nil];
+        completionBlock(nil, nil, NO, error);
+        return;
+    }
+    
     NSURL *cachedURL = [request.URL copy];
     
     if ([self.pendingURLs containsObject:PSURLCacheKeyWithURL(cachedURL)]) {

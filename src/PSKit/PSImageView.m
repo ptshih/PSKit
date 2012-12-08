@@ -48,7 +48,7 @@
     if (image && ![image isEqual:self.placeholderImage]) {
         self.backgroundColor = self.bgColor;
         // Only animate on Retina screens
-        if (self.shouldAnimate && [UIScreen mainScreen].scale > 1.0) {
+        if (self.shouldAnimate) {
             self.alpha = 0.0;
             [super setImage:image];
             [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
