@@ -42,6 +42,8 @@
 @optional
 - (void)tileView:(PSTileView *)tileView didSelectCell:(PSTileViewCell *)cell atIndex:(NSInteger)index;
 
+- (void)tileView:(PSTileView *)tileView didReloadTemplateWithMap:(NSMutableDictionary *)indexToRectMap;
+
 @end
 
 #pragma mark - DataSource

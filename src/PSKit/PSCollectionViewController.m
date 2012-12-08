@@ -138,8 +138,6 @@
 }
 
 - (void)dataSourceDidLoad {
-    [super dataSourceDidLoad];
-    
     [self.collectionView reloadData];
     self.collectionView.contentOffset = self.contentOffset;
     
@@ -152,11 +150,10 @@
         self.pullLoadMoreView.hidden = NO;
     }
     
-    [self endRefresh];
+    [super dataSourceDidLoad];
 }
 
 - (void)dataSourceDidLoadMore {
-    [super dataSourceDidLoadMore];
     [self.collectionView reloadData];
     
     if (self.collectionView.contentSize.height < self.collectionView.height) {
@@ -168,11 +165,10 @@
         self.pullLoadMoreView.hidden = NO;
     }
     
-    [self endLoadMore];
+    [super dataSourceDidLoadMore];
 }
 
 - (void)dataSourceDidError {
-    [super dataSourceDidError];
     [self.collectionView reloadData];
     self.collectionView.contentOffset = CGPointZero;
 
@@ -185,7 +181,7 @@
         self.pullLoadMoreView.hidden = NO;
     }
     
-    [self endRefresh];
+    [super dataSourceDidError];
 }
 
 - (BOOL)dataSourceIsEmpty {

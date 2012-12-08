@@ -173,12 +173,10 @@
 
 - (void)dataSourceDidLoad {
     [super dataSourceDidLoad];
-    [self endRefresh];
 }
 
 - (void)dataSourceDidError {
     [super dataSourceDidError];
-    [self endRefresh];
 }
 
 - (BOOL)dataSourceIsEmpty {

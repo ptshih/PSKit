@@ -120,7 +120,7 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
 /**
  Magic!
  */
-- (void)removeAndAddCellsIfNecessary:(BOOL)force;
+- (void)removeAndAddCellsIfNecessary;
 
 @end
 
@@ -175,7 +175,13 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
         [self relayoutTiles];
     } else {
         // Recycles cells
-        [self removeAndAddCellsIfNecessary:NO];
+        CGFloat diff = fabsf(self.lastOffset - self.contentOffset.y);
+        
+        if (diff > self.offsetThreshold) {
+            self.lastOffset = self.contentOffset.y;
+            
+            [self removeAndAddCellsIfNecessary];
+        }
     }
     
     self.lastWidth = self.width;
@@ -308,25 +314,23 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     
     self.contentSize = CGSizeMake(self.width, height);
     
-    [self removeAndAddCellsIfNecessary:YES];
+    if (self.tileViewDelegate && [self.tileViewDelegate respondsToSelector:@selector(tileView:didReloadTemplateWithMap:)]) {
+        [self.tileViewDelegate tileView:self didReloadTemplateWithMap:self.indexToRectMap];
+    }
+    
+    [self removeAndAddCellsIfNecessary];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPSTileViewDidRelayoutNotification object:self];
 }
 
-- (void)removeAndAddCellsIfNecessary:(BOOL)force {
-    static NSInteger bufferViewFactor = 2;
+- (void)removeAndAddCellsIfNecessary {
+    static NSInteger bufferViewFactor = 8;
     static NSInteger topIndex = 0;
     static NSInteger bottomIndex = 0;
     
     NSInteger numTiles = [self.tileViewDataSource numberOfTilesInTileView:self];
     
     if (numTiles == 0) return;
-    
-    CGFloat diff = fabsf(self.lastOffset - self.contentOffset.y);
-    
-    if ((diff < self.offsetThreshold) && !force) return;
-    
-    self.lastOffset = self.contentOffset.y;
     
 //    NSLog(@"diff: %f, lastOffset: %f", diff, self.lastOffset);
     
@@ -366,8 +370,8 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
         topIndex = [[sortedKeys objectAtIndex:0] integerValue];
         bottomIndex = [[sortedKeys lastObject] integerValue];
         
-        topIndex = MAX(0, topIndex - (bufferViewFactor * self.numCols));
-        bottomIndex = MIN(numTiles, bottomIndex + (bufferViewFactor * self.numCols));
+        topIndex = MAX(0, topIndex - (bufferViewFactor));
+        bottomIndex = MIN(numTiles, bottomIndex + (bufferViewFactor));
     }
     
     // Add views

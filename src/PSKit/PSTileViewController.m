@@ -126,8 +126,6 @@
 }
 
 - (void)dataSourceDidLoad {
-    [super dataSourceDidLoad];
-    
     [self.tileView reloadData];
     self.tileView.contentOffset = self.contentOffset;
     
@@ -140,11 +138,10 @@
         self.pullLoadMoreView.hidden = NO;
     }
     
-    [self endRefresh];
+    [super dataSourceDidLoad];
 }
 
 - (void)dataSourceDidLoadMore {
-    [super dataSourceDidLoadMore];
     [self.tileView reloadData];
     
     if (self.tileView.contentSize.height < self.tileView.height) {
@@ -156,11 +153,10 @@
         self.pullLoadMoreView.hidden = NO;
     }
     
-    [self endLoadMore];
+    [super dataSourceDidLoadMore];
 }
 
 - (void)dataSourceDidError {
-    [super dataSourceDidError];
     [self.tileView reloadData];
     self.tileView.contentOffset = CGPointZero;
     
@@ -173,7 +169,7 @@
         self.pullLoadMoreView.hidden = NO;
     }
     
-    [self endRefresh];
+    [super dataSourceDidError];
 }
 
 - (BOOL)dataSourceIsEmpty {

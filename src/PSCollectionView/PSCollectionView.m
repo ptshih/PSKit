@@ -137,7 +137,7 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
 /**
  Magic!
  */
-- (void)removeAndAddCellsIfNecessary:(BOOL)force;
+- (void)removeAndAddCellsIfNecessary;
 
 @end
 
@@ -196,7 +196,13 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
         [self relayoutViews];
     } else {
         // Recycles cells
-        [self removeAndAddCellsIfNecessary:NO];
+        CGFloat diff = fabsf(self.lastOffset - self.contentOffset.y);
+        
+        if (diff > self.offsetThreshold) {
+            self.lastOffset = self.contentOffset.y;
+            
+            [self removeAndAddCellsIfNecessary];
+        }
     }
     
     self.lastWidth = self.width;
@@ -284,25 +290,19 @@ static inline NSInteger PSCollectionIndexForKey(NSString *key) {
     
     self.contentSize = CGSizeMake(self.width, totalHeight);
     
-    [self removeAndAddCellsIfNecessary:YES];
+    [self removeAndAddCellsIfNecessary];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPSCollectionViewDidRelayoutNotification object:self];
 }
 
-- (void)removeAndAddCellsIfNecessary:(BOOL)force {
-    static NSInteger bufferViewFactor = 2;
+- (void)removeAndAddCellsIfNecessary {
+    static NSInteger bufferViewFactor = 8;
     static NSInteger topIndex = 0;
     static NSInteger bottomIndex = 0;
     
     NSInteger numViews = [self.collectionViewDataSource numberOfRowsInCollectionView:self];
     
     if (numViews == 0) return;
-    
-    CGFloat diff = fabsf(self.lastOffset - self.contentOffset.y);
-    
-    if ((diff < self.offsetThreshold) && !force) return;
-    
-    self.lastOffset = self.contentOffset.y;
     
     //    NSLog(@"diff: %f, lastOffset: %f", diff, self.lastOffset);
     
