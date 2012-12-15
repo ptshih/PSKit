@@ -411,6 +411,8 @@
                 // If this is a new cell
                 self.shouldCreateCell = YES;
             }
+        } else {
+            self.shouldCreateCell = NO;
         }
     } else {
         NSLog(@"single touch moved");
