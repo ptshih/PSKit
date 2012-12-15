@@ -88,9 +88,27 @@
 
 // This is the class for the tile background
 @interface PSGridViewTile : UIView
+
+- (void)resize:(CGFloat)zoomScale;
+
 @end
 
 @implementation PSGridViewTile
+
+- (id)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.backgroundColor = [UIColor whiteColor];
+//        self.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
+//        self.layer.borderWidth = 2.0;
+    }
+    return self;
+}
+
+- (void)resize:(CGFloat)zoomScale {
+    self.transform = CGAffineTransformMakeScale(1.0 / zoomScale, 1.0 / zoomScale);
+}
+
 @end
 
 
@@ -132,12 +150,9 @@
         self.alwaysBounceHorizontal = YES;
         self.showsHorizontalScrollIndicator = NO;
         self.showsVerticalScrollIndicator = NO;
-//        self.multipleTouchEnabled = YES;
-        
-        self.backgroundColor = [UIColor whiteColor];
 
         self.numCols = 12;
-        self.numRows = 12;
+        self.numRows = 24;
         
         self.lastOffset = 0.0;
         self.offsetThreshold = floorf(self.height / 4.0);
@@ -152,7 +167,7 @@
         self.cells = [NSMutableDictionary dictionary]; // active cells
         self.borders = [NSMutableSet set]; // tile borders
         
-        self.gridView = [[UIView alloc] initWithFrame:self.bounds];
+        self.gridView = [[UIView alloc] initWithFrame:CGRectZero];
         [self addSubview:self.gridView];
         
         self.selectionView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -169,7 +184,7 @@
                 tileView.multipleTouchEnabled = YES;
 //                tileView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
 //                tileView.layer.borderWidth = 1.0;
-                tileView.backgroundColor = [UIColor clearColor];
+//                tileView.backgroundColor = [UIColor clearColor];
 //                tileView.backgroundColor = RGBCOLOR(arc4random() % 255, arc4random() % 255, arc4random() % 255);
                 
                 [self.gridView addSubview:tileView];
@@ -188,23 +203,27 @@
     [self.borders removeAllObjects];
     for (int row = 0; row <= self.numRows; row++) {
         CALayer *hBorder = [CALayer layer];
-        hBorder.frame = CGRectMake(0, row * [self cellHeight], self.gridView.width, 1.0);
-        hBorder.backgroundColor = [UIColor colorWithWhite:0.8f alpha:1.0f].CGColor;
+        hBorder.frame = CGRectMake(0, row * [self cellHeight] -1.0, self.gridView.width, 2.0);
+        hBorder.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
+        hBorder.rasterizationScale = [UIScreen mainScreen].scale;
+        hBorder.shouldRasterize = YES;
         [self.gridView.layer addSublayer:hBorder];
         [self.borders addObject:hBorder];
     }
     
     for (int col = 0; col <= self.numCols; col++) {
         CALayer *vBorder = [CALayer layer];
-        vBorder.frame = CGRectMake(col * [self cellWidth], 0, 1.0, self.gridView.height);
-        vBorder.backgroundColor = [UIColor colorWithWhite:0.8f alpha:1.0f].CGColor;
+        vBorder.frame = CGRectMake(col * [self cellWidth] -1.0, 0, 2.0, self.gridView.height);
+        vBorder.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
+        vBorder.rasterizationScale = [UIScreen mainScreen].scale;
+        vBorder.shouldRasterize = YES;
         [self.gridView.layer addSublayer:vBorder];
         [self.borders addObject:vBorder];
     }
     
     // Zoom scale
-    self.minimumZoomScale = 1.0;
-    self.maximumZoomScale = 2.0;
+    self.minimumZoomScale = isDeviceIPad() ? 0.6 : 0.25;
+    self.maximumZoomScale = 1.0;
     self.zoomScale = 1.0;
     
     return self;
@@ -212,6 +231,30 @@
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
     return self.gridView;
+}
+
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView {
+    [self adjustZoomView:scrollView];
+//    [self.tiles enumerateKeysAndObjectsUsingBlock:^(id key, PSGridViewTile *tile, BOOL *stop) {
+//        [tile resize:self.zoomScale];
+//    }];
+    
+//    for (CALayer *layer in self.borders) {
+//        layer.transform = CGAffineTransformMakeScale(1.0 / self.zoomScale, 1.0 / self.zoomScale);
+//    }
+}
+
+- (void)adjustZoomView:(UIScrollView *)scrollView {
+    UIView *subView = [self viewForZoomingInScrollView:scrollView];
+    
+    CGFloat offsetX = (scrollView.bounds.size.width > scrollView.contentSize.width)?
+    (scrollView.bounds.size.width - scrollView.contentSize.width) * 0.5 : 0.0;
+    
+    CGFloat offsetY = (scrollView.bounds.size.height > scrollView.contentSize.height)?
+    (scrollView.bounds.size.height - scrollView.contentSize.height) * 0.5 : 0.0;
+    
+    subView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX,
+                                 scrollView.contentSize.height * 0.5 + offsetY);
 }
 
 #pragma mark - Helpers
@@ -310,6 +353,7 @@
         self.orientation = orientation;
         // Recalculates layout
         [self relayoutCells];
+        [self adjustZoomView:self];
     } else if(self.lastWidth != self.width) {
         // Recalculates layout
         [self relayoutCells];
@@ -384,13 +428,36 @@
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
 //    [super touchesEnded:touches withEvent:event];
+    
+    // We are creating a new cell
+    if (self.shouldCreateCell) {
+        self.shouldCreateCell = NO;
+        
+        // This is the new proposed cell rect
+        CGRect newCellRect = [self rectForIndices:self.touchedIndices];
+        
+        PSGridViewCell *newCell = [[PSGridViewCell alloc] initWithFrame:newCellRect];
+        newCell.backgroundColor = RGBCOLOR(arc4random() % 255, arc4random() % 255, arc4random() % 255);
+        [self.gridView insertSubview:newCell belowSubview:self.selectionView];
+        
+        // Add new key
+        [self.cells setObject:newCell forKey:[self keyForIndices:self.touchedIndices]];
+        
+        // Setup gesture recognizer
+        if ([newCell.gestureRecognizers count] == 0) {
+            PSGridViewTapGestureRecognizer *gr = [[PSGridViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectCell:)];
+            gr.delegate = self;
+            [newCell addGestureRecognizer:gr];
+            newCell.userInteractionEnabled = YES;
+        }
+    }
+    
     [self touchesEndedOrCancelled:touches withEvent:event];
-
 }
 
 - (void)touchesBeganOrMoved:(NSSet *)touches withEvent:(UIEvent *)event {
 //    NSLog(@"Began or Moved: %@", touches);
-    NSLog(@"x: %f, y: %f", [[touches anyObject] locationInView:self.gridView].x, [[touches anyObject] locationInView:self.gridView].y);
+//    NSLog(@"x: %f, y: %f", [[touches anyObject] locationInView:self.gridView].x, [[touches anyObject] locationInView:self.gridView].y);
 
     // Disable UIScrollView scrolling
     self.scrollEnabled = NO;
@@ -516,32 +583,6 @@
 }
 
 - (void)touchesEndedOrCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-//    UITouch *touch = [touches anyObject];
-//    CGPoint touchPoint = [touch locationInView:self];
-    
-    // We are creating a new cell
-    if (self.shouldCreateCell) {
-        self.shouldCreateCell = NO;
-        
-        // This is the new proposed cell rect
-        CGRect newCellRect = [self rectForIndices:self.touchedIndices];
-        
-        PSGridViewCell *newCell = [[PSGridViewCell alloc] initWithFrame:newCellRect];
-        newCell.backgroundColor = RGBCOLOR(arc4random() % 255, arc4random() % 255, arc4random() % 255);
-        [self.gridView insertSubview:newCell belowSubview:self.selectionView];
-        
-        // Add new key
-        [self.cells setObject:newCell forKey:[self keyForIndices:self.touchedIndices]];
-        
-        // Setup gesture recognizer
-        if ([newCell.gestureRecognizers count] == 0) {
-            PSGridViewTapGestureRecognizer *gr = [[PSGridViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectCell:)];
-            gr.delegate = self;
-            [newCell addGestureRecognizer:gr];
-            newCell.userInteractionEnabled = YES;
-        }
-    }
-    
     // Hide selection view
     [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.selectionView.alpha = 0.0;
