@@ -10,6 +10,6 @@
 
 @interface PSGridViewCell : UIView
 
-- (void)loadImage:(UIImage *)image;
+- (void)loadImageAtURL:(NSURL *)URL;
 
 @end

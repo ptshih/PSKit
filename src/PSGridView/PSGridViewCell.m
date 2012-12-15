@@ -46,4 +46,9 @@
     self.imageView.image = image;
 }
 
+- (void)loadImageAtURL:(NSURL *)URL {
+    self.imageView.originalURL = URL;
+    [self.imageView loadImageWithURL:URL cacheType:PSURLCacheTypePermanent];
+}
+
 @end
