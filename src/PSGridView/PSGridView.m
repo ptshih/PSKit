@@ -129,13 +129,15 @@
     if (self) {
         self.delegate = self;
         self.alwaysBounceVertical = YES;
+        self.alwaysBounceHorizontal = YES;
+        self.showsHorizontalScrollIndicator = NO;
+        self.showsVerticalScrollIndicator = NO;
 //        self.multipleTouchEnabled = YES;
-//        self.maximumZoomScale = 2.0;
         
         self.backgroundColor = [UIColor whiteColor];
 
-        self.numCols = 4;
-        self.numRows = 16;
+        self.numCols = 12;
+        self.numRows = 12;
         
         self.lastOffset = 0.0;
         self.offsetThreshold = floorf(self.height / 4.0);
@@ -176,20 +178,51 @@
         }
     }
     
+    CGFloat width = self.numCols * [self cellWidth];
+    CGFloat height = self.numRows * [self cellHeight];
+    self.contentSize = CGSizeMake(width, height);
+    self.gridView.frame = CGRectMake(0, 0, self.contentSize.width, self.contentSize.height);
+    
+    // Draw Borders
+    [self.borders makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
+    [self.borders removeAllObjects];
+    for (int row = 0; row <= self.numRows; row++) {
+        CALayer *hBorder = [CALayer layer];
+        hBorder.frame = CGRectMake(0, row * [self cellHeight], self.gridView.width, 1.0);
+        hBorder.backgroundColor = [UIColor colorWithWhite:0.8f alpha:1.0f].CGColor;
+        [self.gridView.layer addSublayer:hBorder];
+        [self.borders addObject:hBorder];
+    }
+    
+    for (int col = 0; col <= self.numCols; col++) {
+        CALayer *vBorder = [CALayer layer];
+        vBorder.frame = CGRectMake(col * [self cellWidth], 0, 1.0, self.gridView.height);
+        vBorder.backgroundColor = [UIColor colorWithWhite:0.8f alpha:1.0f].CGColor;
+        [self.gridView.layer addSublayer:vBorder];
+        [self.borders addObject:vBorder];
+    }
+    
+    // Zoom scale
+    self.minimumZoomScale = 1.0;
+    self.maximumZoomScale = 2.0;
+    self.zoomScale = 1.0;
+    
     return self;
 }
 
-//- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
-//    return self.gridView;
-//}
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+    return self.gridView;
+}
 
 #pragma mark - Helpers
 
 - (CGFloat)cellWidth {
+    return 96.0;
     return floorf(self.width / self.numCols);
 }
 
 - (CGFloat)cellHeight {
+    return 96.0;
     return [self cellWidth] * (3.0 / 4.0);
 }
 
@@ -266,33 +299,6 @@
     return [NSString stringWithFormat:@"%d,%d", row, col];
 }
 
-#pragma mark - Draw
-
-//- (void)drawRect:(CGRect)rect {
-//    [super drawRect:rect];
-//    
-//    CGFloat dim = [self cellDim];
-//
-//    CGContextRef context = UIGraphicsGetCurrentContext();
-//
-//    CGContextSetStrokeColorWithColor(context, [UIColor darkGrayColor].CGColor);
-//    CGContextSetLineWidth(context, 1.0);
-//
-//    // Draw vertical lines
-//    for (int i = 1; i < self.numCols; i++) {
-//        CGContextMoveToPoint(context, i * dim, 0); //start at this point
-//        CGContextAddLineToPoint(context, i * dim, self.height); //draw to this point
-//    }
-//    
-//    // Draw horizontal lines
-//    for (int j = 1; j < self.numRows; j++) {
-//        CGContextMoveToPoint(context, 0, j * dim); //start at this point
-//        CGContextAddLineToPoint(context, self.width, j * dim); //draw to this point
-//    }
-//
-//    CGContextStrokePath(context);
-//}
-
 #pragma mark - Layout
 
 - (void)layoutSubviews {
@@ -320,28 +326,6 @@
 }
 
 - (void)relayoutCells {
-    CGFloat height = self.numRows * [self cellHeight];
-    self.contentSize = CGSizeMake(self.width, height);
-    self.gridView.frame = CGRectMake(0, 0, self.contentSize.width, self.contentSize.height);
-    
-    // Draw Borders
-    [self.borders makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
-    for (int row = 0; row <= self.numRows; row++) {
-        CALayer *hBorder = [CALayer layer];
-        hBorder.frame = CGRectMake(0, row * [self cellHeight], self.gridView.width, 1.0);
-        hBorder.backgroundColor = [UIColor colorWithWhite:0.8f alpha:1.0f].CGColor;
-        [self.gridView.layer addSublayer:hBorder];
-        [self.borders addObject:hBorder];
-    }
-    
-    for (int col = 0; col <= self.numCols; col++) {
-        CALayer *vBorder = [CALayer layer];
-        vBorder.frame = CGRectMake(col * [self cellWidth], 0, 1.0, self.gridView.height);
-        vBorder.backgroundColor = [UIColor colorWithWhite:0.8f alpha:1.0f].CGColor;
-        [self.gridView.layer addSublayer:vBorder];
-        [self.borders addObject:vBorder];
-    }
-    
     // Create base tiles
     for (int row = 0; row < self.numRows; row++) {
         for (int col = 0; col < self.numCols; col++) {
@@ -406,6 +390,7 @@
 
 - (void)touchesBeganOrMoved:(NSSet *)touches withEvent:(UIEvent *)event {
 //    NSLog(@"Began or Moved: %@", touches);
+    NSLog(@"x: %f, y: %f", [[touches anyObject] locationInView:self.gridView].x, [[touches anyObject] locationInView:self.gridView].y);
 
     // Disable UIScrollView scrolling
     self.scrollEnabled = NO;
@@ -419,7 +404,7 @@
     if (touches.count == 1) {
         // Detect if a tile has been touched for the first time
         UITouch *touch = [touches anyObject];
-        CGPoint touchPoint = [touch locationInView:self];
+        CGPoint touchPoint = [touch locationInView:self.gridView];
         if (!self.touchedTile && [touch.view isKindOfClass:[PSGridViewTile class]]) {
             self.touchedTile = (PSGridViewTile *)touch.view;
             self.touchOrigin = touchPoint;
@@ -451,14 +436,14 @@
     if (self.touchedTile) {
         // Find the touch rectangle from origin to destination
         UITouch *touch = [touches anyObject];
-        CGPoint touchPoint = [touch locationInView:self];
+        CGPoint touchPoint = [touch locationInView:self.gridView];
         p0 = self.touchOrigin;
         p1 = touchPoint;
     } else if (self.touchedCell) {
         // Calculate touch rectangle from all touches
         NSArray *allTouches = [touches allObjects];
-        p0 = [[allTouches objectAtIndex:0] locationInView:self];
-        p1 = [[allTouches objectAtIndex:1] locationInView:self];
+        p0 = [[allTouches objectAtIndex:0] locationInView:self.gridView];
+        p1 = [[allTouches objectAtIndex:1] locationInView:self.gridView];
     } else {
         // Did not touch a valid object
         return;
