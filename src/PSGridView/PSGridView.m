@@ -74,9 +74,17 @@
 @end
 
 
+#pragma mark - Gesture Recognizer
+
+// This is just so we know that we sent this tap gesture recognizer in the delegate
+@interface PSGridViewTapGestureRecognizer : UITapGestureRecognizer
+@end
+
+@implementation PSGridViewTapGestureRecognizer
+@end
 
 
-@interface PSGridView ()
+@interface PSGridView () <UIScrollViewDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, assign) NSInteger numCols;
 @property (nonatomic, assign) NSInteger numRows;
@@ -95,6 +103,7 @@
 @property (nonatomic, strong) NSMutableArray *tiles;
 @property (nonatomic, strong) NSMutableDictionary *cells;
 
+@property (nonatomic, strong) UIView *gridView;
 @property (nonatomic, strong) UIView *selectionView;
     
 @end
@@ -106,13 +115,15 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.delegate = self;
         self.alwaysBounceVertical = YES;
         self.multipleTouchEnabled = YES;
+//        self.maximumZoomScale = 2.0;
         
         self.backgroundColor = [UIColor whiteColor];
 
         self.numCols = 4;
-        self.numRows = 8;
+        self.numRows = 16;
         
         self.lastOffset = 0.0;
         self.offsetThreshold = floorf(self.height / 4.0);
@@ -126,11 +137,14 @@
         self.tiles = [NSMutableArray array];
         self.cells = [NSMutableDictionary dictionary]; // active cells
         
+        self.gridView = [[UIView alloc] initWithFrame:self.bounds];
+        [self addSubview:self.gridView];
+        
         self.selectionView = [[UIView alloc] initWithFrame:CGRectZero];
         self.selectionView.userInteractionEnabled = NO;
         self.selectionView.backgroundColor = RGBACOLOR(0, 0, 0, 0.5);
         self.selectionView.alpha = 0.0;
-        [self addSubview:self.selectionView];
+        [self.gridView addSubview:self.selectionView];
     }
     
     return self;
@@ -138,14 +152,25 @@
 
 #pragma mark - Helpers
 
+//- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+//    return self.gridView;
+//}
+
 - (CGFloat)cellDim {
     return floorf(self.width / self.numCols);
+}
+
+- (CGFloat)cellWidth {
+    return floorf(self.width / self.numCols);
+}
+
+- (CGFloat)cellHeight {
+    return [self cellWidth] * (3.0 / 4.0);
 }
 
 // Returns row,col pair of indices for a given rect
 - (NSArray *)indicesForRect:(CGRect)rect {
     NSMutableArray *indices = [NSMutableArray array];
-//    CGFloat dim = [self cellDim];
     
     int i = 0;
     for (UIView *tile in self.tiles) {
@@ -182,12 +207,11 @@
 
 // Returns rect for an array of row,col indices
 - (CGRect)rectForIndices:(NSArray *)indices {
-    CGFloat dim = [self cellDim];
     CGRect rect = CGRectNull;
     for (NSString *index in indices) {
         NSInteger row = [[[index componentsSeparatedByString:@","] objectAtIndex:0] integerValue];
         NSInteger col = [[[index componentsSeparatedByString:@","] objectAtIndex:1] integerValue];
-        CGRect indexRect = CGRectMake(col * dim, row * dim, dim, dim);
+        CGRect indexRect = CGRectMake(col * [self cellWidth], row * [self cellHeight], [self cellWidth], [self cellHeight]);
         if (CGRectIsNull(rect)) {
             rect = indexRect;
         } else {
@@ -272,22 +296,21 @@
 }
 
 - (void)relayoutCells {
-    CGFloat dim = [self cellDim];
-    CGFloat height = self.numRows * dim;
+    CGFloat height = self.numRows * [self cellHeight];
     
     // Create base tiles
     [self.tiles makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [self.tiles removeAllObjects];
     for (int row = 0; row < self.numRows; row++) {
         for (int col = 0; col < self.numCols; col++) {
-            CGRect tileRect = CGRectMake(col * dim, row * dim, dim, dim);;
+            CGRect tileRect = CGRectMake(col * [self cellWidth], row * [self cellHeight], [self cellWidth], [self cellHeight]);;
             UIView *tileView = [[UIView alloc] initWithFrame:tileRect];
             tileView.multipleTouchEnabled = YES;
             tileView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
-            tileView.layer.borderWidth = 0.5;
+            tileView.layer.borderWidth = 1.0;
             tileView.backgroundColor = [UIColor whiteColor];
 //            tileView.backgroundColor = RGBCOLOR(arc4random() % 255, arc4random() % 255, arc4random() % 255);
-            [self addSubview:tileView];
+            [self.gridView addSubview:tileView];
             [self.tiles addObject:tileView];
         }
     }
@@ -299,29 +322,53 @@
         CGRect indicesRect = [self rectForIndices:indices];
         
         cell.frame = indicesRect;
-        [self addSubview:cell];
+        [self.gridView addSubview:cell];
     }];
     
     self.contentSize = CGSizeMake(self.width, height);
+    self.gridView.frame = CGRectMake(0, 0, self.contentSize.width, self.contentSize.height);
+}
+
+#pragma mark - Gesture Recognizer
+
+- (void)didSelectCell:(UITapGestureRecognizer *)gestureRecognizer {
+    if (self.gridViewDelegate && [self.gridViewDelegate respondsToSelector:@selector(gridView:didSelectCell:atIndices:)]) {
+        [self.gridViewDelegate gridView:self didSelectCell:(PSGridViewCell *)gestureRecognizer.view atIndices:[self indicesForRect:gestureRecognizer.view.frame]];
+    }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if (![gestureRecognizer isMemberOfClass:[PSGridViewTapGestureRecognizer class]]) return YES;
+    
+    if ([touch.view isKindOfClass:[PSGridViewCell class]]) {
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 
 #pragma mark - Touches
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+//    [super touchesBegan:touches withEvent:event];
     [self touchesBeganOrMoved:touches withEvent:event];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+//    [super touchesMoved:touches withEvent:event];
     [self touchesBeganOrMoved:touches withEvent:event];
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+//    [super touchesCancelled:touches withEvent:event];
     [self touchesEndedOrCancelled:touches withEvent:event];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+//    [super touchesEnded:touches withEvent:event];
     [self touchesEndedOrCancelled:touches withEvent:event];
+
 }
 
 - (void)touchesBeganOrMoved:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -336,6 +383,7 @@
     if (touches.count == 2) {
         // Disable UIScrollView scrolling
         self.scrollEnabled = NO;
+        self.pinchGestureRecognizer.enabled = NO;
         
         // These touches are active
         [self.activeTouches unionSet:touches];
@@ -380,7 +428,7 @@
             
             // Show selection view
             self.selectionView.frame = newCellRect;
-            [self bringSubviewToFront:self.selectionView];
+            [self.gridView bringSubviewToFront:self.selectionView];
             if (self.selectionView.alpha != 1.0) {
                 [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
                     self.selectionView.alpha = 1.0;
@@ -426,6 +474,7 @@
     // If we have 2 active touches
     if (self.activeTouches.count == 2) {
         self.scrollEnabled = YES;
+        self.pinchGestureRecognizer.enabled = YES;
         
         // If we should create a new cell
         if (self.shouldCreateCell) {
@@ -435,10 +484,18 @@
             
             PSGridViewCell *newCell = [[PSGridViewCell alloc] initWithFrame:newCellRect];
             newCell.backgroundColor = RGBCOLOR(arc4random() % 255, arc4random() % 255, arc4random() % 255);
-            [self addSubview:newCell];
+            [self.gridView insertSubview:newCell belowSubview:self.selectionView];
             
             // Add new key
             [self.cells setObject:newCell forKey:[self.touchedIndices componentsJoinedByString:@"|"]];
+            
+            // Setup gesture recognizer
+            if ([newCell.gestureRecognizers count] == 0) {
+                PSGridViewTapGestureRecognizer *gr = [[PSGridViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectCell:)];
+                gr.delegate = self;
+                [newCell addGestureRecognizer:gr];
+                newCell.userInteractionEnabled = YES;
+            }
         }
     }
     

@@ -8,25 +8,42 @@
 
 #import "PSGridViewCell.h"
 
+@interface PSGridViewCell ()
+
+@property (nonatomic, strong) PSCachedImageView *imageView;
+
+@end
+
 @implementation PSGridViewCell
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        // Initialization code
         self.multipleTouchEnabled = YES;
+        
+        self.imageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
+        self.imageView.loadingColor = RGBACOLOR(60, 60, 60, 1.0);
+        self.imageView.loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+        self.imageView.shouldAnimate = YES;
+        self.imageView.clipsToBounds = YES;
+        [self addSubview:self.imageView];
     }
     return self;
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
+- (void)prepareForReuse {
+    [self.imageView prepareForReuse];
 }
-*/
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    // Photo
+    self.imageView.frame = self.bounds;
+}
+
+- (void)loadImage:(UIImage *)image {
+    self.imageView.image = image;
+}
 
 @end
