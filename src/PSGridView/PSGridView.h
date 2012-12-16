@@ -17,6 +17,8 @@
 @property (nonatomic, unsafe_unretained) id <PSGridViewDelegate> gridViewDelegate;
 @property (nonatomic, unsafe_unretained) id <PSGridViewDataSource> gridViewDataSource;
 
+- (void)editCell:(PSGridViewCell *)cell;
+
 @end
 
 
@@ -25,7 +27,7 @@
 @protocol PSGridViewDelegate <NSObject>
 
 @optional
-- (void)gridView:(PSGridView *)tileView didSelectCell:(PSGridViewCell *)cell atIndices:(NSArray *)indices;
+- (void)gridView:(PSGridView *)gridView didSelectCell:(PSGridViewCell *)cell atIndices:(NSArray *)indices;
 
 @end
 
