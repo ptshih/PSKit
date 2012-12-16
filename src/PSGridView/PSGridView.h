@@ -25,7 +25,8 @@
 @protocol PSGridViewDelegate <NSObject>
 
 @optional
-- (void)gridView:(PSGridView *)gridView didSelectCell:(PSGridViewCell *)cell atIndices:(NSArray *)indices completionBlock:(void (^)(BOOL cellConfigured))completionBlock;
+- (void)gridView:(PSGridView *)gridView didSelectCell:(PSGridViewCell *)cell atIndices:(NSSet *)indices completionBlock:(void (^)(BOOL cellConfigured))completionBlock;
+- (void)gridView:(PSGridView *)gridView didLongPressCell:(PSGridViewCell *)cell atIndices:(NSSet *)indices completionBlock:(void (^)(BOOL cellRemoved))completionBlock;
 
 @end
 

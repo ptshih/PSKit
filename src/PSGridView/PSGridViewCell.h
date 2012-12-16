@@ -10,6 +10,8 @@
 
 @interface PSGridViewCell : UIView
 
+@property (nonatomic, strong) NSSet *indices;
+
 - (void)loadText:(NSString *)text;
 - (void)loadImageAtURL:(NSURL *)URL;
 - (void)loadColor:(UIColor *)color;

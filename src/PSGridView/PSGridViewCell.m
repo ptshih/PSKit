@@ -26,7 +26,7 @@
 //        self.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
 //        self.backgroundColor = RGBCOLOR(230, 230, 230);
         
-        self.contentView = [[UIView alloc] initWithFrame:CGRectInset(self.bounds, 1, 1)];
+        self.contentView = [[UIView alloc] initWithFrame:self.bounds];
         self.contentView.autoresizingMask = self.autoresizingMask;
         self.contentView.userInteractionEnabled = NO;
         self.contentView.backgroundColor = RGBCOLOR(222, 222, 222);

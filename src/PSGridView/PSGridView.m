@@ -129,16 +129,16 @@
 @property (nonatomic, assign, readwrite) CGFloat lastOffset;
 @property (nonatomic, assign, readwrite) CGFloat offsetThreshold;
 
-@property (nonatomic, assign) BOOL shouldCreateCell;
-@property (nonatomic, assign) BOOL didResizeCell;
+@property (nonatomic, assign) BOOL shouldTouchCell;
 @property (nonatomic, assign) CGRect touchRect;
 @property (nonatomic, assign) CGPoint touchOrigin;
 @property (nonatomic, assign) PSGridViewCell *touchedCell;
 @property (nonatomic, assign) PSGridViewTile *touchedTile;
-@property (nonatomic, strong) NSArray *touchedIndices;
+@property (nonatomic, strong) NSMutableSet *touchedIndices;
+@property (nonatomic, strong) NSMutableSet *activeTouches;
 
 @property (nonatomic, strong) NSMutableDictionary *tiles;
-@property (nonatomic, strong) NSMutableDictionary *cells;
+@property (nonatomic, strong) NSMutableSet *cells;
 @property (nonatomic, strong) NSMutableSet *borders;
 
 @property (nonatomic, strong) UIView *gridView;
@@ -165,19 +165,20 @@
         self.lastOffset = 0.0;
         self.offsetThreshold = floorf(self.height / 4.0);
         
-        self.shouldCreateCell = NO;
-        self.didResizeCell = NO;
+        self.shouldTouchCell = NO; // determines if cell/tile should be added/edited
         self.touchRect = CGRectZero;
         self.touchedCell = nil;
         self.touchedTile = nil;
-        
+        self.touchedIndices = [NSMutableSet set];
+        self.activeTouches = [NSMutableSet set];
         
         self.tiles = [NSMutableDictionary dictionary]; // background tiles
-        self.cells = [NSMutableDictionary dictionary]; // active cells
+        self.cells = [NSMutableSet set]; // active cells
         self.borders = [NSMutableSet set]; // tile borders
         
         // Main grid view
         self.gridView = [[UIView alloc] initWithFrame:CGRectZero];
+        self.gridView.backgroundColor = TILE_BORDER_COLOR;
         [self addSubview:self.gridView];
         
         // Selection view (touch overlay)
@@ -203,36 +204,31 @@
         }
     }
     
-    CGFloat width = self.numCols * [self cellWidth];
-    CGFloat height = self.numRows * [self cellHeight];
-    self.contentSize = CGSizeMake(width, height);
-    self.gridView.frame = CGRectMake(0, 0, self.contentSize.width, self.contentSize.height);
-    
     // Draw Borders
-    [self.borders makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
-    [self.borders removeAllObjects];
-    for (int row = 0; row <= self.numRows; row++) {
-        CALayer *hBorder = [CALayer layer];
-        hBorder.frame = CGRectMake(0, row * [self cellHeight] -0.5, self.gridView.width, 1.0);
-        hBorder.backgroundColor = TILE_BORDER_COLOR.CGColor;
-        hBorder.rasterizationScale = [UIScreen mainScreen].scale;
-        hBorder.shouldRasterize = YES;
-        [self.gridView.layer addSublayer:hBorder];
-        [self.borders addObject:hBorder];
-    }
-    
-    for (int col = 0; col <= self.numCols; col++) {
-        CALayer *vBorder = [CALayer layer];
-        vBorder.frame = CGRectMake(col * [self cellWidth] -0.5, 0, 1.0, self.gridView.height);
-        vBorder.backgroundColor = TILE_BORDER_COLOR.CGColor;
-        vBorder.rasterizationScale = [UIScreen mainScreen].scale;
-        vBorder.shouldRasterize = YES;
-        [self.gridView.layer addSublayer:vBorder];
-        [self.borders addObject:vBorder];
-    }
+//    [self.borders makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
+//    [self.borders removeAllObjects];
+//    for (int row = 0; row <= self.numRows; row++) {
+//        CALayer *hBorder = [CALayer layer];
+//        hBorder.frame = CGRectMake(0, row * [self cellHeight] -0.5, self.gridView.width, 1.0);
+//        hBorder.backgroundColor = TILE_BORDER_COLOR.CGColor;
+//        hBorder.rasterizationScale = [UIScreen mainScreen].scale;
+//        hBorder.shouldRasterize = YES;
+//        [self.gridView.layer addSublayer:hBorder];
+//        [self.borders addObject:hBorder];
+//    }
+//    
+//    for (int col = 0; col <= self.numCols; col++) {
+//        CALayer *vBorder = [CALayer layer];
+//        vBorder.frame = CGRectMake(col * [self cellWidth] -0.5, 0, 1.0, self.gridView.height);
+//        vBorder.backgroundColor = TILE_BORDER_COLOR.CGColor;
+//        vBorder.rasterizationScale = [UIScreen mainScreen].scale;
+//        vBorder.shouldRasterize = YES;
+//        [self.gridView.layer addSublayer:vBorder];
+//        [self.borders addObject:vBorder];
+//    }
     
     // Zoom scale
-    self.minimumZoomScale = isDeviceIPad() ? (2.0 / 3.0) : 0.5;
+    self.minimumZoomScale = isDeviceIPad() ? 0.6 : 0.5;
     self.maximumZoomScale = 1.0;
     self.zoomScale = 1.0;
     
@@ -264,12 +260,17 @@
 
 - (CGFloat)cellWidth {
     return 96.0;
-    return floorf(self.width / self.numCols);
+//    return floorf(self.width / self.numCols);
 }
 
 - (CGFloat)cellHeight {
     return 96.0;
-    return [self cellWidth] * (3.0 / 4.0);
+//    return [self cellWidth] * (3.0 / 4.0);
+}
+
+// Returns {row,col} index for row/col
+- (NSString *)indexForRow:(NSInteger)row col:(NSInteger)col {
+    return [NSString stringWithFormat:@"%d,%d", row, col];
 }
 
 // Returns an array of {row,col} indices for a given cell key
@@ -282,9 +283,22 @@
     return [indices componentsJoinedByString:@"|"];
 }
 
+// NOTE: CAN RETURN NIL
+- (NSString *)indexForPoint:(CGPoint)point {
+    __block NSString *touchIndex = nil;
+    [self.tiles enumerateKeysAndObjectsUsingBlock:^(NSString *index, PSGridViewTile *tile, BOOL *stop) {
+        if (CGRectContainsPoint(tile.frame, point)) {
+            touchIndex = index;
+            *stop = YES;
+        }
+    }];
+    
+    return touchIndex;
+}
+
 // Returns row,col pair of indices for a given rect
-- (NSArray *)indicesForRect:(CGRect)rect {
-    NSMutableArray *indices = [NSMutableArray array];
+- (NSSet *)indicesForRect:(CGRect)rect {
+    NSMutableSet *indices = [NSMutableSet set];
     
     [self.tiles enumerateKeysAndObjectsUsingBlock:^(NSString *index, PSGridViewTile *tile, BOOL *stop) {
         if (CGRectIntersectsRect(rect, tile.frame)) {
@@ -292,25 +306,23 @@
         }
     }];
     
-    return [NSArray arrayWithArray:indices];
+    return [NSSet setWithSet:indices];
 }
 
-// Returns rect for an array of row,col indices
-- (CGRect)rectForIndices:(NSArray *)indices {
+// Returns combined rect for an array of row,col indices
+- (CGRect)rectForIndices:(NSSet *)indices {
     CGRect rect = CGRectNull;
     for (NSString *index in indices) {
-        NSInteger row = [[[index componentsSeparatedByString:@","] objectAtIndex:0] integerValue];
-        NSInteger col = [[[index componentsSeparatedByString:@","] objectAtIndex:1] integerValue];
-        CGRect indexRect = CGRectMake(col * [self cellWidth], row * [self cellHeight], [self cellWidth], [self cellHeight]);
+        PSGridViewTile *tile = [self.tiles objectForKey:index];
+        
         if (CGRectIsNull(rect)) {
-            rect = indexRect;
+            rect = tile.frame;
         } else {
-            rect = CGRectUnion(rect, indexRect);
+            rect = CGRectUnion(rect, tile.frame);
         }
     }
     
 //    NSLog(@"Rect for Indices %@", NSStringFromCGRect(rect));
-    
     return rect;
 }
 
@@ -332,17 +344,18 @@
     return [NSString stringWithFormat:@"%d,%d", row, col];
 }
 
-// Returns index for row/col
-- (NSString *)indexForRow:(NSInteger)row col:(NSInteger)col {
-    return [NSString stringWithFormat:@"%d,%d", row, col];
+// UNUSED
+- (NSInteger)rowForIndex:(NSString *)index {
+    NSInteger row = [[[index componentsSeparatedByString:@","] objectAtIndex:0] integerValue];
+    
+    return row;
 }
 
 // UNUSED
-- (NSString *)coordinateForIndex:(NSString *)index {
-    NSInteger row = [[[index componentsSeparatedByString:@","] objectAtIndex:0] integerValue];
+- (NSInteger)colForIndex:(NSString *)index {
     NSInteger col = [[[index componentsSeparatedByString:@","] objectAtIndex:1] integerValue];
     
-    return [NSString stringWithFormat:@"%d,%d", row, col];
+    return col;
 }
 
 #pragma mark - Layout
@@ -373,24 +386,26 @@
 }
 
 - (void)relayoutCells {
-    // Create base tiles
+    // Layout base tiles
     for (int row = 0; row < self.numRows; row++) {
         for (int col = 0; col < self.numCols; col++) {
             PSGridViewTile *tileView = [self.tiles objectForKey:[self indexForRow:row col:col]];
-            CGRect tileRect = CGRectMake(col * [self cellWidth], row * [self cellHeight], [self cellWidth], [self cellHeight]);;
+            CGRect tileRect = CGRectMake(col * [self cellWidth] + (1.0 * col) + 1.0, row * [self cellHeight] + (1.0 * row) + 1.0, [self cellWidth], [self cellHeight]);;
             tileView.frame = tileRect;
         }
     }
     
     // Add existing cells back
-    [self.cells enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        PSGridViewCell *cell = obj;
-        NSArray *indices = [key componentsSeparatedByString:@"|"];
-        CGRect indicesRect = [self rectForIndices:indices];
-        
-        cell.frame = indicesRect;
+    for (PSGridViewCell *cell in self.cells) {
+        cell.frame = [self rectForIndices:cell.indices];
         [self.gridView addSubview:cell];
-    }];
+    }
+    
+    // Calculate content size and frame
+    CGFloat width = self.numCols * [self cellWidth] + (1.0 * self.numCols) + 1.0;
+    CGFloat height = self.numRows * [self cellHeight] + (1.0 * self.numRows) + 1.0;
+    self.contentSize = CGSizeMake(width, height);
+    self.gridView.frame = CGRectMake(0, 0, self.contentSize.width, self.contentSize.height);
 }
 
 #pragma mark - Cells
@@ -404,7 +419,8 @@
                 [self.gridView insertSubview:cell belowSubview:self.selectionView];
                 
                 // Add new key
-                [self.cells setObject:cell forKey:[self keyForIndices:self.touchedIndices]];
+                cell.indices = [self indicesForRect:rect];
+                [self.cells addObject:cell];
                 
                 // Setup gesture recognizer
                 if ([cell.gestureRecognizers count] == 0) {
@@ -431,49 +447,40 @@
 
 - (void)editCell:(PSGridViewCell *)cell {
     if (self.gridViewDelegate && [self.gridViewDelegate respondsToSelector:@selector(gridView:didSelectCell:atIndices:completionBlock:)]) {
-        [self.gridViewDelegate gridView:self didSelectCell:(PSGridViewCell *)cell atIndices:[self indicesForRect:cell.frame] completionBlock:^(BOOL cellConfigured) {
+        [self.gridViewDelegate gridView:self didSelectCell:(PSGridViewCell *)cell atIndices:cell.indices completionBlock:^(BOOL cellConfigured) {
             [self endTouches];
         }];
     }
 }
 
-#pragma mark - Selection View
-- (void)showSelectionView:(BOOL)animated {
+// Remove cell
+- (void)removeCell:(PSGridViewCell *)cell {
     [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.selectionView.alpha = 1.0;
+        cell.alpha = 0.0;
     } completion:^(BOOL finished) {
-        
-    }];
-}
-
-- (void)hideSelectionView:(BOOL)animated {
-    CGFloat animateDuration = animated ? 0.2 : 0.0;
-    [UIView animateWithDuration:animateDuration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.selectionView.alpha = 0.0;
-    } completion:^(BOOL finished) {
-        
+        [cell removeFromSuperview];
+        [self.cells removeObject:cell];
     }];
 }
 
 #pragma mark - Gesture Recognizer
 
 - (void)didSelectCell:(UITapGestureRecognizer *)gestureRecognizer {
-
+    // unused
 }
 
 - (void)didLongPressCell:(UILongPressGestureRecognizer *)gestureRecognizer {
-    PSGridViewCell *cell = (PSGridViewCell *)gestureRecognizer.view;
-    
-    // Remove cell
-    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        cell.alpha = 0.0;
-    } completion:^(BOOL finished) {
-        [cell removeFromSuperview];
-        NSArray *oldIndices = [self indicesForRect:cell.frame];
-        [self.cells removeObjectForKey:[self keyForIndices:oldIndices]];
-    }];
-    
-    
+//    NSLog(@"%d", gestureRecognizer.state);
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        if (self.gridViewDelegate && [self.gridViewDelegate respondsToSelector:@selector(gridView:didLongPressCell:atIndices:completionBlock:)]) {
+            PSGridViewCell *cell = (PSGridViewCell *)gestureRecognizer.view;
+            [self.gridViewDelegate gridView:self didLongPressCell:cell atIndices:cell.indices completionBlock:^(BOOL cellRemoved) {
+                if (cellRemoved) {
+                    [self removeCell:cell];
+                }
+            }];
+        }
+    }
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
@@ -486,154 +493,114 @@
     }
 }
 
+#pragma mark - Selection View
+- (void)showSelectionView:(BOOL)animated withRect:(CGRect)rect {
+    self.selectionView.frame = rect;
+    [self.gridView bringSubviewToFront:self.selectionView];
+    self.selectionView.backgroundColor = SELECTION_OK_BG_COLOR;
+    if (self.selectionView.alpha != 1.0) {
+        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            self.selectionView.alpha = 1.0;
+        } completion:^(BOOL finished) {
+            
+        }];
+    }
+}
+
+- (void)hideSelectionView:(BOOL)animated {
+    CGFloat animateDuration = animated ? 0.2 : 0.0;
+    [UIView animateWithDuration:animateDuration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.selectionView.alpha = 0.0;
+    } completion:^(BOOL finished) {
+        
+    }];
+}
+
 
 #pragma mark - Touches
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-//    [super touchesBegan:touches withEvent:event];
-    [self touchesBeganOrMoved:touches withEvent:event];
+    [super touchesBegan:touches withEvent:event];
+    
+    [self beginTouches];
+    
+    // Figure out if we touched an existing cell
+    for (UITouch *touch in touches) {
+        CGPoint touchPoint = [touch locationInView:self.gridView];
+        self.touchOrigin = touchPoint;
+        
+        if (!self.touchedCell && !self.touchedTile && [touch.view isKindOfClass:[PSGridViewCell class]]) {
+            // Cell
+            self.touchedCell = (PSGridViewCell *)touch.view;
+            self.shouldTouchCell = YES;
+            
+            [self.touchedIndices unionSet:[(PSGridViewCell *)touch.view indices]];
+        } else if (!self.touchedTile && !self.touchedCell && [touch.view isKindOfClass:[PSGridViewTile class]]) {
+            // Tile
+            self.touchedTile = (PSGridViewTile *)touch.view;
+            self.shouldTouchCell = YES;
+        } else {
+            // Neither cell nor tile
+            self.shouldTouchCell = NO;
+        }
+        
+        // Add all touches
+        NSString *touchIndex = [self indexForPoint:touchPoint];
+        if (touchIndex) {
+            [self.touchedIndices addObject:touchIndex];
+        }
+        
+        // Show selection view overlay
+        [self showSelectionView:YES withRect:[self rectForIndices:self.touchedIndices]];
+    }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-//    [super touchesMoved:touches withEvent:event];
-    [self touchesBeganOrMoved:touches withEvent:event];
-}
-
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-//    [super touchesCancelled:touches withEvent:event];
-    [self endTouches];
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-//    [super touchesEnded:touches withEvent:event];
+    [super touchesMoved:touches withEvent:event];
     
-    // We are creating a new cell
-    if (self.shouldCreateCell) {
-        // This is the new proposed cell rect
-        CGRect newCellRect = [self rectForIndices:self.touchedIndices];
+    [self.activeTouches unionSet:touches];
+    
+//    for (UITouch *touch in touches) {
+//        CGPoint touchPoint = [touch locationInView:self.gridView];
+//        
+//        // Add all touches
+//        NSString *touchIndex = [self indexForPoint:touchPoint];
+//        if (touchIndex) {
+//            [self.movedIndices addObject:touchIndex];
+//        }
+//    }
+    
+    // We are now pinching
+    if (self.activeTouches.count == 2) {
+        NSArray *allActiveTouches = [self.activeTouches allObjects];
+        CGPoint p0, p1;
+        p0 = [[allActiveTouches objectAtIndex:0] locationInView:self.gridView];
+        p1 = [[allActiveTouches objectAtIndex:1] locationInView:self.gridView];
         
-        // Add a new cell
-        [self addCellWithRect:newCellRect];
-    } else if (!self.didResizeCell && [self.touchedCell isEqual:[[touches anyObject] view]]) {
-        // Edit a cell
+        CGRect touchRect = CGRectMake(MIN(p0.x, p1.x), MIN(p0.y, p1.y), fabsf(p0.x - p1.x), fabsf(p0.y - p1.y));
+        NSSet *movedIndices = [self indicesForRect:touchRect];
+        
+        // This is the new proposed cell rect
+        CGRect newCellRect = [self rectForIndices:movedIndices];
         
         // Show selection view overlay
-        self.selectionView.frame = self.touchedCell.frame;
-        [self.gridView bringSubviewToFront:self.selectionView];
-        self.selectionView.backgroundColor = SELECTION_OK_BG_COLOR;
-        if (self.selectionView.alpha != 1.0) {
-            [self showSelectionView:YES];
-        }
+        [self showSelectionView:YES withRect:newCellRect];
         
-        [self editCell:self.touchedCell];
-    } else {
-        [self endTouches];
-    }
-}
-
-- (void)touchesBeganOrMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-//    NSLog(@"Began or Moved: %@", touches);
-//    NSLog(@"x: %f, y: %f", [[touches anyObject] locationInView:self.gridView].x, [[touches anyObject] locationInView:self.gridView].y);
-
-    [self beginTouches];
-    
-    // Detect number of touches
-    if (touches.count == 1) {
-        // Detect if a tile has been touched for the first time
-        UITouch *touch = [touches anyObject];
-        CGPoint touchPoint = [touch locationInView:self.gridView];
-        if (!self.touchedTile && [touch.view isKindOfClass:[PSGridViewTile class]]) {
-            self.touchedTile = (PSGridViewTile *)touch.view;
-            self.touchOrigin = touchPoint;
-        }
-        
-        // Detect if this is a cell being touched for the first time
-        if (!self.touchedCell && [touch.view isKindOfClass:[PSGridViewCell class]]) {
-            self.touchedCell = (PSGridViewCell *)touch.view;
-        }
-        
-        // If the touch isnt' on a tile, it is invalid
-        if (![touch.view isKindOfClass:[PSGridViewTile class]]) {
-            return;
-        }
-    } else if (touches.count == 2) {
-        // Figure out if we touched an existing cell
-        for (UITouch *touch in touches) {
-            if (!self.touchedCell && [touch.view isKindOfClass:[PSGridViewCell class]]) {
-                self.touchedCell = (PSGridViewCell *)touch.view;
-            }
-            
-            // If the touch isnt' on a cell, it is invalid
-            if (![touch.view isKindOfClass:[PSGridViewCell class]]) {
-                return;
+        // Check to see if the current touch rectangle conflicts with any existing cells
+        BOOL hasConflict = NO;
+        for (PSGridViewCell *cell in self.cells) {
+            // Only conflict with other cells, not itself
+            if (![cell isEqual:self.touchedCell]) {
+                // If current touch area intersects an existing cell, we have a conflict
+                if (CGRectIntersectsRect(newCellRect, cell.frame)) {
+                    hasConflict = YES;
+                }
             }
         }
-    } else {
-        // Do not respond to touches that are more than 2
-        return;
-    }
-    
-    // Calculate touch rectangle
-    CGPoint p0, p1;
-    if (self.touchedTile) {
-        // Find the touch rectangle from origin to destination
-        UITouch *touch = [touches anyObject];
-        CGPoint touchPoint = [touch locationInView:self.gridView];
-        p0 = self.touchOrigin;
-        p1 = touchPoint;
-    } else if (self.touchedCell) {
-        // Calculate touch rectangle from all touches
-        NSArray *allTouches = [touches allObjects];
-        p0 = [[allTouches objectAtIndex:0] locationInView:self.gridView];
-        p1 = [[allTouches objectAtIndex:1] locationInView:self.gridView];
-    } else {
-        // Did not touch a valid object
-        return;
-    }
-    
-    CGRect touchRect = CGRectMake(MIN(p0.x, p1.x), MIN(p0.y, p1.y), fabsf(p0.x - p1.x), fabsf(p0.y - p1.y));
-    self.touchRect = touchRect; // selection area
-    self.touchedIndices = [self indicesForRect:touchRect];
-    
-    
-    // Check to see if the current touch rectangle conflicts with any existing cells
-    __block BOOL hasConflict = NO;
-    [self.cells enumerateKeysAndObjectsUsingBlock:^(id key, PSGridViewCell *cell, BOOL *stop) {
-        // Only conflict with other cells, not itself
-        if (![cell isEqual:self.touchedCell]) {
-            NSArray *cellIndices = [self indicesForKey:key];
-            CGRect cellIndicesRect = [self rectForIndices:cellIndices];
-            
-            // If current touch area intersects an existing cell, we have a conflict
-            if (CGRectIntersectsRect(touchRect, cellIndicesRect)) {
-                hasConflict = YES;
-                *stop = YES;
-            }
-        }
-    }];
-    
-    
-    if (!hasConflict) {
-        // This is the new proposed cell rect
-        CGRect newCellRect = [self rectForIndices:self.touchedIndices];
         
-        // Show selection view overlay
-        self.selectionView.frame = newCellRect;
-        [self.gridView bringSubviewToFront:self.selectionView];
-        self.selectionView.backgroundColor = SELECTION_OK_BG_COLOR;
-        if (self.selectionView.alpha != 1.0) {
-            [self showSelectionView:YES];
-        }
-        
-        if (self.touchedTile) {
-            // We are creating a new cell
-            self.shouldCreateCell = YES;
-        } else if (self.touchedCell) {
+        // No conflict with existing cells
+        if (!hasConflict) {
             // We are modifying an existing cell
-            // Remove old key
-            NSArray *oldIndices = [self indicesForRect:self.touchedCell.frame];
-            [self.cells removeObjectForKey:[self keyForIndices:oldIndices]];
-            
             // if new rect is wholly resides in existing rect, this is a shrink
             if (CGRectContainsRect(self.touchedCell.frame, newCellRect)) {
                 self.touchedCell.frame = newCellRect;
@@ -641,20 +608,86 @@
                 self.touchedCell.frame = CGRectUnion(newCellRect, self.touchedCell.frame);
             }
             
-            // Add new key
-            NSArray *newIndices = [self indicesForRect:self.touchedCell.frame];
-            [self.cells setObject:self.touchedCell forKey:[self keyForIndices:newIndices]];
-            
-            self.didResizeCell = YES;
+            self.touchedCell.indices = [self indicesForRect:self.touchedCell.frame];
+            self.shouldTouchCell = NO;
         } else {
-            // Did not touch a valid object
-            return;
+            // Conflicting cell, No-Op
+            self.selectionView.backgroundColor = SELECTION_ERROR_BG_COLOR;
+            self.shouldTouchCell = NO;
         }
-    } else {
-        // Conflicting cell, No-Op
-        self.selectionView.backgroundColor = SELECTION_ERROR_BG_COLOR;
-        return;
+    } else if (self.touchedTile && !self.touchedCell && self.activeTouches.count == 1) {
+        // Find the touch rectangle from origin to destination
+        UITouch *touch = [touches anyObject];
+        CGPoint touchPoint = [touch locationInView:self.gridView];
+        CGPoint p0, p1;
+        p0 = self.touchOrigin;
+        p1 = touchPoint;
+        
+        CGRect touchRect = CGRectMake(MIN(p0.x, p1.x), MIN(p0.y, p1.y), fabsf(p0.x - p1.x), fabsf(p0.y - p1.y));
+        NSSet *movedIndices = [self indicesForRect:touchRect];
+        
+        // This is the new proposed cell rect
+        CGRect newCellRect = [self rectForIndices:movedIndices];
+        
+        // Show selection view overlay
+        [self showSelectionView:YES withRect:newCellRect];
+        
+        // Check to see if the current touch rectangle conflicts with any existing cells
+        BOOL hasConflict = NO;
+        for (PSGridViewCell *cell in self.cells) {
+            // Only conflict with other cells, not itself
+            if (![cell isEqual:self.touchedCell]) {
+                // If current touch area intersects an existing cell, we have a conflict
+                if (CGRectIntersectsRect(newCellRect, cell.frame)) {
+                    hasConflict = YES;
+                }
+            }
+        }
+        
+        // No conflict with existing cells
+        if (!hasConflict) {
+            [self.touchedIndices unionSet:movedIndices];
+            self.shouldTouchCell = YES;
+        } else {
+            // Conflicting cell, No-Op
+            self.selectionView.backgroundColor = SELECTION_ERROR_BG_COLOR;
+            self.shouldTouchCell = NO;
+        }
     }
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesEnded:touches withEvent:event];
+    
+    for (UITouch *touch in touches) {
+        UIView *touchView = touch.view;
+        if (self.shouldTouchCell && self.touchedTile && [touchView isKindOfClass:[PSGridViewTile class]]) {
+            // new cell
+            
+            // This is the new proposed cell rect
+            CGRect newCellRect = [self rectForIndices:self.touchedIndices];
+            
+            // Add a new cell
+            // Show selection view overlay
+            [self showSelectionView:YES withRect:newCellRect];
+            [self addCellWithRect:newCellRect];
+        } else if (self.shouldTouchCell && self.touchedCell && [touchView isKindOfClass:[PSGridViewCell class]]) {
+            // existing cell
+            
+            // Edit a cell
+            // Show selection view overlay
+            [self showSelectionView:YES withRect:self.touchedCell.frame];
+            [self editCell:self.touchedCell];
+        } else {
+            // neither cell nor tile
+            [self endTouches];
+        }
+    }
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesCancelled:touches withEvent:event];
+    [self endTouches];
 }
 
 - (void)beginTouches {
@@ -662,21 +695,21 @@
     self.scrollEnabled = NO;
     self.pinchGestureRecognizer.enabled = NO;
     self.panGestureRecognizer.enabled = NO;
-    
-    // Default cell creation to NO;
-    self.shouldCreateCell = NO;
 }
 
 - (void)endTouches {
     // Hide selection view
     [self hideSelectionView:YES];
     
+    self.shouldTouchCell = NO;
+    
     // Reset touched cell and tile
     self.touchedCell = nil;
     self.touchedTile = nil;
     
-    self.didResizeCell = NO;
-    self.shouldCreateCell = NO;
+    // Remove all touched indices
+    [self.touchedIndices removeAllObjects];
+    [self.activeTouches removeAllObjects];
     
     // Re-enable scrollview scrolling and gesture detection
     self.scrollEnabled = YES;
