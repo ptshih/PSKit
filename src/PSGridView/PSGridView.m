@@ -96,8 +96,8 @@
 
 #define TILE_BG_COLOR [UIColor colorWithRGBHex:0xefefef]
 #define TILE_BORDER_COLOR [UIColor colorWithRGBHex:0x9a9a9a]
-#define SELECTION_OK_BG_COLOR RGBACOLOR(0, 0, 0, 0.5)
-#define SELECTION_ERROR_BG_COLOR RGBACOLOR(255.0, 0, 0, 0.7)
+#define SELECTION_OK_BG_COLOR RGBACOLOR(0, 0, 0, 0.3)
+#define SELECTION_ERROR_BG_COLOR RGBACOLOR(255.0, 0, 0, 0.6)
 
 
 // This is the class for the tile background
@@ -129,6 +129,7 @@
 @property (nonatomic, assign, readwrite) CGFloat offsetThreshold;
 
 @property (nonatomic, assign) BOOL shouldCreateCell;
+@property (nonatomic, assign) BOOL didResizeCell;
 @property (nonatomic, assign) CGRect touchRect;
 @property (nonatomic, assign) CGPoint touchOrigin;
 @property (nonatomic, assign) PSGridViewCell *touchedCell;
@@ -164,6 +165,7 @@
         self.offsetThreshold = floorf(self.height / 4.0);
         
         self.shouldCreateCell = NO;
+        self.didResizeCell = NO;
         self.touchRect = CGRectZero;
         self.touchedCell = nil;
         self.touchedTile = nil;
@@ -391,101 +393,45 @@
 #pragma mark - Cells
 
 - (void)addCellWithRect:(CGRect)rect {
-    // Configure the cell, if successful then add it
-    [UIActionSheet actionSheetWithTitle:@"Add/Edit Content" message:nil destructiveButtonTitle:nil buttons:@[@"Text", @"Image URL", @"Color"] showInView:self onDismiss:^(int buttonIndex, NSString *textInput) {
+    if (self.gridViewDataSource) {
         PSGridViewCell *cell = [[PSGridViewCell alloc] initWithFrame:rect];
-        [self.gridView insertSubview:cell belowSubview:self.selectionView];
-        
-        // Add new key
-        [self.cells setObject:cell forKey:[self keyForIndices:self.touchedIndices]];
-        
-        // Setup gesture recognizer
-        if ([cell.gestureRecognizers count] == 0) {
-            PSGridViewTapGestureRecognizer *gr = [[PSGridViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectCell:)];
-            gr.delegate = self;
-            [cell addGestureRecognizer:gr];
-            
-            PSGridViewLongPressGestureRecognizer *lpgr = [[PSGridViewLongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongPressCell:)];
-            lpgr.delegate = self;
-            [cell addGestureRecognizer:lpgr];
-            
-            cell.userInteractionEnabled = YES;
-        }
-        
-        // Load with configuration
-        switch (buttonIndex) {
-            case 0: {
-                [UIAlertView alertViewWithTitle:@"Enter Text" style:UIAlertViewStylePlainTextInput message:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Ok"] onDismiss:^(int buttonIndex, NSString *textInput){
-                    NSLog(@"%@", textInput);
+        [self.gridViewDataSource gridView:self configureCell:cell completionBlock:^(BOOL cellConfigured) {
+            if (cellConfigured) {
+                // Config success
+                [self.gridView insertSubview:cell belowSubview:self.selectionView];
+                
+                // Add new key
+                [self.cells setObject:cell forKey:[self keyForIndices:self.touchedIndices]];
+                
+                // Setup gesture recognizer
+                if ([cell.gestureRecognizers count] == 0) {
+//                    PSGridViewTapGestureRecognizer *gr = [[PSGridViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectCell:)];
+//                    gr.delegate = self;
+//                    [cell addGestureRecognizer:gr];
                     
-                    if (textInput.length > 0) {
-                        [cell loadText:textInput];
-                    }
-                } onCancel:^{
-                }];
-                break;
-            }
-            case 1: {
-                [UIAlertView alertViewWithTitle:@"Image" style:UIAlertViewStylePlainTextInput message:@"URL" cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Ok"] onDismiss:^(int buttonIndex, NSString *textInput){
-                    NSLog(@"%@", textInput);
+                    PSGridViewLongPressGestureRecognizer *lpgr = [[PSGridViewLongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongPressCell:)];
+                    lpgr.delegate = self;
+                    [cell addGestureRecognizer:lpgr];
                     
-                    if (textInput.length > 0) {
-                        [cell loadImageAtURL:[NSURL URLWithString:textInput]];
-                    }
-                } onCancel:^{
-                }];
-                break;
+                    cell.userInteractionEnabled = YES;
+                }
+                [self endTouches];
+            } else {
+                // Config aborted
+                [self endTouches];
             }
-            case 2: {
-                [cell loadColor:TEXTURE_DARK_LINEN];
-                break;
-            }
-            default:
-                break;
-        }
+        }];
+    } else {
         [self endTouches];
-    } onCancel:^{
-        [self endTouches];
-    }];
+    }
 }
 
-// Public
 - (void)editCell:(PSGridViewCell *)cell {
-    [UIActionSheet actionSheetWithTitle:@"Add/Edit Content" message:nil destructiveButtonTitle:nil buttons:@[@"Text", @"Image URL", @"Color"] showInView:self onDismiss:^(int buttonIndex, NSString *textInput) {
-        
-        // Load with configuration
-        switch (buttonIndex) {
-            case 0: {
-                [UIAlertView alertViewWithTitle:@"Enter Text" style:UIAlertViewStylePlainTextInput message:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Ok"] onDismiss:^(int buttonIndex, NSString *textInput){
-                    NSLog(@"%@", textInput);
-                    
-                    if (textInput.length > 0) {
-                        [cell loadText:textInput];
-                    }
-                } onCancel:^{
-                }];
-                break;
-            }
-            case 1: {
-                [UIAlertView alertViewWithTitle:@"Image" style:UIAlertViewStylePlainTextInput message:@"URL" cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Ok"] onDismiss:^(int buttonIndex, NSString *textInput){
-                    NSLog(@"%@", textInput);
-                    
-                    if (textInput.length > 0) {
-                        [cell loadImageAtURL:[NSURL URLWithString:textInput]];
-                    }
-                } onCancel:^{
-                }];
-                break;
-            }
-            case 2: {
-                [cell loadColor:TEXTURE_DARK_LINEN];
-                break;
-            }
-            default:
-                break;
-        }
-    } onCancel:^{
-    }];
+    if (self.gridViewDelegate && [self.gridViewDelegate respondsToSelector:@selector(gridView:didSelectCell:atIndices:completionBlock:)]) {
+        [self.gridViewDelegate gridView:self didSelectCell:(PSGridViewCell *)cell atIndices:[self indicesForRect:cell.frame] completionBlock:^(BOOL cellConfigured) {
+            [self endTouches];
+        }];
+    }
 }
 
 #pragma mark - Selection View
@@ -509,9 +455,7 @@
 #pragma mark - Gesture Recognizer
 
 - (void)didSelectCell:(UITapGestureRecognizer *)gestureRecognizer {
-    if (self.gridViewDelegate && [self.gridViewDelegate respondsToSelector:@selector(gridView:didSelectCell:atIndices:)]) {
-        [self.gridViewDelegate gridView:self didSelectCell:(PSGridViewCell *)gestureRecognizer.view atIndices:[self indicesForRect:gestureRecognizer.view.frame]];
-    }
+
 }
 
 - (void)didLongPressCell:(UILongPressGestureRecognizer *)gestureRecognizer {
@@ -554,7 +498,7 @@
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
 //    [super touchesCancelled:touches withEvent:event];
-    [self touchesEndedOrCancelled:touches withEvent:event];
+    [self endTouches];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -562,12 +506,23 @@
     
     // We are creating a new cell
     if (self.shouldCreateCell) {
-        self.shouldCreateCell = NO;
         // This is the new proposed cell rect
         CGRect newCellRect = [self rectForIndices:self.touchedIndices];
         
         // Add a new cell
         [self addCellWithRect:newCellRect];
+    } else if (!self.didResizeCell && [self.touchedCell isEqual:[[touches anyObject] view]]) {
+        // Edit a cell
+        
+        // Show selection view overlay
+        self.selectionView.frame = self.touchedCell.frame;
+        [self.gridView bringSubviewToFront:self.selectionView];
+        self.selectionView.backgroundColor = SELECTION_OK_BG_COLOR;
+        if (self.selectionView.alpha != 1.0) {
+            [self showSelectionView:YES];
+        }
+        
+        [self editCell:self.touchedCell];
     } else {
         [self endTouches];
     }
@@ -587,6 +542,11 @@
         if (!self.touchedTile && [touch.view isKindOfClass:[PSGridViewTile class]]) {
             self.touchedTile = (PSGridViewTile *)touch.view;
             self.touchOrigin = touchPoint;
+        }
+        
+        // Detect if this is a cell being touched for the first time
+        if (!self.touchedCell && [touch.view isKindOfClass:[PSGridViewCell class]]) {
+            self.touchedCell = (PSGridViewCell *)touch.view;
         }
         
         // If the touch isnt' on a tile, it is invalid
@@ -681,6 +641,8 @@
             // Add new key
             NSArray *newIndices = [self indicesForRect:self.touchedCell.frame];
             [self.cells setObject:self.touchedCell forKey:[self keyForIndices:newIndices]];
+            
+            self.didResizeCell = YES;
         } else {
             // Did not touch a valid object
             return;
@@ -690,10 +652,6 @@
         self.selectionView.backgroundColor = SELECTION_ERROR_BG_COLOR;
         return;
     }
-}
-
-- (void)touchesEndedOrCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-    [self endTouches];
 }
 
 - (void)beginTouches {
@@ -713,6 +671,9 @@
     // Reset touched cell and tile
     self.touchedCell = nil;
     self.touchedTile = nil;
+    
+    self.didResizeCell = NO;
+    self.shouldCreateCell = NO;
     
     // Re-enable scrollview scrolling and gesture detection
     self.scrollEnabled = YES;
