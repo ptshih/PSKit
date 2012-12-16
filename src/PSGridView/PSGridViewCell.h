@@ -13,5 +13,6 @@
 - (void)loadText:(NSString *)text;
 - (void)loadImageAtURL:(NSURL *)URL;
 - (void)loadColor:(UIColor *)color;
+- (void)loadImage:(UIImage *)image;
 
 @end

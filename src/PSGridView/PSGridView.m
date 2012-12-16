@@ -98,6 +98,7 @@
 #define TILE_BORDER_COLOR [UIColor colorWithRGBHex:0x9a9a9a]
 #define SELECTION_OK_BG_COLOR RGBACOLOR(0, 0, 0, 0.3)
 #define SELECTION_ERROR_BG_COLOR RGBACOLOR(255.0, 0, 0, 0.6)
+#define SELECTION_BORDER_COLOR [UIColor colorWithRGBHex:0x7a7a7a]
 
 
 // This is the class for the tile background
@@ -183,6 +184,8 @@
         self.selectionView = [[UIView alloc] initWithFrame:CGRectZero];
         self.selectionView.userInteractionEnabled = NO;
         self.selectionView.backgroundColor = SELECTION_OK_BG_COLOR;
+        self.selectionView.layer.borderWidth = 1.0;
+        self.selectionView.layer.borderColor = [SELECTION_BORDER_COLOR CGColor];
         self.selectionView.alpha = 0.0;
         [self.gridView addSubview:self.selectionView];
         
@@ -229,7 +232,7 @@
     }
     
     // Zoom scale
-    self.minimumZoomScale = isDeviceIPad() ? (2.0 / 3.0) : 0.25;
+    self.minimumZoomScale = isDeviceIPad() ? (2.0 / 3.0) : 0.5;
     self.maximumZoomScale = 1.0;
     self.zoomScale = 1.0;
     

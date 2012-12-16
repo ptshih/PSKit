@@ -93,9 +93,14 @@
 }
 
 - (void)loadImage:(UIImage *)image {
+    [self prepareLoad];
     [self setupImageView];
     
     self.imageView.image = image;
+    [self.imageView.loadingIndicator stopAnimating];
+    
+    // Photo
+    self.imageView.frame = self.contentView.bounds;
 }
 
 - (void)loadImageAtURL:(NSURL *)URL {
