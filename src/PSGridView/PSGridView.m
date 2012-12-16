@@ -100,6 +100,8 @@
 #define SELECTION_ERROR_BG_COLOR RGBACOLOR(255.0, 0, 0, 0.6)
 #define SELECTION_BORDER_COLOR [UIColor colorWithRGBHex:0x7a7a7a]
 
+#define TILE_MARGIN 2.0
+
 
 // This is the class for the tile background
 @interface PSGridViewTile : UIView
@@ -128,6 +130,7 @@
 @property (nonatomic, assign, readwrite) CGFloat lastWidth;
 @property (nonatomic, assign, readwrite) CGFloat lastOffset;
 @property (nonatomic, assign, readwrite) CGFloat offsetThreshold;
+
 
 @property (nonatomic, assign) BOOL shouldTouchCell;
 @property (nonatomic, assign) CGRect touchRect;
@@ -191,46 +194,62 @@
         [self.gridView addSubview:self.selectionView];
         
         
+        // Calculate content size and frame
+        CGFloat width = self.numCols * [self cellWidth] + (TILE_MARGIN * self.numCols) + TILE_MARGIN;
+        CGFloat height = self.numRows * [self cellHeight] + (TILE_MARGIN * self.numRows) + TILE_MARGIN;
+        self.contentSize = CGSizeMake(width, height);
+        self.gridView.frame = CGRectMake(0, 0, self.contentSize.width, self.contentSize.height);
+        
+        // Draw Borders
+//        [self.borders makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
+//        [self.borders removeAllObjects];
+//        for (int row = 0; row <= self.numRows; row++) {
+//            CALayer *hBorder = [CALayer layer];
+//            hBorder.frame = CGRectMake(0, row * [self cellHeight] + (1.0 * row), self.gridView.width, 1.0);
+//            hBorder.backgroundColor = TILE_BORDER_COLOR.CGColor;
+//            hBorder.rasterizationScale = [UIScreen mainScreen].scale;
+//            hBorder.shouldRasterize = YES;
+//            [self.gridView.layer addSublayer:hBorder];
+//            [self.borders addObject:hBorder];
+//        }
+//        
+//        for (int col = 0; col <= self.numCols; col++) {
+//            CALayer *vBorder = [CALayer layer];
+//            vBorder.frame = CGRectMake(col * [self cellWidth] + (1.0 * col), 0, 1.0, self.gridView.height);
+//            vBorder.backgroundColor = TILE_BORDER_COLOR.CGColor;
+//            vBorder.rasterizationScale = [UIScreen mainScreen].scale;
+//            vBorder.shouldRasterize = YES;
+//            [self.gridView.layer addSublayer:vBorder];
+//            [self.borders addObject:vBorder];
+//        }
+        
         // Create base tiles
         for (int row = 0; row < self.numRows; row++) {
             for (int col = 0; col < self.numCols; col++) {
                 PSGridViewTile *tileView = [[PSGridViewTile alloc] initWithFrame:CGRectZero];
                 tileView.multipleTouchEnabled = YES;
-//                tileView.backgroundColor = RGBCOLOR(arc4random() % 255, arc4random() % 255, arc4random() % 255);
+                CGRect tileRect = CGRectMake(col * [self cellWidth] + (TILE_MARGIN * col) + TILE_MARGIN, row * [self cellHeight] + (TILE_MARGIN * row) + TILE_MARGIN, [self cellWidth], [self cellHeight]);;
+                tileView.frame = tileRect;
                 
                 [self.gridView addSubview:tileView];
                 [self.tiles setObject:tileView forKey:[self indexForRow:row col:col]];
             }
         }
+        
+        // Layout base tiles
+//        for (int row = 0; row < self.numRows; row++) {
+//            for (int col = 0; col < self.numCols; col++) {
+//                PSGridViewTile *tileView = [self.tiles objectForKey:[self indexForRow:row col:col]];
+//                CGRect tileRect = CGRectMake(col * [self cellWidth] + (TILE_MARGIN * col) + TILE_MARGIN, row * [self cellHeight] + (TILE_MARGIN * row) + TILE_MARGIN, [self cellWidth], [self cellHeight]);;
+//                tileView.frame = tileRect;
+//            }
+//        }
+        
+        // Zoom scale
+        self.minimumZoomScale = isDeviceIPad() ? 0.6 : 0.5;
+        self.maximumZoomScale = 1.0;
+        self.zoomScale = 1.0;
     }
-    
-    // Draw Borders
-//    [self.borders makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
-//    [self.borders removeAllObjects];
-//    for (int row = 0; row <= self.numRows; row++) {
-//        CALayer *hBorder = [CALayer layer];
-//        hBorder.frame = CGRectMake(0, row * [self cellHeight] -0.5, self.gridView.width, 1.0);
-//        hBorder.backgroundColor = TILE_BORDER_COLOR.CGColor;
-//        hBorder.rasterizationScale = [UIScreen mainScreen].scale;
-//        hBorder.shouldRasterize = YES;
-//        [self.gridView.layer addSublayer:hBorder];
-//        [self.borders addObject:hBorder];
-//    }
-//    
-//    for (int col = 0; col <= self.numCols; col++) {
-//        CALayer *vBorder = [CALayer layer];
-//        vBorder.frame = CGRectMake(col * [self cellWidth] -0.5, 0, 1.0, self.gridView.height);
-//        vBorder.backgroundColor = TILE_BORDER_COLOR.CGColor;
-//        vBorder.rasterizationScale = [UIScreen mainScreen].scale;
-//        vBorder.shouldRasterize = YES;
-//        [self.gridView.layer addSublayer:vBorder];
-//        [self.borders addObject:vBorder];
-//    }
-    
-    // Zoom scale
-    self.minimumZoomScale = isDeviceIPad() ? 0.6 : 0.5;
-    self.maximumZoomScale = 1.0;
-    self.zoomScale = 1.0;
     
     return self;
 }
@@ -386,26 +405,11 @@
 }
 
 - (void)relayoutCells {
-    // Layout base tiles
-    for (int row = 0; row < self.numRows; row++) {
-        for (int col = 0; col < self.numCols; col++) {
-            PSGridViewTile *tileView = [self.tiles objectForKey:[self indexForRow:row col:col]];
-            CGRect tileRect = CGRectMake(col * [self cellWidth] + (1.0 * col) + 1.0, row * [self cellHeight] + (1.0 * row) + 1.0, [self cellWidth], [self cellHeight]);;
-            tileView.frame = tileRect;
-        }
-    }
-    
     // Add existing cells back
-    for (PSGridViewCell *cell in self.cells) {
-        cell.frame = [self rectForIndices:cell.indices];
-        [self.gridView addSubview:cell];
-    }
-    
-    // Calculate content size and frame
-    CGFloat width = self.numCols * [self cellWidth] + (1.0 * self.numCols) + 1.0;
-    CGFloat height = self.numRows * [self cellHeight] + (1.0 * self.numRows) + 1.0;
-    self.contentSize = CGSizeMake(width, height);
-    self.gridView.frame = CGRectMake(0, 0, self.contentSize.width, self.contentSize.height);
+//    for (PSGridViewCell *cell in self.cells) {
+//        cell.frame = [self rectForIndices:cell.indices];
+//        [self.gridView addSubview:cell];
+//    }
 }
 
 #pragma mark - Cells
@@ -484,12 +488,11 @@
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    if (![gestureRecognizer isMemberOfClass:[PSGridViewTapGestureRecognizer class]] && ![gestureRecognizer isMemberOfClass:[PSGridViewLongPressGestureRecognizer class]]) return YES;
-    
-    if ([touch.view isKindOfClass:[PSGridViewCell class]]) {
-        return YES;
+    if ([touch.view isKindOfClass:[PSGridViewCell class]] && [gestureRecognizer isMemberOfClass:[PSGridViewLongPressGestureRecognizer class]]) {
+        // GR touches happen before subclass overrides
+        return (self.activeTouches.count == 0);
     } else {
-        return NO;
+        return YES;
     }
 }
 
@@ -552,13 +555,14 @@
         
         // Show selection view overlay
         [self showSelectionView:YES withRect:[self rectForIndices:self.touchedIndices]];
+        
+        // Add touch to activeTouches
+        [self.activeTouches addObject:touch];
     }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesMoved:touches withEvent:event];
-    
-    [self.activeTouches unionSet:touches];
     
 //    for (UITouch *touch in touches) {
 //        CGPoint touchPoint = [touch locationInView:self.gridView];
@@ -571,7 +575,7 @@
 //    }
     
     // We are now pinching
-    if (self.activeTouches.count == 2) {
+    if (self.touchedCell && !self.touchedTile && self.activeTouches.count == 2) {
         NSArray *allActiveTouches = [self.activeTouches allObjects];
         CGPoint p0, p1;
         p0 = [[allActiveTouches objectAtIndex:0] locationInView:self.gridView];
@@ -646,6 +650,7 @@
         
         // No conflict with existing cells
         if (!hasConflict) {
+            [self.touchedIndices removeAllObjects];
             [self.touchedIndices unionSet:movedIndices];
             self.shouldTouchCell = YES;
         } else {
@@ -660,6 +665,8 @@
     [super touchesEnded:touches withEvent:event];
     
     for (UITouch *touch in touches) {
+        [self.activeTouches removeObject:touch];
+        
         UIView *touchView = touch.view;
         if (self.shouldTouchCell && self.touchedTile && [touchView isKindOfClass:[PSGridViewTile class]]) {
             // new cell
@@ -687,6 +694,11 @@
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesCancelled:touches withEvent:event];
+    
+    for (UITouch *touch in touches) {
+        [self.activeTouches removeObject:touch];
+    }
+    
     [self endTouches];
 }
 
@@ -698,6 +710,11 @@
 }
 
 - (void)endTouches {
+    if (self.activeTouches.count > 0) {
+        NSLog(@"Still have %d touches active", self.activeTouches.count);
+        return;
+    }
+    
     // Hide selection view
     [self hideSelectionView:YES];
     
