@@ -97,9 +97,12 @@
 #define TILE_BG_COLOR [UIColor colorWithRGBHex:0xefefef]
 //#define TILE_BORDER_COLOR [UIColor colorWithRGBHex:0x3a3a3a]
 #define TILE_BORDER_COLOR [UIColor colorWithRGBHex:0xffffff]
-#define SELECTION_OK_BG_COLOR RGBACOLOR(0, 0, 0, 0.3)
-#define SELECTION_ERROR_BG_COLOR RGBACOLOR(255.0, 0, 0, 0.6)
+#define SELECTION_TILE_BG_COLOR RGBACOLOR(0, 0, 0, 0.3)
+#define SELECTION_CELL_BG_COLOR RGBACOLOR(0, 0, 255.0, 0.5)
+#define SELECTION_ERROR_BG_COLOR RGBACOLOR(255.0, 0, 0, 0.5)
+#define SELECTION_TARGET_BG_COLOR RGBACOLOR(0.0, 255.0, 0, 0.5)
 #define SELECTION_BORDER_COLOR [UIColor colorWithRGBHex:0x7a7a7a]
+#define TARGET_BG_COLOR RGBACOLOR(0.0, 255.0, 0, 0.2)
 
 #define TILE_MARGIN 8.0
 
@@ -119,8 +122,27 @@
         self.userInteractionEnabled = NO;
         self.multipleTouchEnabled = YES;
         self.backgroundColor = TILE_BG_COLOR;
-        
-        self.index = @"-1,-1";
+    }
+    return self;
+}
+
+@end
+
+// This is the class for the target background
+@interface PSGridViewTarget : UIView
+
+@property (nonatomic, strong) NSSet *indices;
+
+@end
+
+@implementation PSGridViewTarget
+
+- (id)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.userInteractionEnabled = NO;
+        self.multipleTouchEnabled = YES;
+        self.backgroundColor = TARGET_BG_COLOR;
     }
     return self;
 }
@@ -201,7 +223,7 @@
         // Selection view (touch overlay)
         self.selectionView = [[UIView alloc] initWithFrame:CGRectZero];
         self.selectionView.userInteractionEnabled = NO;
-        self.selectionView.backgroundColor = SELECTION_OK_BG_COLOR;
+        self.selectionView.backgroundColor = SELECTION_ERROR_BG_COLOR;
         self.selectionView.layer.borderWidth = 1.0;
         self.selectionView.layer.borderColor = [SELECTION_BORDER_COLOR CGColor];
         self.selectionView.alpha = 0.0;
@@ -357,7 +379,12 @@
 }
 
 - (void)addTargetWithRect:(CGRect)rect {
+    PSGridViewTarget *target = [[PSGridViewTarget alloc] initWithFrame:rect];
+    target.indices = [self indicesForRect:rect];
+    [self.targets addObject:target];
+    [self.gridView insertSubview:target belowSubview:self.selectionView];
     
+    [self endTouches];
 }
 
 #pragma mark - Gesture Recognizer
@@ -385,7 +412,6 @@
 - (void)showSelectionView:(BOOL)animated withRect:(CGRect)rect {
     self.selectionView.frame = rect;
     [self.gridView bringSubviewToFront:self.selectionView];
-    self.selectionView.backgroundColor = SELECTION_OK_BG_COLOR;
     if (self.selectionView.alpha != 1.0) {
         [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             self.selectionView.alpha = 1.0;
@@ -434,17 +460,18 @@
                     [self.ignoredTouches addObject:touch];
                 } else {
                     self.touchedView = cell;
-//                    [self.touchedIndices addObject:touch]
                     [self.touchedIndices unionSet:cell.indices];
                     
+                    self.originalTouchPoint = touchPoint;
                     self.originalCellRect = cell.frame;
                     
                     [self.activeTouches addObject:touch];
                     
-                    self.shouldCreateOrUpdateCell = YES;
+                    self.selectionView.backgroundColor = SELECTION_CELL_BG_COLOR;
+                    
+                    foundTouch = YES;
                 }
                 
-                foundTouch = YES;
                 break;
             }
         }
@@ -461,6 +488,8 @@
                     [self.activeTouches addObject:touch];
                     
                     self.shouldCreateOrUpdateCell = YES;
+                    
+                    self.selectionView.backgroundColor = SELECTION_TILE_BG_COLOR;
                     
                     foundTouch = YES;
                     break;
@@ -514,6 +543,7 @@
             if (!hasConflict) {
                 [self.touchedIndices removeAllObjects];
                 [self.touchedIndices unionSet:movedIndices];
+                self.selectionView.backgroundColor = SELECTION_TILE_BG_COLOR;
                 self.shouldCreateOrUpdateCell = YES;
             } else {
                 // Conflicting cell, No-Op
@@ -559,6 +589,7 @@
             }
             
             [(PSGridViewCell *)self.touchedView setIndices:[self indicesForRect:self.touchedView.frame]];
+            self.selectionView.backgroundColor = SELECTION_CELL_BG_COLOR;
             self.shouldCreateOrUpdateCell = NO;
         } else {
             // Conflicting cell, No-Op
@@ -566,49 +597,37 @@
             self.shouldCreateOrUpdateCell = NO;
         }
     } else if (self.touchedView && [self.touchedView isKindOfClass:[PSGridViewCell class]] && self.activeTouches.count == 1 && 0) {
-        // Moving an existing cell
+        // DISABLED UNUSED
+        
+        // Find the touch rectangle from origin to destination
         for (UITouch *touch in touches) {
             if ([self.ignoredTouches containsObject:touch]) {
                 continue;
             }
             
             CGPoint touchPoint = [touch locationInView:self.gridView];
-            self.touchedView.center = touchPoint;
-
+            CGPoint p1, p2;
+            p1 = self.originalTouchPoint;
+            p2 = touchPoint;
+            CGRect touchRect = CGRectMake(MIN(p1.x, p2.x), MIN(p1.y, p2.y), fabsf(p1.x - p2.x), fabsf(p1.y - p2.y));
+            NSSet *movedIndices = [self indicesForRect:touchRect];
             
-            NSSet *newIndices = [self indicesForRect:CGRectInset(self.touchedView.frame, TILE_MARGIN, TILE_MARGIN)];
+            // This is the new proposed cell rect
+            CGRect newCellRect = [self rectForIndices:movedIndices];
             
             // Show selection view overlay
-            [self showSelectionView:YES withRect:self.touchedView.frame];
+            [self showSelectionView:YES withRect:newCellRect];
             
-            // Check to see if the current touch rectangle conflicts with any existing cells
-            BOOL hasConflict = NO;
-            for (PSGridViewCell *cell in self.cells) {
-                // Only conflict with other cells, not itself
-                if (![cell isEqual:self.touchedView]) {
-                    // If current touch area intersects an existing cell, we have a conflict
-                    if (CGRectIntersectsRect(self.touchedView.frame, cell.frame)) {
-                        hasConflict = YES;
-                    }
-                }
-            }
-            
-            // No conflict with existing cells
-            if (!hasConflict) {
-                [self.touchedIndices removeAllObjects];
-                [self.touchedIndices unionSet:newIndices];
-                
-//                self.touchedView.frame = newRect;
-//                [(PSGridViewCell *)self.touchedView setIndices:newIndices];
+            // Check to see if the current touch rectangle leaves the area of the cell
+            if (CGRectContainsRect(self.touchedView.frame, newCellRect)) {
+                self.selectionView.backgroundColor = SELECTION_TARGET_BG_COLOR;
                 self.shouldCreateOrUpdateCell = NO;
-                self.shouldMoveCell = YES;
-                self.shouldResetCell = NO;
+                [self.touchedIndices removeAllObjects];
+                [self.touchedIndices unionSet:movedIndices];
             } else {
-                // Conflicting cell, No-Op
+                // error
                 self.selectionView.backgroundColor = SELECTION_ERROR_BG_COLOR;
                 self.shouldCreateOrUpdateCell = NO;
-                self.shouldMoveCell = NO;
-                self.shouldResetCell = YES;
             }
         }
     }
@@ -647,20 +666,13 @@
                 
                 // Add a new cell
                 // Show selection view overlay
-                [self showSelectionView:YES withRect:newCellRect];
                 [self addCellWithRect:newCellRect];
             } else if ([self.touchedView isKindOfClass:[PSGridViewCell class]]) {
                 // existing cell
                 
                 // Only edit if the touch hasn't moved outside of the existing cell frame
                 if (CGRectContainsPoint(self.touchedView.frame, [touch locationInView:self.gridView])) {
-                    CGRect newCellRect = [self rectForIndices:self.touchedIndices];
-                    // Show selection view overlay
-                    [self showSelectionView:YES withRect:newCellRect];
-                    
-                    // add tap area
-                    [self addTargetWithRect:newCellRect];
-//                    [self editCell:(PSGridViewCell *)self.touchedView];
+                    [self editCell:(PSGridViewCell *)self.touchedView];
                 } else {
                     [self endTouches];
                 }
@@ -668,11 +680,9 @@
         } else if (self.shouldMoveCell) {
             self.touchedView.frame = [self rectForIndices:self.touchedIndices];
             [(PSGridViewCell *)self.touchedView setIndices:self.touchedIndices];
-            [self showSelectionView:YES withRect:self.touchedView.frame];
             [self endTouches];
         } else if (self.shouldResetCell) {
             self.touchedView.frame = self.originalCellRect;
-            [self showSelectionView:YES withRect:self.touchedView.frame];
             [self endTouches];
         } else {
             [self endTouches];
