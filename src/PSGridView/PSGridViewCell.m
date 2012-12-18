@@ -21,6 +21,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.userInteractionEnabled = NO;
         self.multipleTouchEnabled = YES;
         self.autoresizingMask = UIViewAutoresizingFlexibleSize;
 //        self.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
