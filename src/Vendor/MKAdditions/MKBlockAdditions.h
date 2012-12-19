@@ -8,7 +8,7 @@
 
 typedef void (^VoidBlock)();
 
-typedef void (^DismissBlock)(int buttonIndex);
+typedef void (^DismissBlock)(int buttonIndex, NSString *textInput);
 typedef void (^CancelBlock)();
 typedef void (^PhotoPickedBlock)(UIImage *chosenImage);
 
