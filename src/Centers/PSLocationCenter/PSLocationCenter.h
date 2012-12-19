@@ -25,8 +25,8 @@
 - (BOOL)hasAcquiredAccurateLocation;
 - (BOOL)locationServicesAuthorized;
 - (CLLocationCoordinate2D)locationCoordinate;
-- (CLLocationDegrees)latitude;
-- (CLLocationDegrees)longitude;
+- (CLLocationDegrees)lat;
+- (CLLocationDegrees)lng;
 - (CLLocationAccuracy)accuracy;
 
 - (NSString *)locationString;

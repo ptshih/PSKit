@@ -164,11 +164,11 @@ static const NSTimeInterval __pollDuration = 30;
     return self.location.coordinate;
 }
 
-- (CLLocationDegrees)latitude {
+- (CLLocationDegrees)lat {
     return self.location.coordinate.latitude;
 }
 
-- (CLLocationDegrees)longitude {
+- (CLLocationDegrees)lng {
     return self.location.coordinate.longitude;
 }
 
@@ -178,7 +178,7 @@ static const NSTimeInterval __pollDuration = 30;
 
 - (NSString *)locationString {
     if ([self hasAcquiredLocation]) {
-        return [NSString stringWithFormat:@"%f,%f", [self latitude], [self longitude]];
+        return [NSString stringWithFormat:@"%f,%f", [self lat], [self lng]];
     } else {
         return nil;
     }
