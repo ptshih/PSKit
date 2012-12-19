@@ -8,6 +8,17 @@
 
 #define kNullViewAnimationDuration 0.3
 
+#pragma mark - Gesture Recognizer
+
+// This is just so we know that we sent this tap gesture recognizer in the delegate
+
+@interface PSSwipePopGestureRecognizer : UISwipeGestureRecognizer
+@end
+
+@implementation PSSwipePopGestureRecognizer
+@end
+
+
 // PSNullView
 
 @interface PSNullView : UIView
@@ -58,6 +69,10 @@
 
 #import "PSViewController.h"
 
+@interface PSViewController () <UIGestureRecognizerDelegate>
+
+@end
+
 @implementation PSViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -72,6 +87,7 @@
         self.shouldShowFooter = NO;
         self.shouldShowNullView = NO;
         self.shouldAddRoundedCorners = NO;
+        self.shouldSwipeToPop = NO;
         self.shouldAdjustViewForKeyboard = NO;
         
         self.headerHeight = 44.0;
@@ -110,10 +126,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UISwipeGestureRecognizer *popGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipePopController:)];
-    popGesture.direction = UISwipeGestureRecognizerDirectionRight;
-    [self.view addGestureRecognizer:popGesture];
-    
     self.view.autoresizingMask = ~UIViewAutoresizingNone;
     
     // Background
@@ -137,6 +149,13 @@
     // Add rounded corners
     if (self.shouldAddRoundedCorners) {
         [self addRoundedCorners];
+    }
+    
+    if (self.shouldSwipeToPop) {
+        PSSwipePopGestureRecognizer *swipePopGesture = [[PSSwipePopGestureRecognizer alloc] initWithTarget:self action:@selector(swipePopController:)];
+        swipePopGesture.direction = UISwipeGestureRecognizerDirectionRight;
+        swipePopGesture.delegate = self;
+        [self.view addGestureRecognizer:swipePopGesture];
     }
 }
 
