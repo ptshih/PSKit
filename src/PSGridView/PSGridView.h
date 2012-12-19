@@ -17,6 +17,11 @@
 @property (nonatomic, unsafe_unretained) id <PSGridViewDelegate> gridViewDelegate;
 @property (nonatomic, unsafe_unretained) id <PSGridViewDataSource> gridViewDataSource;
 
+- (id)initWithFrame:(CGRect)frame dictionary:(NSDictionary *)dictionary;
+
+- (void)toggleTargetMode;
+- (NSDictionary *)exportData;
+
 @end
 
 

@@ -11,6 +11,9 @@
 @interface PSGridViewCell : UIView
 
 @property (nonatomic, strong) NSSet *indices;
+@property (nonatomic, strong, readonly) NSDictionary *content;
+
+- (void)loadContent:(NSDictionary *)content;
 
 - (void)loadText:(NSString *)text;
 - (void)loadImageAtURL:(NSURL *)URL;
