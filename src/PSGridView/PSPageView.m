@@ -65,7 +65,7 @@
         
         // Config
 //        self.backgroundColor = [UIColor whiteColor];
-        self.margin = 16.0;
+        self.margin = 8.0;
 
     }
     return self;
@@ -95,6 +95,9 @@
     CGFloat top = -1;
     CGFloat bottom = -1;
     
+    CGFloat left = -1;
+    CGFloat right = -1;
+    
     for (PSGridViewCell *cell in self.cells) {
 //        NSLog(@"indices: %@", cell.indices);
         
@@ -102,23 +105,45 @@
         cell.frame = cellRect;
         NSLog(@"%@", NSStringFromCGRect(cell.frame));
         
+        if (left == -1) {
+            left = cellRect.origin.x;
+        } else {
+            left = MIN(left, cellRect.origin.x);
+        }
+        
+        if (right == -1) {
+            right = cellRect.origin.x + cellRect.size.width;
+        } else {
+            right = MAX(right, cellRect.origin.x + cellRect.size.width); // find bottom
+        }
+        
         if (top == -1) {
             top = cellRect.origin.y;
         } else {
             top = MIN(top, cellRect.origin.y); // find top
         }
-        bottom = MAX(bottom, cellRect.origin.y + cellRect.size.height); // find bottom
+        
+        if (bottom == -1) {
+            bottom = cellRect.origin.y + cellRect.size.height;
+        } else {
+            bottom = MAX(bottom, cellRect.origin.y + cellRect.size.height); // find bottom
+        }
     }
     
     top -= self.margin;
+    left -= self.margin;
     
     for (PSGridViewCell *cell in self.cells) {
         cell.top -= top;
+        cell.left -= left;
     }
     bottom -= top;
     bottom += self.margin;
+    right -= left;
+    right += self.margin;
     
     height = bottom;
+    width = right;
     
     self.contentSize = CGSizeMake(width, height);
     self.pageView.frame = CGRectMake(0, 0, width, height);
