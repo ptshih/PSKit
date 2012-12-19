@@ -7,72 +7,7 @@
 //
 
 #import "PSGridView.h"
-
-#pragma mark - UIView Category
-
-@interface UIView (PSCollectionView)
-
-@property(nonatomic, assign) CGFloat left;
-@property(nonatomic, assign) CGFloat top;
-@property(nonatomic, assign, readonly) CGFloat right;
-@property(nonatomic, assign, readonly) CGFloat bottom;
-@property(nonatomic, assign) CGFloat width;
-@property(nonatomic, assign) CGFloat height;
-
-@end
-
-@implementation UIView (PSCollectionView)
-
-- (CGFloat)left {
-    return self.frame.origin.x;
-}
-
-- (void)setLeft:(CGFloat)x {
-    CGRect frame = self.frame;
-    frame.origin.x = x;
-    self.frame = frame;
-}
-
-- (CGFloat)top {
-    return self.frame.origin.y;
-}
-
-- (void)setTop:(CGFloat)y {
-    CGRect frame = self.frame;
-    frame.origin.y = y;
-    self.frame = frame;
-}
-
-- (CGFloat)right {
-    return self.frame.origin.x + self.frame.size.width;
-}
-
-- (CGFloat)bottom {
-    return self.frame.origin.y + self.frame.size.height;
-}
-
-- (CGFloat)width {
-    return self.frame.size.width;
-}
-
-- (void)setWidth:(CGFloat)width {
-    CGRect frame = self.frame;
-    frame.size.width = width;
-    self.frame = frame;
-}
-
-- (CGFloat)height {
-    return self.frame.size.height;
-}
-
-- (void)setHeight:(CGFloat)height {
-    CGRect frame = self.frame;
-    frame.size.height = height;
-    self.frame = frame;
-}
-
-@end
-
+#import "UIView+PSKit.h"
 
 #pragma mark - Gesture Recognizer
 
@@ -95,38 +30,17 @@
 #pragma mark - Colors
 
 #define TILE_BG_COLOR [UIColor colorWithRGBHex:0xefefef]
-#define TILE_BORDER_COLOR [UIColor colorWithRGBHex:0x000000]
+#define TILE_BORDER_COLOR [UIColor colorWithRGBHex:0xcdcdcd]
 //#define TILE_BORDER_COLOR [UIColor colorWithRGBHex:0xffffff]
 #define SELECTION_TILE_BG_COLOR RGBACOLOR(0, 0, 0, 0.3)
 #define SELECTION_CELL_BG_COLOR RGBACOLOR(0, 0, 255.0, 0.5)
 #define SELECTION_ERROR_BG_COLOR RGBACOLOR(255.0, 0, 0, 0.5)
 #define SELECTION_TARGET_BG_COLOR RGBACOLOR(0.0, 255.0, 0, 0.5)
-#define SELECTION_BORDER_COLOR [UIColor colorWithRGBHex:0x7a7a7a]
+#define SELECTION_BORDER_COLOR [UIColor colorWithRGBHex:0x9a9a9a]
 #define TARGET_BG_COLOR RGBACOLOR(0.0, 255.0, 0, 0.5)
 
-#define TILE_MARGIN 8.0
+#define TILE_MARGIN 2.0
 
-
-// This is the class for the tile background
-@interface PSGridViewTile : UIView
-
-@property (nonatomic, strong) NSString *index;
-
-@end
-
-@implementation PSGridViewTile
-
-- (id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        self.userInteractionEnabled = NO;
-        self.multipleTouchEnabled = YES;
-        self.backgroundColor = TILE_BG_COLOR;
-    }
-    return self;
-}
-
-@end
 
 // This is the class for the target background
 @interface PSGridViewTarget : UIView
@@ -199,6 +113,7 @@
             for (int col = 0; col < self.numCols; col++) {
                 PSGridViewTile *tileView = [[PSGridViewTile alloc] initWithFrame:CGRectZero];
                 tileView.index = [self indexForRow:row col:col];
+                tileView.backgroundColor = TILE_BG_COLOR;
                 [self.tiles addObject:tileView];
                 [self.gridView addSubview:tileView];
             }
@@ -284,7 +199,7 @@
 //        }
         
         // Zoom scale
-        self.minimumZoomScale = isDeviceIPad() ? 0.5 : 0.5;
+        self.minimumZoomScale = isDeviceIPad() ? 0.8 : 0.5;
         self.maximumZoomScale = 2.0;
         self.zoomScale = 1.0;
     }
@@ -398,7 +313,7 @@
     for (PSGridViewTile *tile in self.tiles) {
         CGFloat row = [self rowForIndex:tile.index];
         CGFloat col = [self colForIndex:tile.index];
-        CGRect tileRect = CGRectMake(col * [self cellWidth] + (TILE_MARGIN * col) + TILE_MARGIN, row * [self cellHeight] + (TILE_MARGIN * row) + TILE_MARGIN, [self cellWidth], [self cellHeight]);;
+        CGRect tileRect = CGRectMake(col * [self cellWidth] + (TILE_MARGIN * col) + TILE_MARGIN, row * [self cellHeight] + (TILE_MARGIN * row) + TILE_MARGIN, [self cellWidth], [self cellHeight]);
         tile.frame = tileRect;
     }
     

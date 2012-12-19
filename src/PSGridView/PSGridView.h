@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 #import "PSGridViewCell.h"
+#import "PSGridViewTile.h"
 
 @protocol PSGridViewDelegate, PSGridViewDataSource;
 
