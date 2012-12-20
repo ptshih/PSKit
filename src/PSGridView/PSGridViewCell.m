@@ -8,7 +8,27 @@
 
 #import "PSGridViewCell.h"
 
-@interface PSGridViewCell ()
+#pragma mark - Gesture Recognizer
+
+// This is just so we know that we sent this tap gesture recognizer in the delegate
+
+@interface PSGridViewTapGestureRecognizer : UITapGestureRecognizer
+@end
+
+@implementation PSGridViewTapGestureRecognizer
+@end
+
+
+@interface PSGridViewLongPressGestureRecognizer : UILongPressGestureRecognizer
+@end
+
+@implementation PSGridViewLongPressGestureRecognizer
+@end
+
+
+
+
+@interface PSGridViewCell () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) UIView *contentView;
 @property (nonatomic, strong) PSCachedImageView *imageView;
@@ -22,8 +42,8 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.userInteractionEnabled = NO;
-        self.multipleTouchEnabled = YES;
+        self.userInteractionEnabled = YES;
+        self.multipleTouchEnabled = NO;
 //        self.autoresizingMask = UIViewAutoresizingFlexibleSize;
 //        self.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
 //        self.backgroundColor = RGBCOLOR(230, 230, 230);
@@ -38,9 +58,42 @@
         
 //        self.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
 //        self.layer.borderWidth = 1.0;
+        
+        // Setup gesture recognizer
+        PSGridViewTapGestureRecognizer *gr = [[PSGridViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapCell:)];
+        gr.delegate = self;
+        [self addGestureRecognizer:gr];
+    
+        PSGridViewLongPressGestureRecognizer *lpgr = [[PSGridViewLongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongPressCell:)];
+        lpgr.delegate = self;
+        [self addGestureRecognizer:lpgr];
     }
     return self;
 }
+
+#pragma mark - Gesture Recognizer
+
+- (void)didTapCell:(UITapGestureRecognizer *)gestureRecognizer {
+    NSLog(@"tap: %d", gestureRecognizer.state);
+    if (self.delegate && [self.delegate respondsToSelector:@selector(gridViewCell:didTapWithWithState:)]) {
+        [self.delegate gridViewCell:self didTapWithWithState:gestureRecognizer.state];
+    }
+}
+
+- (void)didLongPressCell:(UILongPressGestureRecognizer *)gestureRecognizer {
+    NSLog(@"lp: %d", gestureRecognizer.state);
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        if (self.delegate && [self.delegate respondsToSelector:@selector(gridViewCell:didLongPressWithState:)]) {
+            [self.delegate gridViewCell:self didLongPressWithState:gestureRecognizer.state];
+        }
+    }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return YES;
+}
+
+#pragma mark -
 
 - (void)prepareForReuse {
     [self.imageView prepareForReuse];
@@ -54,20 +107,6 @@
         self.textLabel.frame = CGRectInset(self.contentView.bounds, 16.0, 16.0);
     } else if (self.imageView) {
         self.imageView.frame = self.contentView.bounds;
-    }
-}
-
-#pragma mark - Setup
-
-- (void)setupImageView {
-    if (!self.imageView) {
-        self.imageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
-        self.imageView.autoresizingMask = UIViewAutoresizingFlexibleSize;
-        self.imageView.loadingColor = RGBACOLOR(60, 60, 60, 1.0);
-        self.imageView.loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
-        self.imageView.shouldAnimate = YES;
-        self.imageView.clipsToBounds = YES;
-        [self.contentView addSubview:self.imageView];
     }
 }
 
@@ -99,18 +138,27 @@
     } else if ([[self.content objectForKey:@"type"] isEqualToString:@"image"]) {
         NSString *href = [self.content objectForKey:@"href"];
         [self loadImageAtURL:[NSURL URLWithString:href]];
+    } else if ([[self.content objectForKey:@"type"] isEqualToString:@"photo"]) {
+        [self loadImage:[self.content objectForKey:@"photo"]];
+    } else if([[self.content objectForKey:@"type"] isEqualToString:@"color"]) {
+        [self loadColor:[self.content objectForKey:@"color"]];
     }
+    
+    [self setNeedsLayout];
 }
 
 - (void)loadImage:(UIImage *)image {
-    [self prepareLoad];
-    [self setupImageView];
-    
-    self.imageView.image = image;
+    if (!self.imageView) {
+        self.imageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
+        self.imageView.autoresizingMask = UIViewAutoresizingFlexibleSize;
+        self.imageView.loadingColor = RGBACOLOR(60, 60, 60, 1.0);
+        self.imageView.loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+        self.imageView.shouldAnimate = YES;
+        self.imageView.clipsToBounds = YES;
+        [self.contentView addSubview:self.imageView];
+    }
     [self.imageView.loadingIndicator stopAnimating];
-    
-    // Photo
-    self.imageView.frame = self.contentView.bounds;
+    self.imageView.image = image;
 }
 
 - (void)loadImageAtURL:(NSURL *)URL {
@@ -146,8 +194,21 @@
 }
 
 - (void)loadColor:(UIColor *)color {
-    [self prepareLoad];
     self.contentView.backgroundColor = color;
 }
+
+#pragma mark - Touches
+
+//- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+//}
+//
+//- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+//}
+//
+//- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+//}
+//
+//- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+//}
 
 @end
