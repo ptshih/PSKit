@@ -28,9 +28,10 @@
 
 
 
-@interface PSGridViewCell () <UIGestureRecognizerDelegate>
+@interface PSGridViewCell () <UIGestureRecognizerDelegate, UIScrollViewDelegate>
 
-@property (nonatomic, strong) UIView *contentView;
+@property (nonatomic, strong) UIView *highlightView;
+@property (nonatomic, strong) UIScrollView *imageScrollView;
 @property (nonatomic, strong) PSCachedImageView *imageView;
 @property (nonatomic, strong) UILabel *textLabel;
 @property (nonatomic, strong, readwrite) NSDictionary *content;
@@ -44,31 +45,97 @@
     if (self) {
         self.userInteractionEnabled = YES;
         self.multipleTouchEnabled = NO;
+        self.clipsToBounds = YES;
 //        self.autoresizingMask = UIViewAutoresizingFlexibleSize;
 //        self.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
-//        self.backgroundColor = RGBCOLOR(230, 230, 230);
+        self.backgroundColor = RGBCOLOR(160, 160, 160);
         
-        self.contentView = [[UIView alloc] initWithFrame:self.bounds];
-        self.contentView.autoresizingMask = UIViewAutoresizingFlexibleSize;
-        self.contentView.userInteractionEnabled = NO;
-        self.contentView.backgroundColor = RGBCOLOR(222, 222, 222);
-        [self addSubview:self.contentView];
         
         self.content = @{};
+        
+        
+        // Content
+        self.imageScrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
+        self.imageScrollView.userInteractionEnabled = NO;
+        self.imageScrollView.delegate = self;
+        self.imageScrollView.scrollEnabled = YES;
+        self.imageScrollView.minimumZoomScale = 1.0;
+        self.imageScrollView.maximumZoomScale = 2.0;
+        self.imageScrollView.showsHorizontalScrollIndicator = NO;
+        self.imageScrollView.showsVerticalScrollIndicator = NO;
+        [self addSubview:self.imageScrollView];
+        
+        self.imageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
+        self.imageView.autoresizingMask = UIViewAutoresizingFlexibleSize;
+        self.imageView.loadingColor = RGBACOLOR(60, 60, 60, 1.0);
+        self.imageView.loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+        self.imageView.shouldAnimate = YES;
+        self.imageView.clipsToBounds = YES;
+        [self.imageScrollView addSubview:self.imageView];
+        
+        self.textLabel = [UILabel labelWithStyle:@"cellTitleDarkLabel"];
+        self.textLabel.userInteractionEnabled = NO;
+        self.textLabel.autoresizingMask = UIViewAutoresizingFlexibleSize;
+        self.textLabel.font = [UIFont fontWithName:@"ProximaNovaCond-Semibold" size:64.0];
+        self.textLabel.minimumFontSize = 12.0;
+        self.textLabel.adjustsFontSizeToFitWidth = YES;
+        self.textLabel.numberOfLines = 1;
+        self.textLabel.textAlignment = UITextAlignmentCenter;
+        //        self.textLabel.backgroundColor = [UIColor lightGrayColor];
+        self.textLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
+        [self addSubview:self.textLabel];
+        
+        
+        // Highlight
+        self.highlightView = [[UIView alloc] initWithFrame:self.bounds];
+        self.highlightView.autoresizingMask = UIViewAutoresizingFlexibleSize;
+        self.highlightView.userInteractionEnabled = NO;
+        self.highlightView.backgroundColor = RGBACOLOR(0, 0, 0, 0.5);
+        self.highlightView.alpha = 0.0;
+        [self addSubview:self.highlightView];
         
 //        self.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
 //        self.layer.borderWidth = 1.0;
         
         // Setup gesture recognizer
-        PSGridViewTapGestureRecognizer *gr = [[PSGridViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapCell:)];
-        gr.delegate = self;
-        [self addGestureRecognizer:gr];
+//        PSGridViewTapGestureRecognizer *gr = [[PSGridViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapCell:)];
+//        gr.delegate = self;
+//        [self addGestureRecognizer:gr];
     
-        PSGridViewLongPressGestureRecognizer *lpgr = [[PSGridViewLongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongPressCell:)];
-        lpgr.delegate = self;
-        [self addGestureRecognizer:lpgr];
+//        PSGridViewLongPressGestureRecognizer *lpgr = [[PSGridViewLongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongPressCell:)];
+//        lpgr.delegate = self;
+//        [self addGestureRecognizer:lpgr];
     }
     return self;
+}
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+    return self.imageView;
+}
+
+- (void)centerSubview:(UIView *)subView forScrollView:(UIScrollView *)scrollView {
+    CGFloat offsetX = (scrollView.bounds.size.width > scrollView.contentSize.width)?
+    (scrollView.bounds.size.width - scrollView.contentSize.width) * 0.5 : 0.0;
+    
+    CGFloat offsetY = (scrollView.bounds.size.height > scrollView.contentSize.height)?
+    (scrollView.bounds.size.height - scrollView.contentSize.height) * 0.5 : 0.0;
+    
+    subView.center = CGPointMake(scrollView.contentSize.width * 0.5 + offsetX,
+                                 scrollView.contentSize.height * 0.5 + offsetY);
+}
+
+- (void)showHighlight {
+    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.highlightView.alpha = 1.0;
+    } completion:^(BOOL finished) {
+    }];
+}
+
+- (void)hideHighlight {
+    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.highlightView.alpha = 0.0;
+    } completion:^(BOOL finished) {
+    }];
 }
 
 #pragma mark - Gesture Recognizer
@@ -89,6 +156,16 @@
     }
 }
 
+- (void)didPanCell:(UIPanGestureRecognizer *)gr {
+    CGPoint translatedPoint = [gr translationInView:self];
+    [gr setTranslation:CGPointZero inView:self];
+    self.imageView.center = CGPointMake(self.imageView.center.x + translatedPoint.x, self.imageView.center.y + translatedPoint.y);
+}
+
+- (void)didPinchCell:(UIPinchGestureRecognizer *)gr {
+//    self.imageView.
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     return YES;
 }
@@ -103,27 +180,29 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    if (self.textLabel) {
-        self.textLabel.frame = CGRectInset(self.contentView.bounds, 16.0, 16.0);
-    } else if (self.imageView) {
-        self.imageView.frame = self.contentView.bounds;
+    if (self.textLabel.hidden == NO) {
+        self.textLabel.frame = CGRectInset(self.bounds, 16.0, 16.0);
+    } else if (self.imageScrollView.hidden == NO) {
+        self.imageScrollView.frame = self.bounds;
+        self.imageView.frame = self.imageScrollView.bounds;
+        
+//        CGFloat objectWidth = self.imageView.image.size.width;
+//        CGFloat objectHeight = self.imageView.image.size.height;
+//        CGFloat scaledHeight = floorf(objectHeight / (objectWidth / self.imageScrollView.width));
+//        
+//        self.imageView.frame = CGRectMake(0, 0, self.imageScrollView.width, scaledHeight);
+//        self.imageScrollView.contentSize = self.imageView.frame.size;
+//        [self centerSubview:self.imageView forScrollView:self.imageScrollView];
     }
 }
 
 #pragma mark - Load
 
 - (void)prepareLoad {
-    if (self.imageView) {
-        [self.imageView removeFromSuperview];
-        self.imageView = nil;
-    }
+    self.imageScrollView.hidden = YES;
+    self.textLabel.hidden = YES;
     
-    if (self.textLabel) {
-        [self.textLabel removeFromSuperview];
-        self.textLabel = nil;
-    }
-    
-    self.contentView.backgroundColor = [UIColor colorWithRGBHex:0xefefef];
+    self.backgroundColor = [UIColor colorWithRGBHex:0xefefef];
 }
 
 - (void)loadContent:(NSDictionary *)content {
@@ -148,53 +227,31 @@
 }
 
 - (void)loadImage:(UIImage *)image {
-    if (!self.imageView) {
-        self.imageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
-        self.imageView.autoresizingMask = UIViewAutoresizingFlexibleSize;
-        self.imageView.loadingColor = RGBACOLOR(60, 60, 60, 1.0);
-        self.imageView.loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
-        self.imageView.shouldAnimate = YES;
-        self.imageView.clipsToBounds = YES;
-        [self.contentView addSubview:self.imageView];
-    }
+//        UIPanGestureRecognizer *pangr = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(didPanCell:)];
+//        [self.imageView addGestureRecognizer:pangr];
+//        
+//        UIPinchGestureRecognizer *pinchgr = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(didPinchCell:)];
+//        [self.imageView addGestureRecognizer:pinchgr];
+    
+    self.imageScrollView.hidden = NO;
     [self.imageView.loadingIndicator stopAnimating];
     self.imageView.image = image;
 }
 
 - (void)loadImageAtURL:(NSURL *)URL {
-    if (!self.imageView) {
-        self.imageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
-        self.imageView.autoresizingMask = UIViewAutoresizingFlexibleSize;
-        self.imageView.loadingColor = RGBACOLOR(60, 60, 60, 1.0);
-        self.imageView.loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
-        self.imageView.shouldAnimate = YES;
-        self.imageView.clipsToBounds = YES;
-        [self.contentView addSubview:self.imageView];
-    }
-    
+    self.imageScrollView.hidden = NO;
     self.imageView.originalURL = URL;
     [self.imageView loadImageWithURL:URL cacheType:PSURLCacheTypePermanent];
 }
 
 - (void)loadText:(NSString *)text {
-    if (!self.textLabel) {
-        self.textLabel = [UILabel labelWithStyle:@"cellTitleDarkLabel"];
-        self.textLabel.autoresizingMask = UIViewAutoresizingFlexibleSize;
-        self.textLabel.font = [UIFont fontWithName:@"ProximaNovaCond-Semibold" size:64.0];
-        self.textLabel.minimumFontSize = 12.0;
-        self.textLabel.adjustsFontSizeToFitWidth = YES;
-        self.textLabel.numberOfLines = 1;
-        self.textLabel.textAlignment = UITextAlignmentCenter;
-        //        self.textLabel.backgroundColor = [UIColor lightGrayColor];
-        self.textLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
-        [self.contentView addSubview:self.textLabel];
-    }
+    self.textLabel.hidden = NO;
     
     self.textLabel.text = text;
 }
 
 - (void)loadColor:(UIColor *)color {
-    self.contentView.backgroundColor = color;
+    self.backgroundColor = color;
 }
 
 #pragma mark - Touches

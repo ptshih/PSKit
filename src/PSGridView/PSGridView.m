@@ -302,8 +302,6 @@
 - (void)addCellWithRect:(CGRect)rect {
     PSGridViewCell *cell = [[PSGridViewCell alloc] initWithFrame:rect];
     cell.delegate = self;
-    cell.layer.borderWidth = 2.0;
-    cell.layer.borderColor = [RGBACOLOR(0, 0, 0, 0.0) CGColor];
     
     [self.gridView insertSubview:cell belowSubview:self.selectionView];
     
@@ -444,11 +442,11 @@
     if ([touch.view isKindOfClass:[PSGridViewCell class]]) {
         // Resizing
         self.selectedCell = (PSGridViewCell *)touch.view;
-        self.selectedCell.layer.borderColor = RGBACOLOR(0, 0, 0, 0.5).CGColor;
+        [self.selectedCell showHighlight];
         
         // Find out which corner of the tile was touched
-        CGFloat dx = [self cellWidth] / 2.0;
-        CGFloat dy = [self cellHeight] / 2.0;
+        CGFloat dx = [self cellWidth];
+        CGFloat dy = [self cellHeight];
         CGFloat left = self.selectedCell.left;
         CGFloat right = self.selectedCell.right;
         CGFloat top = self.selectedCell.top;
@@ -507,25 +505,27 @@
             
             NSSet *movedIndices = [self indicesForRect:touchRect];
             
-            // This is the new proposed cell rect
-            CGRect resizedRect = [self rectForIndices:movedIndices];
-            
-            
-            // Check to see if the current touch rectangle conflicts with any existing cells
-            BOOL hasConflict = NO;
-            for (PSGridViewCell *cell in self.cells) {
-                // If current touch area intersects an existing cell, we have a conflict
-                if (![cell isEqual:self.selectedCell]) {
+            if (movedIndices.count > 0) {
+                // This is the new proposed cell rect
+                CGRect resizedRect = [self rectForIndices:movedIndices];
+                
+                
+                // Check to see if the current touch rectangle conflicts with any existing cells
+                BOOL hasConflict = NO;
+                for (PSGridViewCell *cell in self.cells) {
                     // If current touch area intersects an existing cell, we have a conflict
-                    if (CGRectIntersectsRect(resizedRect, cell.frame)) {
-                        hasConflict = YES;
+                    if (![cell isEqual:self.selectedCell]) {
+                        // If current touch area intersects an existing cell, we have a conflict
+                        if (CGRectIntersectsRect(resizedRect, cell.frame)) {
+                            hasConflict = YES;
+                        }
                     }
                 }
-            }
-            
-            if (!hasConflict) {
-                self.selectedCell.frame = resizedRect;
-                [self.touchedIndices setSet:movedIndices];
+                
+                if (!hasConflict) {
+                    self.selectedCell.frame = resizedRect;
+                    [self.touchedIndices setSet:movedIndices];
+                }
             }
         }
     } else if (self.touchedIndices.count > 0) {
@@ -571,7 +571,7 @@
         return;
     }
     
-//    UITouch *touch = [touches anyObject];
+    UITouch *touch = [touches anyObject];
 //    CGPoint touchPoint = [touch locationInView:self.gridView];
     
     if (self.selectedCell) {
@@ -580,6 +580,8 @@
         // Only set new indices if it actually changed
         if (self.touchedIndices.count > 0) {
             self.selectedCell.indices = [NSSet setWithSet:self.touchedIndices];
+        } else if (touch.tapCount == 1) {
+            [self editCell:self.selectedCell];
         }
     } else if (self.touchedIndices.count > 0) {
         // Normal Tile
@@ -621,7 +623,7 @@
 - (void)endTouches {
     // Reset selected cell
     if (self.selectedCell) {
-        self.selectedCell.layer.borderColor = RGBACOLOR(0, 0, 0, 0.0).CGColor;
+        [self.selectedCell hideHighlight];
         self.selectedCell = nil;
     }
     

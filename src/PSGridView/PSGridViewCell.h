@@ -18,6 +18,8 @@
 @property (nonatomic, unsafe_unretained) id <PSGridViewCellDelegate> delegate;
 
 - (void)loadContent:(NSDictionary *)content;
+- (void)showHighlight;
+- (void)hideHighlight;
 
 @end
 
