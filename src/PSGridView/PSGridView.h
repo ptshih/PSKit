@@ -10,6 +10,7 @@
 
 #import "PSGridViewCell.h"
 #import "PSGridViewTile.h"
+#import "PSGridViewTarget.h"
 
 @interface PSGridView : UIScrollView
 

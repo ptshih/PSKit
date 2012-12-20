@@ -19,33 +19,9 @@
 #define SELECTION_ERROR_BG_COLOR RGBACOLOR(255.0, 0, 0, 0.5)
 #define SELECTION_TARGET_BG_COLOR RGBACOLOR(0.0, 255.0, 0, 0.5)
 #define SELECTION_BORDER_COLOR [UIColor colorWithRGBHex:0x9a9a9a]
-#define TARGET_BG_COLOR RGBACOLOR(0.0, 255.0, 0, 0.5)
 #define RESIZE_BORDER_COLOR RGBACOLOR(0.0, 128.0, 128.0, 0.5)
 
 #define TILE_MARGIN 2.0
-
-
-// This is the class for the target background
-@interface PSGridViewTarget : UIView
-
-@property (nonatomic, strong) NSSet *indices;
-
-@end
-
-@implementation PSGridViewTarget
-
-- (id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        self.userInteractionEnabled = YES;
-        self.multipleTouchEnabled = NO;
-        self.backgroundColor = TARGET_BG_COLOR;
-    }
-    return self;
-}
-
-@end
-
 
 
 
