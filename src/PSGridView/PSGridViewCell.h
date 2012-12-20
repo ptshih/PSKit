@@ -13,13 +13,15 @@
 @interface PSGridViewCell : UIView
 
 @property (nonatomic, strong) NSSet *indices;
-@property (nonatomic, strong, readonly) NSDictionary *content;
+@property (nonatomic, strong) NSDictionary *content;
 
 @property (nonatomic, unsafe_unretained) id <PSGridViewCellDelegate> delegate;
 
-- (void)loadContent:(NSDictionary *)content;
+- (void)loadContent;
 - (void)showHighlight;
 - (void)hideHighlight;
+- (void)enableVideoTouch;
+- (void)disableVideoTouch;
 
 @end
 

@@ -216,7 +216,7 @@
     for (NSDictionary *cellDict in [dict objectForKey:@"cells"]) {
         PSGridViewCell *cell = [[PSGridViewCell alloc] initWithFrame:CGRectZero];
         cell.indices = [NSSet setWithArray:[cellDict objectForKey:@"indices"]];
-        [cell loadContent:[cellDict objectForKey:@"content"]];
+        cell.content = [cellDict objectForKey:@"content"];
         [self.gridView insertSubview:cell belowSubview:self.selectionView];
         [self.cells addObject:cell];
     }
@@ -302,7 +302,7 @@
 
 - (void)editCell:(PSGridViewCell *)cell {
     // TODO
-    [UIActionSheet actionSheetWithTitle:@"Add/Edit Content" message:nil destructiveButtonTitle:nil buttons:@[@"Text", @"Image URL", @"Color", @"Photo", @"Remove"] showInView:self onDismiss:^(int buttonIndex, NSString *textInput) {
+    [UIActionSheet actionSheetWithTitle:@"Add/Edit Content" message:nil destructiveButtonTitle:nil buttons:@[@"Text", @"Image URL", @"Video", @"Photo", @"Remove"] showInView:self onDismiss:^(int buttonIndex, NSString *textInput) {
         
         // Load with configuration
         switch (buttonIndex) {
@@ -312,7 +312,8 @@
                     
                     if (textInput.length > 0) {
                         NSDictionary *content = @{@"type" : @"text", @"text": textInput};
-                        [cell loadContent:content];
+                        cell.content = content;
+                        [cell loadContent];
                     }
                 } onCancel:^{
                 }];
@@ -324,22 +325,26 @@
                     
                     if (textInput.length > 0) {
                         NSDictionary *content = @{@"type" : @"image", @"href": textInput};
-                        [cell loadContent:content];
+                        cell.content = content;
+                        [cell loadContent];
                     }
                 } onCancel:^{
                 }];
                 break;
             }
             case 2: {
-                NSDictionary *content = @{@"type" : @"color", @"color": TEXTURE_DARK_LINEN};
-                [cell loadContent:content];
+                NSDictionary *content = @{@"type" : @"video", @"yid": @"9bZkp7q19f0"};
+                cell.content = content;
+                [cell disableVideoTouch];
+                [cell loadContent];
                 break;
             }
             case 3: {
                 [UIActionSheet photoPickerWithTitle:@"Pick a Photo" showInView:self.parentViewController.view presentVC:self.parentViewController onPhotoPicked:^(UIImage *chosenImage) {
                     if (chosenImage) {
                         NSDictionary *content = @{@"type" : @"photo", @"photo": chosenImage};
-                        [cell loadContent:content];
+                        cell.content = content;
+                        [cell loadContent];
                     }
                 } onCancel:^{
                 }];

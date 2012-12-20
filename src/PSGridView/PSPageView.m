@@ -128,6 +128,8 @@
         } else {
             bottom = MAX(bottom, cellRect.origin.y + cellRect.size.height); // find bottom
         }
+        
+        [cell loadContent];
     }
     
     top -= self.margin;
@@ -207,7 +209,7 @@
     for (NSDictionary *cellDict in [dict objectForKey:@"cells"]) {
         PSGridViewCell *cell = [[PSGridViewCell alloc] initWithFrame:CGRectZero];
         cell.indices = [NSSet setWithArray:[cellDict objectForKey:@"indices"]];
-        [cell loadContent:[cellDict objectForKey:@"content"]];
+        cell.content = [cellDict objectForKey:@"content"];
         [self.pageView addSubview:cell];
         [self.cells addObject:cell];
     }

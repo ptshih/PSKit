@@ -8,6 +8,8 @@
 
 #import "PSGridViewCell.h"
 
+#import "PSYouTubeView.h"
+
 #pragma mark - Gesture Recognizer
 
 // This is just so we know that we sent this tap gesture recognizer in the delegate
@@ -33,8 +35,8 @@
 @property (nonatomic, strong) UIView *highlightView;
 @property (nonatomic, strong) UIScrollView *imageScrollView;
 @property (nonatomic, strong) PSCachedImageView *imageView;
+@property (nonatomic, strong) PSYouTubeView *ytView;
 @property (nonatomic, strong) UILabel *textLabel;
-@property (nonatomic, strong, readwrite) NSDictionary *content;
 
 @end
 
@@ -55,7 +57,8 @@
         
         
         // Content
-        self.imageScrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
+        self.imageScrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+        self.imageScrollView.autoresizingMask = UIViewAutoresizingFlexibleSize;
         self.imageScrollView.userInteractionEnabled = NO;
         self.imageScrollView.delegate = self;
         self.imageScrollView.scrollEnabled = YES;
@@ -63,9 +66,10 @@
         self.imageScrollView.maximumZoomScale = 2.0;
         self.imageScrollView.showsHorizontalScrollIndicator = NO;
         self.imageScrollView.showsVerticalScrollIndicator = NO;
+        self.imageScrollView.hidden = YES;
         [self addSubview:self.imageScrollView];
         
-        self.imageView = [[PSCachedImageView alloc] initWithFrame:CGRectZero];
+        self.imageView = [[PSCachedImageView alloc] initWithFrame:self.imageScrollView.bounds];
         self.imageView.autoresizingMask = UIViewAutoresizingFlexibleSize;
         self.imageView.loadingColor = RGBACOLOR(60, 60, 60, 1.0);
         self.imageView.loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
@@ -83,7 +87,14 @@
         self.textLabel.textAlignment = UITextAlignmentCenter;
         //        self.textLabel.backgroundColor = [UIColor lightGrayColor];
         self.textLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
+        self.textLabel.hidden = YES;
         [self addSubview:self.textLabel];
+        
+        // Video
+        self.ytView = [[PSYouTubeView alloc] initWithFrame:self.bounds];
+        self.ytView.autoresizingMask = UIViewAutoresizingFlexibleSize;
+        self.ytView.hidden = YES;
+        [self addSubview:self.ytView];
         
         
         // Highlight
@@ -136,6 +147,13 @@
         self.highlightView.alpha = 0.0;
     } completion:^(BOOL finished) {
     }];
+}
+
+- (void)enableVideoTouch {
+    self.ytView.userInteractionEnabled = YES;
+}
+- (void)disableVideoTouch {
+    self.ytView.userInteractionEnabled = NO;
 }
 
 #pragma mark - Gesture Recognizer
@@ -193,6 +211,8 @@
 //        self.imageView.frame = CGRectMake(0, 0, self.imageScrollView.width, scaledHeight);
 //        self.imageScrollView.contentSize = self.imageView.frame.size;
 //        [self centerSubview:self.imageView forScrollView:self.imageScrollView];
+    } else if (self.ytView.hidden == NO) {
+        self.ytView.frame = self.bounds;
     }
 }
 
@@ -201,12 +221,12 @@
 - (void)prepareLoad {
     self.imageScrollView.hidden = YES;
     self.textLabel.hidden = YES;
+    self.ytView.hidden = YES;
     
     self.backgroundColor = [UIColor colorWithRGBHex:0xefefef];
 }
 
-- (void)loadContent:(NSDictionary *)content {
-    self.content = content;
+- (void)loadContent {
     // Update UI
     
     [self prepareLoad];
@@ -219,11 +239,25 @@
         [self loadImageAtURL:[NSURL URLWithString:href]];
     } else if ([[self.content objectForKey:@"type"] isEqualToString:@"photo"]) {
         [self loadImage:[self.content objectForKey:@"photo"]];
-    } else if([[self.content objectForKey:@"type"] isEqualToString:@"color"]) {
+    } else if ([[self.content objectForKey:@"type"] isEqualToString:@"color"]) {
         [self loadColor:[self.content objectForKey:@"color"]];
+    } else if ([[self.content objectForKey:@"type"] isEqualToString:@"video"]) {
+        [self loadVideo:[self.content objectForKey:@"yid"]];
     }
     
     [self setNeedsLayout];
+}
+
+- (void)loadVideo:(NSString *)yid {
+    if (self.ytView.userInteractionEnabled) {
+        self.ytView.hidden = NO;
+        self.ytView.frame = self.bounds;
+        NSString *src = [NSString stringWithFormat:@"http://www.youtube.com/embed/%@",yid];
+        [self.ytView loadYouTubeWithSource:src contentSize:self.bounds.size];
+    } else {
+        NSString *src = [NSString stringWithFormat:@"http://img.youtube.com/vi/%@/hqdefault.jpg", yid];
+        [self loadImageAtURL:[NSURL URLWithString:src]];
+    }
 }
 
 - (void)loadImage:(UIImage *)image {
