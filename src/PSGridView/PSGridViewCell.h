@@ -15,6 +15,9 @@
 @property (nonatomic, strong) NSSet *indices;
 @property (nonatomic, strong) NSDictionary *content;
 
+@property (nonatomic, assign) UIView *parentView;
+@property (nonatomic, assign) NSMutableSet *cells;
+
 @property (nonatomic, unsafe_unretained) id <PSGridViewCellDelegate> delegate;
 
 - (void)loadContent;

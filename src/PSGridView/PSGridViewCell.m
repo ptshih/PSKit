@@ -288,18 +288,106 @@
     self.backgroundColor = color;
 }
 
+#pragma mark - Cell Actions
+
+// Remove cell
+- (void)removeCell {
+    PSGridViewCell *cell = self;
+    
+    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        cell.alpha = 0.0;
+    } completion:^(BOOL finished) {
+        [cell removeFromSuperview];
+        [self.cells removeObject:cell];
+    }];
+}
+
+- (void)editCell {
+    // TODO
+    PSGridViewCell *cell = self;
+    
+    [UIActionSheet actionSheetWithTitle:@"Add/Edit Content" message:nil destructiveButtonTitle:nil buttons:@[@"Text", @"Image URL", @"Video", @"Photo", @"Remove"] showInView:self onDismiss:^(int buttonIndex, NSString *textInput) {
+        
+        // Load with configuration
+        switch (buttonIndex) {
+            case 0: {
+                [UIAlertView alertViewWithTitle:@"Enter Text" style:UIAlertViewStylePlainTextInput message:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Ok"] onDismiss:^(int buttonIndex, NSString *textInput){
+                    NSLog(@"%@", textInput);
+                    
+                    if (textInput.length > 0) {
+                        NSDictionary *content = @{@"type" : @"text", @"text": textInput};
+                        cell.content = content;
+                        [cell loadContent];
+                    }
+                } onCancel:^{
+                }];
+                break;
+            }
+            case 1: {
+                [UIAlertView alertViewWithTitle:@"Image" style:UIAlertViewStylePlainTextInput message:@"URL" cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Ok"] onDismiss:^(int buttonIndex, NSString *textInput){
+                    NSLog(@"%@", textInput);
+                    
+                    if (textInput.length > 0) {
+                        NSDictionary *content = @{@"type" : @"image", @"href": textInput};
+                        cell.content = content;
+                        [cell loadContent];
+                    }
+                } onCancel:^{
+                }];
+                break;
+            }
+            case 2: {
+                NSDictionary *content = @{@"type" : @"video", @"yid": @"9bZkp7q19f0"};
+                cell.content = content;
+                [cell disableVideoTouch];
+                [cell loadContent];
+                break;
+            }
+            case 3: {
+//                [UIActionSheet photoPickerWithTitle:@"Pick a Photo" showInView:self.parentViewController.view presentVC:self.parentViewController onPhotoPicked:^(UIImage *chosenImage) {
+//                    if (chosenImage) {
+//                        NSDictionary *content = @{@"type" : @"photo", @"photo": chosenImage};
+//                        cell.content = content;
+//                        [cell loadContent];
+//                    }
+//                } onCancel:^{
+//                }];
+                break;
+            }
+            case 4: {
+                // remove cell
+                [self removeCell];
+                break;
+            }
+            default:
+                break;
+        }
+    } onCancel:^{
+    }];
+}
+
 #pragma mark - Touches
 
-//- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-//}
-//
-//- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-//}
-//
-//- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-//}
-//
-//- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-//}
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesBegan:touches withEvent:event];
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesMoved:touches withEvent:event];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesEnded:touches withEvent:event];
+
+    UITouch *touch = [touches anyObject];
+    
+    if (touch.tapCount == 1) {
+        [self editCell];
+    }
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesCancelled:touches withEvent:event];
+}
 
 @end

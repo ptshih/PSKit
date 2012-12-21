@@ -13,4 +13,7 @@
 @property (nonatomic, strong) NSSet *indices;
 @property (nonatomic, strong) NSDictionary *action;
 
+@property (nonatomic, assign) UIView *parentView;
+@property (nonatomic, assign) NSMutableSet *targets;
+
 @end

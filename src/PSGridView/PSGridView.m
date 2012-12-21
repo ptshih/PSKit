@@ -277,101 +277,23 @@
 
 - (void)addTargetWithRect:(CGRect)rect {
     PSGridViewTarget *target = [[PSGridViewTarget alloc] initWithFrame:rect];
+    target.parentView = self;
+    target.targets = self.targets;
     target.indices = [self indicesForRect:rect];
     [self.targets addObject:target];
     [self.targetView addSubview:target];
 }
 
-- (void)editTarget:(PSGridViewTarget *)target {
-    NSLog(@"edit target");
-}
-
 - (void)addCellWithRect:(CGRect)rect {
     PSGridViewCell *cell = [[PSGridViewCell alloc] initWithFrame:rect];
+    cell.parentView = self;
     cell.delegate = self;
-    
-    [self.gridView insertSubview:cell belowSubview:self.selectionView];
-    
-    // Add new key
+    cell.cells = self.cells;
     cell.indices = [self indicesForRect:rect];
-    [self.cells addObject:cell];
     
-    // Select new cell
-//    [self selectCell:cell animated:YES];
+    [self.cells addObject:cell];
+    [self.gridView insertSubview:cell belowSubview:self.selectionView];
 }
-
-- (void)editCell:(PSGridViewCell *)cell {
-    // TODO
-    [UIActionSheet actionSheetWithTitle:@"Add/Edit Content" message:nil destructiveButtonTitle:nil buttons:@[@"Text", @"Image URL", @"Video", @"Photo", @"Remove"] showInView:self onDismiss:^(int buttonIndex, NSString *textInput) {
-        
-        // Load with configuration
-        switch (buttonIndex) {
-            case 0: {
-                [UIAlertView alertViewWithTitle:@"Enter Text" style:UIAlertViewStylePlainTextInput message:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Ok"] onDismiss:^(int buttonIndex, NSString *textInput){
-                    NSLog(@"%@", textInput);
-                    
-                    if (textInput.length > 0) {
-                        NSDictionary *content = @{@"type" : @"text", @"text": textInput};
-                        cell.content = content;
-                        [cell loadContent];
-                    }
-                } onCancel:^{
-                }];
-                break;
-            }
-            case 1: {
-                [UIAlertView alertViewWithTitle:@"Image" style:UIAlertViewStylePlainTextInput message:@"URL" cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Ok"] onDismiss:^(int buttonIndex, NSString *textInput){
-                    NSLog(@"%@", textInput);
-                    
-                    if (textInput.length > 0) {
-                        NSDictionary *content = @{@"type" : @"image", @"href": textInput};
-                        cell.content = content;
-                        [cell loadContent];
-                    }
-                } onCancel:^{
-                }];
-                break;
-            }
-            case 2: {
-                NSDictionary *content = @{@"type" : @"video", @"yid": @"9bZkp7q19f0"};
-                cell.content = content;
-                [cell disableVideoTouch];
-                [cell loadContent];
-                break;
-            }
-            case 3: {
-                [UIActionSheet photoPickerWithTitle:@"Pick a Photo" showInView:self.parentViewController.view presentVC:self.parentViewController onPhotoPicked:^(UIImage *chosenImage) {
-                    if (chosenImage) {
-                        NSDictionary *content = @{@"type" : @"photo", @"photo": chosenImage};
-                        cell.content = content;
-                        [cell loadContent];
-                    }
-                } onCancel:^{
-                }];
-                break;
-            }
-            case 4: {
-                // remove cell
-                [self removeCell:cell];
-                break;
-            }
-            default:
-                break;
-        }
-    } onCancel:^{
-    }];
-}
-
-// Remove cell
-- (void)removeCell:(PSGridViewCell *)cell {
-    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        cell.alpha = 0.0;
-    } completion:^(BOOL finished) {
-        [cell removeFromSuperview];
-        [self.cells removeObject:cell];
-    }];
-}
-
 
 
 #pragma mark - PSGridViewCellDelegate
@@ -601,13 +523,9 @@
             if ([self.selectedView isKindOfClass:[PSGridViewCell class]] || [self.selectedView isKindOfClass:[PSGridViewTarget class]]) {
                 [self.selectedView setIndices:[NSSet setWithSet:self.touchedIndices]];
             }
-        } else if (touch.tapCount == 1) {
-            if (self.inTargetMode) {
-                [self editTarget:(PSGridViewTarget *)self.selectedView];
-            } else {
-                [self editCell:(PSGridViewCell *)self.selectedView];
-            }
         }
+        
+        // Taps get handled by the individual cells
     } else if (self.touchedIndices.count > 0) {
         // Normal Tile
         
