@@ -42,10 +42,10 @@
         self.alwaysBounceHorizontal = NO;
         self.showsHorizontalScrollIndicator = NO;
         self.showsVerticalScrollIndicator = NO;
-        
+
         // Views
         self.pageView = [[UIView alloc] initWithFrame:CGRectZero];
-        self.pageView.backgroundColor = [UIColor whiteColor];
+        self.pageView.backgroundColor = [UIColor colorWithWhite:0.99 alpha:1.0];
         self.clipsToBounds = NO;
         [self addSubview:self.pageView];
         
@@ -208,6 +208,7 @@
     // Cells
     for (NSDictionary *cellDict in [dict objectForKey:@"cells"]) {
         PSGridViewCell *cell = [[PSGridViewCell alloc] initWithFrame:CGRectZero];
+        cell.parentView = self;
         cell.indices = [NSSet setWithArray:[cellDict objectForKey:@"indices"]];
         cell.content = [cellDict objectForKey:@"content"];
         [self.pageView addSubview:cell];

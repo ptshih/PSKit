@@ -21,6 +21,9 @@
 @property (nonatomic, strong) PSYouTubeView *ytView;
 @property (nonatomic, strong) UILabel *textLabel;
 
+// Touch
+@property (nonatomic, assign) CGPoint originalTouchPoint;
+
 @end
 
 @implementation PSGridViewCell
@@ -31,11 +34,8 @@
         self.userInteractionEnabled = YES;
         self.multipleTouchEnabled = NO;
         self.clipsToBounds = YES;
-//        self.autoresizingMask = UIViewAutoresizingFlexibleSize;
-//        self.backgroundColor = [UIColor colorWithWhite:0.8 alpha:1.0];
-        self.backgroundColor = RGBCOLOR(160, 160, 160);
         
-        
+        // Models
         self.content = @{};
         
         
@@ -85,9 +85,6 @@
         self.highlightView.backgroundColor = RGBACOLOR(0, 0, 0, 0.5);
         self.highlightView.alpha = 0.0;
         [self addSubview:self.highlightView];
-        
-//        self.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
-//        self.layer.borderWidth = 1.0;
     }
     return self;
 }
@@ -207,11 +204,10 @@
 #pragma mark - Load
 
 - (void)prepareLoad {
+    self.backgroundColor = [UIColor colorWithWhite:0.99 alpha:1.0];
     self.imageScrollView.hidden = YES;
     self.textLabel.hidden = YES;
     self.ytView.hidden = YES;
-    
-    self.backgroundColor = [UIColor colorWithRGBHex:0xefefef];
 }
 
 - (void)loadContent {
@@ -264,8 +260,6 @@
     self.textLabel.hidden = NO;
     
     self.textLabel.text = text;
-    
-    self.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)loadColor:(UIColor *)color {
@@ -354,6 +348,8 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
+    UITouch *touch = [touches anyObject];
+    self.originalTouchPoint = [touch locationInView:self];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -364,11 +360,15 @@
     [super touchesEnded:touches withEvent:event];
 
     UITouch *touch = [touches anyObject];
+    CGPoint touchPoint = [touch locationInView:self];
     
-    if (touch.tapCount == 1) {
-        [self editCell];
-    } else {
-        NSLog(@"long press");
+    // If touch moved too far, cancel it
+    if ((fabs(self.originalTouchPoint.x - touchPoint.x) <= 32.0) && (fabs(self.originalTouchPoint.y - touchPoint.y) <= 32.0)) {
+        if (touch.tapCount == 1) {
+            [self editCell];
+        } else {
+            NSLog(@"long press");
+        }
     }
 }
 

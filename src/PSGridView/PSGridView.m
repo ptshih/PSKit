@@ -11,8 +11,9 @@
 
 #pragma mark - Colors
 
-#define TILE_BG_COLOR [UIColor colorWithRGBHex:0xefefef]
-#define TILE_BORDER_COLOR [UIColor colorWithRGBHex:0xcdcdcd]
+#define TILE_BG_COLOR [UIColor colorWithWhite:0.99 alpha:1.0]
+//#define TILE_BG_COLOR [UIColor colorWithRGBHex:0xffffff]
+#define TILE_BORDER_COLOR [UIColor colorWithWhite:0.85 alpha:1.0]
 //#define TILE_BORDER_COLOR [UIColor colorWithRGBHex:0xffffff]
 #define SELECTION_TILE_BG_COLOR RGBACOLOR(0, 0, 0, 0.3)
 #define SELECTION_CELL_BG_COLOR RGBACOLOR(0, 0, 255.0, 0.5)
@@ -22,6 +23,30 @@
 #define RESIZE_BORDER_COLOR RGBACOLOR(0.0, 128.0, 128.0, 0.5)
 
 #define TILE_MARGIN 2.0
+
+@interface GridView : UIView
+
+@end
+
+@implementation GridView
+
+@end
+
+@interface SelectionView : UIView
+
+@end
+
+@implementation SelectionView
+
+@end
+
+@interface TargetView : UIView
+
+@end
+
+@implementation TargetView
+
+@end
 
 
 
@@ -38,16 +63,15 @@
 @property (nonatomic, assign) BOOL inTargetMode;
 @property (nonatomic, assign) CGPoint originalTouchPoint;
 @property (nonatomic, strong) NSMutableSet *touchedIndices;
-@property (nonatomic, strong) NSMutableSet *activeTouches;
-@property (nonatomic, strong) NSMutableSet *ignoredTouches;
 @property (nonatomic, strong) id selectedView;
+@property (nonatomic, strong) Class activeTouchClass;
 
 @property (nonatomic, assign) UIInterfaceOrientation orientation;
 @property (nonatomic, assign, readwrite) CGFloat lastWidth;
 
-@property (nonatomic, strong) UIView *gridView;
-@property (nonatomic, strong) UIView *selectionView;
-@property (nonatomic, strong) UIView *targetView;
+@property (nonatomic, strong) GridView *gridView;
+@property (nonatomic, strong) SelectionView *selectionView;
+@property (nonatomic, strong) TargetView *targetView;
 
     
 @end
@@ -101,23 +125,22 @@
         self.inTargetMode = NO;
         self.originalTouchPoint = CGPointMake(-1, -1);
         self.touchedIndices = [NSMutableSet set];
-        self.activeTouches = [NSMutableSet set];
-        self.ignoredTouches = [NSMutableSet set];
+        self.activeTouchClass = nil;
         self.selectedView = nil;
         
         // Main grid view
-        self.gridView = [[UIView alloc] initWithFrame:CGRectZero];
+        self.gridView = [[GridView alloc] initWithFrame:CGRectZero];
         self.gridView.multipleTouchEnabled = NO;
         self.gridView.backgroundColor = TILE_BORDER_COLOR;
         [self addSubview:self.gridView];
         
-        self.targetView = [[UIView alloc] initWithFrame:CGRectZero];
+        self.targetView = [[TargetView alloc] initWithFrame:CGRectZero];
         self.targetView.backgroundColor = [UIColor blackColor];
         self.targetView.alpha = 0.0;
         [self.gridView addSubview:self.targetView];
         
         // Selection view (touch overlay)
-        self.selectionView = [[UIView alloc] initWithFrame:CGRectZero];
+        self.selectionView = [[SelectionView alloc] initWithFrame:CGRectZero];
         self.selectionView.userInteractionEnabled = NO;
         self.selectionView.backgroundColor = SELECTION_ERROR_BG_COLOR;
         self.selectionView.layer.borderWidth = 2.0;
@@ -288,6 +311,8 @@
     PSGridViewCell *cell = [[PSGridViewCell alloc] initWithFrame:rect];
     cell.parentView = self;
     cell.delegate = self;
+    cell.layer.borderColor = RGBACOLOR(0, 160, 200, 0.5).CGColor;
+    cell.layer.borderWidth = 2.0;
     cell.cells = self.cells;
     cell.indices = [self indicesForRect:rect];
     
@@ -335,20 +360,20 @@
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
     
-    if (self.activeTouches.count > 0) {
-        [self.ignoredTouches unionSet:touches];
+    UITouch *touch = [touches anyObject];
+    
+    if (!self.activeTouchClass) {
+        self.activeTouchClass = [touch.view class];
+    } else {
         return;
     }
     
-    UITouch *touch = [touches anyObject];
     CGPoint touchPoint = [touch locationInView:self.gridView];
     self.originalTouchPoint = touchPoint;
     
-    [self.activeTouches addObject:touch];
-    
     [self beginTouches];
     
-    if ([touch.view isKindOfClass:[PSGridViewCell class]] || [touch.view isKindOfClass:[PSGridViewTarget class]]) {
+    if (self.activeTouchClass == [PSGridViewCell class] || self.activeTouchClass == [PSGridViewTarget class]) {
         // Resizing
         self.selectedView = touch.view;
         if ([self.selectedView respondsToSelector:@selector(showHighlight)]) {
@@ -379,16 +404,27 @@
         } else {
             self.originalTouchPoint = CGPointMake(-1, -1);
         }
-    } else if ([touch.view isEqual:self.gridView] || [touch.view isEqual:self.targetView]) {
+        
+        if (self.activeTouchClass == [PSGridViewCell class]) {
+            self.selectionView.backgroundColor = SELECTION_TILE_BG_COLOR;
+        } else if (self.activeTouchClass == [PSGridViewTarget class]) {
+            self.selectionView.backgroundColor = SELECTION_TARGET_BG_COLOR;
+        }
+    } else if (self.activeTouchClass == [PSGridViewTile class] || self.activeTouchClass == [TargetView class]) {
         // Normal Tile
         
         // Find out which tile was touched
         for (PSGridViewTile *tile in self.tiles) {
             if (CGRectContainsPoint(tile.frame, touchPoint)) {
                 [self.touchedIndices addObject:tile.index];
-                self.selectionView.backgroundColor = SELECTION_TILE_BG_COLOR;
                 break;
             }
+        }
+        
+        if (self.activeTouchClass == [PSGridViewTile class]) {
+            self.selectionView.backgroundColor = SELECTION_TILE_BG_COLOR;
+        } else if (self.activeTouchClass == [TargetView class]) {
+            self.selectionView.backgroundColor = SELECTION_TARGET_BG_COLOR;
         }
         
         // Show selection view overlay
@@ -399,14 +435,13 @@
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesMoved:touches withEvent:event];
     
-    if ([touches isSubsetOfSet:self.ignoredTouches]) {
-        return;
-    }
-    
     UITouch *touch = [touches anyObject];
+    
+    if (touch.view.class != self.activeTouchClass) return;
+    
     CGPoint touchPoint = [touch locationInView:self.gridView];
     
-    if (self.selectedView) {
+    if (self.activeTouchClass == [PSGridViewCell class] || self.activeTouchClass == [PSGridViewTarget class]) {
         // Resizing
         
         if (!CGPointEqualToPoint(self.originalTouchPoint, CGPointMake(-1, -1))) {
@@ -455,7 +490,7 @@
                 }
             }
         }
-    } else if (self.touchedIndices.count > 0) {
+    } else if (self.activeTouchClass == [PSGridViewTile class] || self.activeTouchClass == [TargetView class]) {
         // Normal Tile
         
         CGPoint p1, p2;
@@ -508,27 +543,22 @@
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
     
-    if ([touches isSubsetOfSet:self.ignoredTouches]) {
-        return;
-    }
+    UITouch *touch = [touches anyObject];
     
-//    UITouch *touch = [touches anyObject];
+    if (touch.view.class != self.activeTouchClass) return;
+    
 //    CGPoint touchPoint = [touch locationInView:self.gridView];
     
-    if (self.selectedView) {
-        // Resizing
-        
-        // Only set new indices if it actually changed
+    if (self.activeTouchClass == [PSGridViewCell class] || self.activeTouchClass == [PSGridViewTarget class]) {
+        // Taps get handled by the individual cells
+        // Resize only set new indices if it actually changed
         if (self.touchedIndices.count > 0) {
             if ([self.selectedView isKindOfClass:[PSGridViewCell class]] || [self.selectedView isKindOfClass:[PSGridViewTarget class]]) {
                 [self.selectedView setIndices:[NSSet setWithSet:self.touchedIndices]];
             }
         }
         
-        // Taps get handled by the individual cells
-    } else if (self.touchedIndices.count > 0) {
-        // Normal Tile
-        
+    } else if (self.activeTouchClass == [PSGridViewTile class] || self.activeTouchClass == [TargetView class]) {
         CGRect finalRect = [self rectForIndices:self.touchedIndices];
         
         // Check to see if the current touch rectangle conflicts with any existing cells
@@ -565,6 +595,7 @@
     [super touchesCancelled:touches withEvent:event];
     
     // This is only called from gesture recognizers
+    // Or when an incoming phone call
     
     [self endTouches];
 }
@@ -594,8 +625,7 @@
     // Remove all touched indices
     [self.touchedIndices removeAllObjects];
     
-    [self.activeTouches removeAllObjects];
-    [self.ignoredTouches removeAllObjects];
+    self.activeTouchClass = nil;
     
     // Re-enable scrollview scrolling and gesture detection
     self.scrollEnabled = YES;
