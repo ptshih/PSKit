@@ -60,12 +60,14 @@
         // Models
         self.cells = [NSMutableSet set]; // active cells
         
-        // Import Data
-        [self importData:dictionary];
-        
         // Config
 //        self.backgroundColor = [UIColor whiteColor];
         self.margin = 8.0;
+        
+        // Import Data
+        [self importData:dictionary];
+        
+        self.margin = 8.0; // override margin
 
     }
     return self;
@@ -209,10 +211,14 @@
     return resultingImage;
 }
 
+#pragma mark -
+
 - (void)importData:(NSDictionary *)dict {
     // Page Config
     self.numCols = [[dict objectForKey:@"cols"] integerValue];
     self.numRows = [[dict objectForKey:@"rows"] integerValue];
+    self.margin = [[dict objectForKey:@"margin"] floatValue];
+    self.pageView.backgroundColor = [UIColor colorWithHexString:[dict objectForKey:@"backgroundColor"]];
     
     // Cells
     for (NSDictionary *cellDict in [dict objectForKey:@"cells"]) {

@@ -270,13 +270,11 @@
 
 // Remove cell
 - (void)removeCell {
-    PSGridViewCell *cell = self;
-    
     [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        cell.alpha = 0.0;
+        self.alpha = 0.0;
     } completion:^(BOOL finished) {
-        [cell removeFromSuperview];
-        [self.cells removeObject:cell];
+        [self removeFromSuperview];
+        [self.cells removeObject:self];
     }];
 }
 

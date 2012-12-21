@@ -79,27 +79,6 @@
 #pragma mark - Init/Memory
 
 - (id)initWithFrame:(CGRect)frame dictionary:(NSDictionary *)dictionary {
-    self = [self initWithFrame:frame];
-    if (self) {
-        if (dictionary) {
-            [self importData:dictionary];
-        }
-        
-        // Create base tiles
-        for (int row = 0; row < self.numRows; row++) {
-            for (int col = 0; col < self.numCols; col++) {
-                PSGridViewTile *tileView = [[PSGridViewTile alloc] initWithFrame:CGRectZero];
-                tileView.index = [self indexForRow:row col:col];
-                tileView.backgroundColor = self.tileColor;
-                [self.tiles addObject:tileView];
-                [self.gridView addSubview:tileView];
-            }
-        }
-    }
-    return self;
-}
-
-- (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         self.delegate = self;
@@ -108,12 +87,6 @@
         self.showsHorizontalScrollIndicator = NO;
         self.showsVerticalScrollIndicator = NO;
         self.multipleTouchEnabled = NO;
-        
-        // Models
-        self.tiles = [NSMutableSet set]; // background tiles
-        self.cells = [NSMutableSet set]; // active cells
-        self.borders = [NSMutableSet set]; // tile borders
-        self.targets = [NSMutableSet set]; // tap targets
 
         // Config
         self.numCols = 12;
@@ -127,6 +100,12 @@
         self.selectionErrorColor = RGBACOLOR(255.0, 0, 0, 0.5);
         self.selectionBorderColor = [UIColor colorWithRGBHex:0x9a9a9a];
         
+        // Models
+        self.tiles = [NSMutableSet set]; // background tiles
+        self.cells = [NSMutableSet set]; // active cells
+        self.borders = [NSMutableSet set]; // tile borders
+        self.targets = [NSMutableSet set]; // tap targets
+        
         // Touch Config
         self.inTargetMode = NO;
         self.originalTouchPoint = CGPointMake(-1, -1);
@@ -136,9 +115,19 @@
         
         // Main grid view
         self.gridView = [[GridView alloc] initWithFrame:CGRectZero];
-        self.gridView.multipleTouchEnabled = NO;
         self.gridView.backgroundColor = self.tileBorderColor;
         [self addSubview:self.gridView];
+        
+        // Create base tiles
+        for (int row = 0; row < self.numRows; row++) {
+            for (int col = 0; col < self.numCols; col++) {
+                PSGridViewTile *tileView = [[PSGridViewTile alloc] initWithFrame:CGRectZero];
+                tileView.index = [self indexForRow:row col:col];
+                tileView.backgroundColor = self.tileColor;
+                [self.tiles addObject:tileView];
+                [self.gridView addSubview:tileView];
+            }
+        }
         
         self.targetView = [[TargetView alloc] initWithFrame:CGRectZero];
         self.targetView.backgroundColor = [UIColor blackColor];
@@ -158,6 +147,10 @@
         self.minimumZoomScale = isDeviceIPad() ? 0.8 : 0.5;
         self.maximumZoomScale = 2.0;
         self.zoomScale = 1.0;
+        
+        if (dictionary) {
+            [self importData:dictionary];
+        }
         
         // Draw Borders
 //        [self.borders makeObjectsPerformSelector:@selector(removeFromSuperlayer)];
@@ -302,14 +295,14 @@
         CGRect bottomLeft = CGRectMake(left, bottom - dy, dx, dy);
         CGRect bottomRight = CGRectMake(right - dx, bottom - dy, dx, dy);
         
-        if (CGRectContainsPoint(topLeft, touchPoint)) {
-            self.originalTouchPoint = CGPointMake(right, bottom);
-        } else if (CGRectContainsPoint(topRight, touchPoint)) {
-            self.originalTouchPoint = CGPointMake(left, bottom);
+        if (CGRectContainsPoint(bottomRight, touchPoint)) {
+            self.originalTouchPoint = CGPointMake(left, top);
         } else if (CGRectContainsPoint(bottomLeft, touchPoint)) {
             self.originalTouchPoint = CGPointMake(right, top);
-        } else if (CGRectContainsPoint(bottomRight, touchPoint)) {
-            self.originalTouchPoint = CGPointMake(left, top);
+        } else if (CGRectContainsPoint(topRight, touchPoint)) {
+            self.originalTouchPoint = CGPointMake(left, bottom);
+        } else if (CGRectContainsPoint(topLeft, touchPoint)) {
+            self.originalTouchPoint = CGPointMake(right, bottom);
         } else {
             self.originalTouchPoint = CGPointMake(-1, -1);
         }
@@ -454,45 +447,44 @@
     [super touchesEnded:touches withEvent:event];
     
     UITouch *touch = [touches anyObject];
+//    CGPoint touchPoint = [touch locationInView:self.gridView];
     
     // Only allow one type of view to be touched at a time
     if (touch.view.class != self.activeTouchClass) return;
     
-//    CGPoint touchPoint = [touch locationInView:self.gridView];
-    
-    if (self.activeTouchClass == [PSGridViewCell class] || self.activeTouchClass == [PSGridViewTarget class]) {
-        // Taps get handled by the individual cells
-        // Resize only set new indices if it actually changed
-        if (self.touchedIndices.count > 0) {
+    if (self.touchedIndices.count > 0) {
+        if (self.activeTouchClass == [PSGridViewCell class] || self.activeTouchClass == [PSGridViewTarget class]) {
+            // Taps get handled by the individual cells
+            // Resize
             [self.selectedView setIndices:[NSSet setWithSet:self.touchedIndices]];
-        }
-        
-    } else if (self.activeTouchClass == [PSGridViewTile class] || self.activeTouchClass == [TargetView class]) {
-        CGRect finalRect = [self rectForIndices:self.touchedIndices];
-        
-        // Check to see if the current touch rectangle conflicts with any existing cells
-        BOOL hasConflict = NO;
-        if (self.inTargetMode) {
-            for (PSGridViewTarget *target in self.targets) {
-                // If current touch area intersects an existing cell, we have a conflict
-                if (CGRectIntersectsRect(finalRect, target.frame)) {
-                    hasConflict = YES;
-                }
-            }
             
-            if (!hasConflict) {
-                [self addTargetWithRect:finalRect];
-            }
-        } else {
-            for (PSGridViewCell *cell in self.cells) {
-                // If current touch area intersects an existing cell, we have a conflict
-                if (CGRectIntersectsRect(finalRect, cell.frame)) {
-                    hasConflict = YES;
-                }
-            }
+        } else if (self.activeTouchClass == [PSGridViewTile class] || self.activeTouchClass == [TargetView class]) {
+            CGRect finalRect = [self rectForIndices:self.touchedIndices];
             
-            if (!hasConflict) {
-                [self addCellWithRect:finalRect];
+            // Check to see if the current touch rectangle conflicts with any existing cells
+            BOOL hasConflict = NO;
+            if (self.inTargetMode) {
+                for (PSGridViewTarget *target in self.targets) {
+                    // If current touch area intersects an existing cell, we have a conflict
+                    if (CGRectIntersectsRect(finalRect, target.frame)) {
+                        hasConflict = YES;
+                    }
+                }
+                
+                if (!hasConflict) {
+                    [self addTargetWithRect:finalRect];
+                }
+            } else {
+                for (PSGridViewCell *cell in self.cells) {
+                    // If current touch area intersects an existing cell, we have a conflict
+                    if (CGRectIntersectsRect(finalRect, cell.frame)) {
+                        hasConflict = YES;
+                    }
+                }
+                
+                if (!hasConflict) {
+                    [self addCellWithRect:finalRect];
+                }
             }
         }
     }
@@ -593,9 +585,9 @@
     // Cells
     NSMutableArray *cellDicts = [NSMutableArray array];
     for (PSGridViewCell *cell in self.cells) {
-        NSArray *indices = [cell.indices allObjects];
-        NSDictionary *content = cell.content;
-        NSDictionary *cellDict = @{@"indices" : indices, @"content": content};
+        NSArray *indices = [NSArray arrayWithArray:[cell.indices allObjects]];
+        NSDictionary *content = [NSDictionary dictionaryWithDictionary:cell.content];
+        NSDictionary *cellDict = @{@"indices": indices, @"content": content};
         [cellDicts addObject:cellDict];
     }
     [dict setObject:[NSArray arrayWithArray:cellDicts] forKey:@"cells"];
@@ -603,8 +595,9 @@
     // Tap Targets
     NSMutableArray *targetDicts = [NSMutableArray array];
     for (PSGridViewTarget *target in self.targets) {
-        NSArray *indices = [target.indices allObjects];
-        NSDictionary *targetDict = @{@"indices" : indices, @"actions": @[]};
+        NSArray *indices = [NSArray arrayWithArray:[target.indices allObjects]];
+        NSDictionary *action = [NSDictionary dictionaryWithDictionary:target.action];
+        NSDictionary *targetDict = @{@"indices": indices, @"action": action};
         [targetDicts addObject:targetDict];
     }
     [dict setObject:targetDicts forKey:@"targets"];
@@ -612,7 +605,8 @@
     // Page Config TODO
     [dict setObject:[NSNumber numberWithInteger:self.numCols] forKey:@"cols"];
     [dict setObject:[NSNumber numberWithInteger:self.numRows] forKey:@"rows"];
-    
+    [dict setObject:[NSNumber numberWithInteger:self.margin] forKey:@"margin"];
+    [dict setObject:[self.tileColor hexStringFromColor] forKey:@"backgroundColor"];
     
     return dict;
 }
@@ -621,6 +615,8 @@
     // Page Config
     self.numCols = [[dict objectForKey:@"cols"] integerValue];
     self.numRows = [[dict objectForKey:@"rows"] integerValue];
+    self.margin = [[dict objectForKey:@"margin"] floatValue];
+    self.backgroundColor = [UIColor colorWithHexString:[dict objectForKey:@"backgroundColor"]];
     
     // Cells
     for (NSDictionary *cellDict in [dict objectForKey:@"cells"]) {
