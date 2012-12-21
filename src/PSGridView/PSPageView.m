@@ -156,12 +156,21 @@
     [self centerSubview:self.pageView forScrollView:self];
 }
 
-#pragma mark -
+#pragma mark - Helpers
+
+- (CGFloat)cellWidth {
+    CGFloat width = self.width - self.margin * (self.numCols + 1);
+    CGFloat cellWidth = width / self.numCols;
+    return cellWidth;
+}
+
+- (CGFloat)cellHeight {
+    return [self cellWidth];
+}
 
 - (CGRect)rectForIndices:(NSSet *)indices {
-    CGFloat width = self.width - self.margin * (self.numCols + 1);
-    CGFloat cellWidth = width / 12.0;
-    CGFloat cellHeight = cellWidth;
+    CGFloat cellWidth = [self cellWidth];
+    CGFloat cellHeight = [self cellHeight];
     
     CGRect cellRect = CGRectNull;
     for (NSString *index in indices) {
