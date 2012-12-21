@@ -95,7 +95,7 @@
 
         // Config
         self.numCols = 12;
-        self.numRows = 24;
+        self.numRows = 16;
         
         // Touch Config
         self.inTargetMode = NO;
@@ -512,7 +512,7 @@
         return;
     }
     
-    UITouch *touch = [touches anyObject];
+//    UITouch *touch = [touches anyObject];
 //    CGPoint touchPoint = [touch locationInView:self.gridView];
     
     if (self.selectedView) {

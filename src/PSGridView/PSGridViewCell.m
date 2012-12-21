@@ -10,27 +10,10 @@
 
 #import "PSYouTubeView.h"
 
-#pragma mark - Gesture Recognizer
+// TODO
+#import "AppDelegate.h"
 
-// This is just so we know that we sent this tap gesture recognizer in the delegate
-
-@interface PSGridViewTapGestureRecognizer : UITapGestureRecognizer
-@end
-
-@implementation PSGridViewTapGestureRecognizer
-@end
-
-
-@interface PSGridViewLongPressGestureRecognizer : UILongPressGestureRecognizer
-@end
-
-@implementation PSGridViewLongPressGestureRecognizer
-@end
-
-
-
-
-@interface PSGridViewCell () <UIGestureRecognizerDelegate, UIScrollViewDelegate>
+@interface PSGridViewCell () <UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIView *highlightView;
 @property (nonatomic, strong) UIScrollView *imageScrollView;
@@ -81,11 +64,9 @@
         self.textLabel.userInteractionEnabled = NO;
         self.textLabel.autoresizingMask = UIViewAutoresizingFlexibleSize;
         self.textLabel.font = [UIFont fontWithName:@"ProximaNovaCond-Semibold" size:64.0];
-        self.textLabel.minimumFontSize = 12.0;
-        self.textLabel.adjustsFontSizeToFitWidth = YES;
-        self.textLabel.numberOfLines = 1;
+        self.textLabel.numberOfLines = 0;
         self.textLabel.textAlignment = UITextAlignmentCenter;
-        //        self.textLabel.backgroundColor = [UIColor lightGrayColor];
+//        self.textLabel.backgroundColor = [UIColor greenColor];
         self.textLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
         self.textLabel.hidden = YES;
         [self addSubview:self.textLabel];
@@ -107,17 +88,28 @@
         
 //        self.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
 //        self.layer.borderWidth = 1.0;
-        
-        // Setup gesture recognizer
-//        PSGridViewTapGestureRecognizer *gr = [[PSGridViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapCell:)];
-//        gr.delegate = self;
-//        [self addGestureRecognizer:gr];
-    
-//        PSGridViewLongPressGestureRecognizer *lpgr = [[PSGridViewLongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongPressCell:)];
-//        lpgr.delegate = self;
-//        [self addGestureRecognizer:lpgr];
     }
     return self;
+}
+
+- (void)fitText {
+    // Loop and try to fit the text in the rect
+    CGFloat fontSize = 96.0;
+    CGFloat cellWidth = self.textLabel.width;
+    CGFloat cellHeight = self.textLabel.height;
+    
+    while (1) {
+        self.textLabel.font = [UIFont fontWithName:@"ProximaNovaCond-Semibold" size:fontSize];
+        CGSize size = [self.textLabel sizeForLabelInWidth:cellWidth];
+        if (size.height <= cellHeight) {
+            self.textLabel.width = cellWidth;
+            self.textLabel.height = cellHeight;
+            break;
+        } else {
+            fontSize--;
+        }
+    }
+    NSLog(@"%@", self.textLabel);
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
@@ -158,35 +150,30 @@
 
 #pragma mark - Gesture Recognizer
 
-- (void)didTapCell:(UITapGestureRecognizer *)gestureRecognizer {
-    NSLog(@"tap: %d", gestureRecognizer.state);
-    if (self.delegate && [self.delegate respondsToSelector:@selector(gridViewCell:didTapWithWithState:)]) {
-        [self.delegate gridViewCell:self didTapWithWithState:gestureRecognizer.state];
-    }
-}
-
-- (void)didLongPressCell:(UILongPressGestureRecognizer *)gestureRecognizer {
-    NSLog(@"lp: %d", gestureRecognizer.state);
-    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-        if (self.delegate && [self.delegate respondsToSelector:@selector(gridViewCell:didLongPressWithState:)]) {
-            [self.delegate gridViewCell:self didLongPressWithState:gestureRecognizer.state];
-        }
-    }
-}
-
-- (void)didPanCell:(UIPanGestureRecognizer *)gr {
-    CGPoint translatedPoint = [gr translationInView:self];
-    [gr setTranslation:CGPointZero inView:self];
-    self.imageView.center = CGPointMake(self.imageView.center.x + translatedPoint.x, self.imageView.center.y + translatedPoint.y);
-}
-
-- (void)didPinchCell:(UIPinchGestureRecognizer *)gr {
-//    self.imageView.
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    return YES;
-}
+//- (void)didTapCell:(UITapGestureRecognizer *)gestureRecognizer {
+//    NSLog(@"tap: %d", gestureRecognizer.state);
+//    if (self.delegate && [self.delegate respondsToSelector:@selector(gridViewCell:didTapWithWithState:)]) {
+//        [self.delegate gridViewCell:self didTapWithWithState:gestureRecognizer.state];
+//    }
+//}
+//
+//- (void)didLongPressCell:(UILongPressGestureRecognizer *)gestureRecognizer {
+//    NSLog(@"lp: %d", gestureRecognizer.state);
+//    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+//        if (self.delegate && [self.delegate respondsToSelector:@selector(gridViewCell:didLongPressWithState:)]) {
+//            [self.delegate gridViewCell:self didLongPressWithState:gestureRecognizer.state];
+//        }
+//    }
+//}
+//
+//- (void)didPanCell:(UIPanGestureRecognizer *)gr {
+//    CGPoint translatedPoint = [gr translationInView:self];
+//    [gr setTranslation:CGPointZero inView:self];
+//    self.imageView.center = CGPointMake(self.imageView.center.x + translatedPoint.x, self.imageView.center.y + translatedPoint.y);
+//}
+//
+//- (void)didPinchCell:(UIPinchGestureRecognizer *)gr {
+//}
 
 #pragma mark -
 
@@ -200,6 +187,7 @@
     
     if (self.textLabel.hidden == NO) {
         self.textLabel.frame = CGRectInset(self.bounds, 16.0, 16.0);
+        [self fitText];
     } else if (self.imageScrollView.hidden == NO) {
         self.imageScrollView.frame = self.bounds;
         self.imageView.frame = self.imageScrollView.bounds;
@@ -261,12 +249,6 @@
 }
 
 - (void)loadImage:(UIImage *)image {
-//        UIPanGestureRecognizer *pangr = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(didPanCell:)];
-//        [self.imageView addGestureRecognizer:pangr];
-//        
-//        UIPinchGestureRecognizer *pinchgr = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(didPinchCell:)];
-//        [self.imageView addGestureRecognizer:pinchgr];
-    
     self.imageScrollView.hidden = NO;
     [self.imageView.loadingIndicator stopAnimating];
     self.imageView.image = image;
@@ -282,6 +264,8 @@
     self.textLabel.hidden = NO;
     
     self.textLabel.text = text;
+    
+    self.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)loadColor:(UIColor *)color {
@@ -344,14 +328,14 @@
                 break;
             }
             case 3: {
-//                [UIActionSheet photoPickerWithTitle:@"Pick a Photo" showInView:self.parentViewController.view presentVC:self.parentViewController onPhotoPicked:^(UIImage *chosenImage) {
-//                    if (chosenImage) {
-//                        NSDictionary *content = @{@"type" : @"photo", @"photo": chosenImage};
-//                        cell.content = content;
-//                        [cell loadContent];
-//                    }
-//                } onCancel:^{
-//                }];
+                [UIActionSheet photoPickerWithTitle:@"Pick a Photo" showInView:self.parentView presentVC:[[(AppDelegate *)APP_DELEGATE navigationController] topViewController] onPhotoPicked:^(UIImage *chosenImage) {
+                    if (chosenImage) {
+                        NSDictionary *content = @{@"type" : @"photo", @"photo": chosenImage};
+                        cell.content = content;
+                        [cell loadContent];
+                    }
+                } onCancel:^{
+                }];
                 break;
             }
             case 4: {
@@ -383,6 +367,8 @@
     
     if (touch.tapCount == 1) {
         [self editCell];
+    } else {
+        NSLog(@"long press");
     }
 }
 
