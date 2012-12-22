@@ -428,6 +428,7 @@
         [[[(AppDelegate *)APP_DELEGATE navigationController] topViewController] dismissViewControllerAnimated:YES completion:NULL];
     }
     
+    // TODO: move this to export/save
     NSURL *url = [NSURL URLWithString:@"http://ec2-23-22-240-185.compute-1.amazonaws.com:8080"];
     AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:url];
     NSData *imageData = UIImageJPEGRepresentation(image, 0.7);
@@ -445,8 +446,6 @@
         NSDictionary *content = @{@"type" : @"image", @"href": [res objectForKey:@"url"]};
         self.content = content;
         [self loadContent];
-
-
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
     }];
     [operation start];
