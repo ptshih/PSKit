@@ -56,6 +56,11 @@ static NSOperationQueue *__loadQueue = nil;
     self.URL = nil;
 }
 
+- (void)loadImage:(UIImage *)image {
+    [self.loadingIndicator stopAnimating];
+    self.image = image;
+}
+
 - (void)loadImageWithURL:(NSURL *)URL {
     [self loadImageWithURL:URL cacheType:PSURLCacheTypePermanent];
 }
