@@ -422,7 +422,34 @@
 
 
 - (void)imagePicker:(ImagePickerViewController *)imagePicker didPickImage:(UIImage *)image {
+    if (isDeviceIPad()) {
+        [self.pc dismissPopoverAnimated:YES];
+    } else {
+        [[[(AppDelegate *)APP_DELEGATE navigationController] topViewController] dismissViewControllerAnimated:YES completion:NULL];
+    }
     
+    NSURL *url = [NSURL URLWithString:@"http://ec2-23-22-240-185.compute-1.amazonaws.com:8080"];
+    AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:url];
+    NSData *imageData = UIImageJPEGRepresentation(image, 0.7);
+    NSMutableURLRequest *request = [httpClient multipartFormRequestWithMethod:@"POST" path:@"/test" parameters:nil constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
+        [formData appendPartWithFileData:imageData name:@"file" fileName:@"file.jpg" mimeType:@"image/jpeg"];
+    }];
+    
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    [operation setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite) {
+        NSLog(@"Sent %lld of %lld bytes", totalBytesWritten, totalBytesExpectedToWrite);
+    }];
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSDictionary *res = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONWritingPrettyPrinted error:nil];
+        
+        NSDictionary *content = @{@"type" : @"image", @"href": [res objectForKey:@"url"]};
+        self.content = content;
+        [self loadContent];
+
+
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    }];
+    [operation start];
 }
 
 - (void)imagePicker:(ImagePickerViewController *)imagePicker didPickImageWithURLPath:(NSString *)URLPath {
