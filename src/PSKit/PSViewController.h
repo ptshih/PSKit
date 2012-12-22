@@ -58,6 +58,8 @@
 
 @property (nonatomic, assign) NSInteger limit;
 @property (nonatomic, assign) NSInteger offset;
+@property (nonatomic, assign) NSString *minId;
+@property (nonatomic, assign) NSString *maxId;
 
 /**
  Used to update the view when the orientation changes

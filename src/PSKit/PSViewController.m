@@ -98,6 +98,8 @@
         
         self.limit = 10;
         self.offset = 0;
+        self.minId = nil;
+        self.maxId = nil;
         
         self.nullBackgroundColor = BASE_BG_COLOR;
         self.nullLabelStyle = @"loadingDarkLabel";
@@ -310,6 +312,8 @@
     ASSERT_MAIN_THREAD;
     [self beginRefresh];
     self.offset = 0;
+    self.minId = nil;
+    self.maxId = nil;
     
     if (self.shouldShowNullView) {
         [self.nullView.spinnerView startAnimating];
@@ -324,6 +328,8 @@
     ASSERT_MAIN_THREAD;
     [self beginRefresh];
     self.offset = 0;
+    self.minId = nil;
+    self.maxId = nil;
 }
 
 - (void)loadMoreDataSource {
