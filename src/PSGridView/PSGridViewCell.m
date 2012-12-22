@@ -13,7 +13,11 @@
 // TODO
 #import "AppDelegate.h"
 
-@interface PSGridViewCell () <UIScrollViewDelegate>
+#import "ImagePickerViewController.h"
+
+@interface PSGridViewCell () <UIScrollViewDelegate, ImagePickerDelegate>
+
+@property (nonatomic, strong) UIPopoverController *pc;
 
 @property (nonatomic, strong) UIView *highlightView;
 @property (nonatomic, strong) UIScrollView *imageScrollView;
@@ -23,6 +27,7 @@
 
 // Touch
 @property (nonatomic, assign) CGPoint originalTouchPoint;
+@property (nonatomic, assign) BOOL touchDidMove;
 
 @end
 
@@ -35,8 +40,12 @@
         self.multipleTouchEnabled = NO;
         self.clipsToBounds = YES;
         
+        self.touchDidMove = NO;
+        
         // Models
         self.content = @{};
+        
+        self.backgroundColor = [UIColor colorWithWhite:0.99 alpha:0.8];
         
         
         // Content
@@ -347,31 +356,67 @@
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
     UITouch *touch = [touches anyObject];
-    self.originalTouchPoint = [touch locationInView:self];
+    self.originalTouchPoint = [touch locationInView:self.parentView];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesMoved:touches withEvent:event];
+    
+    UITouch *touch = [touches anyObject];
+    CGPoint touchPoint = [touch locationInView:self.parentView];
+    
+    if ((fabsf(self.originalTouchPoint.x - touchPoint.x) > 32.0) || (fabsf(self.originalTouchPoint.y - touchPoint.y) > 32.0)) {
+        self.touchDidMove = YES;
+    }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
 
     UITouch *touch = [touches anyObject];
-    CGPoint touchPoint = [touch locationInView:self];
-    
+//    CGPoint touchPoint = [touch locationInView:self.parentView];
+
     // If touch moved too far, cancel it
-    if ((fabs(self.originalTouchPoint.x - touchPoint.x) <= 32.0) && (fabs(self.originalTouchPoint.y - touchPoint.y) <= 32.0)) {
+    if (!self.touchDidMove) {
         if (touch.tapCount == 1) {
             [self editCell];
         } else {
             NSLog(@"long press");
+            ImagePickerViewController *vc = [[ImagePickerViewController alloc] initWithSource:@"instagram"];
+            vc.delegate = self;
+            if (isDeviceIPad()) {
+                self.pc = [[UIPopoverController alloc] initWithContentViewController:vc];
+                self.pc.popoverContentSize = CGSizeMake(600, 1100);
+                [self.pc presentPopoverFromRect:CGRectZero inView:self.parentView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+            } else {
+                [[[(AppDelegate *)APP_DELEGATE navigationController] topViewController] presentViewController:vc animated:YES completion:NULL];
+            }
         }
     }
+    
+    self.touchDidMove = NO;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesCancelled:touches withEvent:event];
+    
+    self.touchDidMove = NO;
+}
+
+
+- (void)imagePicker:(ImagePickerViewController *)imagePicker didPickImage:(UIImage *)image {
+    
+}
+
+- (void)imagePicker:(ImagePickerViewController *)imagePicker didPickImageWithURLPath:(NSString *)URLPath {
+    if (isDeviceIPad()) {
+        [self.pc dismissPopoverAnimated:YES];
+    } else {
+        [[[(AppDelegate *)APP_DELEGATE navigationController] topViewController] dismissViewControllerAnimated:YES completion:NULL];
+    }
+    NSDictionary *content = @{@"type" : @"image", @"href": URLPath};
+    self.content = content;
+    [self loadContent];
 }
 
 @end

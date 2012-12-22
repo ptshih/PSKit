@@ -14,6 +14,7 @@
 
 // Touch
 @property (nonatomic, assign) CGPoint originalTouchPoint;
+@property (nonatomic, assign) BOOL touchDidMove;
 
 @end
 
@@ -25,6 +26,8 @@
         self.userInteractionEnabled = YES;
         self.multipleTouchEnabled = NO;
         self.backgroundColor = TARGET_BG_COLOR;
+        
+        self.touchDidMove = NO;
     }
     return self;
 }
@@ -72,31 +75,42 @@
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
     UITouch *touch = [touches anyObject];
-    self.originalTouchPoint = [touch locationInView:self];
+    self.originalTouchPoint = [touch locationInView:self.parentView];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesMoved:touches withEvent:event];
+    
+    UITouch *touch = [touches anyObject];
+    CGPoint touchPoint = [touch locationInView:self.parentView];
+    
+    if ((fabsf(self.originalTouchPoint.x - touchPoint.x) > 32.0) || (fabsf(self.originalTouchPoint.y - touchPoint.y) > 32.0)) {
+        self.touchDidMove = YES;
+    }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
     
     UITouch *touch = [touches anyObject];
-    CGPoint touchPoint = [touch locationInView:self];
+//    CGPoint touchPoint = [touch locationInView:self.parentView];
     
     // If touch moved too far, cancel it
-    if ((fabs(self.originalTouchPoint.x - touchPoint.x) <= 32.0) && (fabs(self.originalTouchPoint.y - touchPoint.y) <= 32.0)) {
+    if (!self.touchDidMove) {
         if (touch.tapCount == 1) {
             [self editTarget];
         } else {
             NSLog(@"long press");
         }
     }
+    
+    self.touchDidMove = NO;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
     [super touchesCancelled:touches withEvent:event];
+    
+    self.touchDidMove = NO;
 }
 
 
