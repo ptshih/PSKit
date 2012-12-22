@@ -14,6 +14,7 @@
 #import "AppDelegate.h"
 
 #import "ImagePickerViewController.h"
+#import "FacebookAlbumViewController.h"
 
 @interface PSGridViewCell () <UIScrollViewDelegate, ImagePickerDelegate>
 
@@ -291,7 +292,7 @@
     // TODO
     PSGridViewCell *cell = self;
     
-    [UIActionSheet actionSheetWithTitle:@"Add/Edit Content" message:nil destructiveButtonTitle:nil buttons:@[@"Text", @"Image URL", @"Video", @"Photo", @"Remove"] showInView:self onDismiss:^(int buttonIndex, NSString *textInput) {
+    [UIActionSheet actionSheetWithTitle:@"Add/Edit Content" message:nil destructiveButtonTitle:nil buttons:@[@"Text", @"Image URL", @"Video", @"Photo", @"Facebook", @"Instagram", @"Remove"] showInView:self onDismiss:^(int buttonIndex, NSString *textInput) {
         
         // Load with configuration
         switch (buttonIndex) {
@@ -329,17 +330,18 @@
                 break;
             }
             case 3: {
-                [UIActionSheet photoPickerWithTitle:@"Pick a Photo" showInView:self.parentView presentVC:[[(AppDelegate *)APP_DELEGATE navigationController] topViewController] onPhotoPicked:^(UIImage *chosenImage) {
-                    if (chosenImage) {
-                        NSDictionary *content = @{@"type" : @"photo", @"photo": chosenImage};
-                        cell.content = content;
-                        [cell loadContent];
-                    }
-                } onCancel:^{
-                }];
+                [self showPickerWithSource:@"library"];
                 break;
             }
             case 4: {
+                [self showPickerWithSource:@"facebook"];
+                break;
+            }
+            case 5: {
+                [self showPickerWithSource:@"instagram"];
+                break;
+            }
+            case 6: {
                 // remove cell
                 [self removeCell];
                 break;
@@ -382,15 +384,6 @@
             [self editCell];
         } else {
             NSLog(@"long press");
-            ImagePickerViewController *vc = [[ImagePickerViewController alloc] initWithSource:@"instagram"];
-            vc.delegate = self;
-            if (isDeviceIPad()) {
-                self.pc = [[UIPopoverController alloc] initWithContentViewController:vc];
-                self.pc.popoverContentSize = CGSizeMake(600, 1100);
-                [self.pc presentPopoverFromRect:CGRectZero inView:self.parentView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-            } else {
-                [[[(AppDelegate *)APP_DELEGATE navigationController] topViewController] presentViewController:vc animated:YES completion:NULL];
-            }
         }
     }
     
@@ -401,6 +394,30 @@
     [super touchesCancelled:touches withEvent:event];
     
     self.touchDidMove = NO;
+}
+
+#pragma mark -
+
+- (void)showPickerWithSource:(NSString *)source {
+    NSDictionary *pickerDict = @{@"source" : source};
+    
+    id vc = nil;
+    if ([source isEqualToString:@"facebook"]) {
+        vc = [[FacebookAlbumViewController alloc] initWithNibName:nil bundle:nil];
+        [vc setParentDelegate:self];
+    } else {
+        vc = [[ImagePickerViewController alloc] initWithDictionary:pickerDict];
+        [vc setDelegate:self];
+    }
+    PSNavigationController *nc = [[PSNavigationController alloc] initWithRootViewController:vc];
+    
+    if (isDeviceIPad()) {
+        self.pc = [[UIPopoverController alloc] initWithContentViewController:nc];
+        self.pc.popoverContentSize = CGSizeMake(600, 1100);
+        [self.pc presentPopoverFromRect:CGRectZero inView:self.parentView permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    } else {
+        [[[(AppDelegate *)APP_DELEGATE navigationController] topViewController] presentViewController:nc animated:YES completion:NULL];
+    }
 }
 
 
