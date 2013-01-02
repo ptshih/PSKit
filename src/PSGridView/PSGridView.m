@@ -605,8 +605,10 @@
     // Page Config TODO
     [dict setObject:[NSNumber numberWithInteger:self.numCols] forKey:@"cols"];
     [dict setObject:[NSNumber numberWithInteger:self.numRows] forKey:@"rows"];
-    [dict setObject:[NSNumber numberWithInteger:self.margin] forKey:@"margin"];
-    [dict setObject:[self.tileColor hexStringFromColor] forKey:@"backgroundColor"];
+//    [dict setObject:[NSNumber numberWithFloat:self.margin] forKey:@"margin"];
+//    [dict setObject:[self.tileColor hexStringFromColor] forKey:@"backgroundColor"];
+    [dict setObject:[[UIColor blackColor] hexStringFromColor] forKey:@"backgroundColor"];
+    [dict setObject:[NSNumber numberWithFloat:4] forKey:@"margin"];
     
     return dict;
 }

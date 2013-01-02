@@ -66,8 +66,6 @@
         
         // Import Data
         [self importData:dictionary];
-        
-        self.margin = 8.0; // override margin
 
     }
     return self;
@@ -134,17 +132,17 @@
         [cell loadContent];
     }
     
-    top -= self.margin;
-    left -= self.margin;
+//    top -= self.margin;
+//    left -= self.margin;
     
     for (PSGridViewCell *cell in self.cells) {
         cell.top -= top;
         cell.left -= left;
     }
     bottom -= top;
-    bottom += self.margin;
+//    bottom += self.margin;
     right -= left;
-    right += self.margin;
+//    right += self.margin;
     
     height = bottom;
     width = right;
@@ -161,7 +159,7 @@
 #pragma mark - Helpers
 
 - (CGFloat)cellWidth {
-    CGFloat width = self.width - self.margin * (self.numCols + 1);
+    CGFloat width = self.width - self.margin * (self.numCols - 1);
     CGFloat cellWidth = width / self.numCols;
     return cellWidth;
 }
@@ -179,7 +177,7 @@
         NSInteger row = [[[index componentsSeparatedByString:@","] objectAtIndex:0] integerValue];
         NSInteger col = [[[index componentsSeparatedByString:@","] objectAtIndex:1] integerValue];
         
-        CGRect newRect = CGRectMake(col * cellWidth + self.margin * (col + 1), row * cellHeight + self.margin * (row + 1), cellWidth, cellHeight);
+        CGRect newRect = CGRectMake(col * cellWidth + self.margin * (col), row * cellHeight + self.margin * (row), cellWidth, cellHeight);
         if (CGRectIsNull(cellRect)) {
             cellRect = newRect;
         } else {

@@ -7,7 +7,6 @@
 //
 
 #import "PSYouTubeView.h"
-#import <AVFoundation/AVFoundation.h>
 
 static NSString *kYouTubeEmbedHTML = @"<html><head"
 "<meta name=\"viewport\" content=\"width=device-width, maximum-scale=1.0, initial-scale=1.0, user-scalable=no\">"
@@ -29,7 +28,7 @@ static NSString *kYouTubeEmbedHTML = @"<html><head"
         self.delegate = self;
         self.scrollView.scrollsToTop = NO;
         self.scrollView.scrollEnabled = NO;
-        self.autoresizingMask = UIViewAutoresizingFlexibleSize;
+        self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 //        self.scalesPageToFit = YES;
         
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];

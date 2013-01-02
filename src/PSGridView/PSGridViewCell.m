@@ -429,10 +429,10 @@
     }
     
     // TODO: move this to export/save
-    NSURL *url = [NSURL URLWithString:@"http://ec2-23-22-240-185.compute-1.amazonaws.com:8080"];
+    NSURL *url = [NSURL URLWithString:@"http://voidray.airbriteinc.com:8080"];
     AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:url];
     NSData *imageData = UIImageJPEGRepresentation(image, 0.7);
-    NSMutableURLRequest *request = [httpClient multipartFormRequestWithMethod:@"POST" path:@"/test" parameters:nil constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
+    NSMutableURLRequest *request = [httpClient multipartFormRequestWithMethod:@"POST" path:@"/" parameters:nil constructingBodyWithBlock: ^(id <AFMultipartFormData>formData) {
         [formData appendPartWithFileData:imageData name:@"file" fileName:@"file.jpg" mimeType:@"image/jpeg"];
     }];
     
@@ -443,7 +443,7 @@
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *res = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONWritingPrettyPrinted error:nil];
         
-        NSDictionary *content = @{@"type" : @"image", @"href": [res objectForKey:@"url"]};
+        NSDictionary *content = @{@"type" : @"image", @"href": [[res objectForKey:@"720"] objectForKey:@"url"]};
         self.content = content;
         [self loadContent];
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
