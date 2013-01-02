@@ -14,6 +14,7 @@
 @interface PSTileViewController : PSViewController <PSTileViewDelegate, PSTileViewDataSource, PSPullRefreshViewDelegate, PSPullLoadMoreViewDelegate, UIScrollViewDelegate>
 
 @property (nonatomic, strong) NSMutableArray *items;
+@property (nonatomic, strong) NSMutableArray *template;
 @property (nonatomic, strong) PSTileView *tileView;
 @property (nonatomic, strong) PSPullRefreshView *pullRefreshView;
 @property (nonatomic, strong) PSPullLoadMoreView *pullLoadMoreView;

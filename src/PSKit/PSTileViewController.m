@@ -20,6 +20,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.items = [NSMutableArray array];
+        self.template = [NSMutableArray array];
         
         // Config
         self.shouldShowNullView = YES;
@@ -188,8 +189,8 @@
     return [self.items count];
 }
 
-- (NSArray *)templateForTileView:(PSTileView *)tileView {
-    return [NSArray array];
+- (NSMutableArray *)templateForTileView:(PSTileView *)tileView {
+    return [NSMutableArray array];
 }
 
 - (PSTileViewCell *)tileView:(PSTileView *)tileView cellForItemAtIndex:(NSInteger)index {

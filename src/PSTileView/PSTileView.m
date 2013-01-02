@@ -102,6 +102,10 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
 
 @interface PSTileView () <UIGestureRecognizerDelegate>
 
+@property (nonatomic, assign, readwrite) CGPoint touchOrigin;
+@property (nonatomic, assign) PSTileViewCell *originCell;
+@property (nonatomic, assign) NSInteger typeIncrement;
+
 @property (nonatomic, assign, readwrite) CGFloat lastOffset;
 @property (nonatomic, assign, readwrite) CGFloat offsetThreshold;
 @property (nonatomic, assign, readwrite) CGFloat lastWidth;
@@ -112,6 +116,7 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
 @property (nonatomic, strong) NSMutableDictionary *visibleCells;
 @property (nonatomic, strong) NSMutableArray *cellKeysToRemove;
 @property (nonatomic, strong) NSMutableDictionary *indexToRectMap;
+@property (nonatomic, strong) NSMutableDictionary *gridToRectMap;
 
 - (void)relayoutTiles;
 
@@ -134,6 +139,8 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     if (self) {
         self.alwaysBounceVertical = YES;
         
+        self.typeIncrement = 0;
+        
         self.lastOffset = 0.0;
         self.offsetThreshold = floorf(self.height / 4.0);
         
@@ -141,6 +148,7 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
         self.visibleCells = [NSMutableDictionary dictionary];
         self.cellKeysToRemove = [NSMutableArray array];
         self.indexToRectMap = [NSMutableDictionary dictionary];
+        self.gridToRectMap = [NSMutableDictionary dictionary];
     }
     
     return self;
@@ -196,9 +204,10 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     [self.visibleCells removeAllObjects];
     [self.cellKeysToRemove removeAllObjects];
     [self.indexToRectMap removeAllObjects];
+    [self.gridToRectMap removeAllObjects];
     
     NSInteger numTiles = [self.tileViewDataSource numberOfTilesInTileView:self];
-    NSArray *template = [self.tileViewDataSource templateForTileView:self];
+    NSMutableArray *template = [self.tileViewDataSource templateForTileView:self];
     self.numCols = [[template objectAtIndex:0] count];
     
     CGFloat dim = self.width / self.numCols;
@@ -225,7 +234,7 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
                 NSMutableArray *tilesInRow = [NSMutableArray array];
                 
                 for (NSString *tileType in tileRow) {
-                    if ([lastType isEqualToString:tileType]) {
+                    if ([lastType isEqualToString:tileType] && ![tileType isEqualToString:@"."]) {
                         // Repeat from same row
                         CGFloat height = [[lastCell objectForKey:@"height"] floatValue];
                         
@@ -235,7 +244,7 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
                             [lastCell setObject:[NSNumber numberWithFloat:width] forKey:@"width"];
                         }
                         [tilesInRow addObject:lastCell];
-                    } else if ([[lastRow objectAtIndex:col] isEqualToString:tileType]) {
+                    } else if ([[lastRow objectAtIndex:col] isEqualToString:tileType] && ![tileType isEqualToString:@"."]) {
                         // Repeat from last row
                         NSMutableDictionary *lastRowCell = [[tiles objectAtIndex:row-1] objectAtIndex:col];
                         
@@ -387,12 +396,12 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
             [self addSubview:newCell];
             
             // Setup gesture recognizer
-            if ([newCell.gestureRecognizers count] == 0) {
-                PSTileViewTapGestureRecognizer *gr = [[PSTileViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectCell:)];
-                gr.delegate = self;
-                [newCell addGestureRecognizer:gr];
-                newCell.userInteractionEnabled = YES;
-            }
+//            if ([newCell.gestureRecognizers count] == 0) {
+//                PSTileViewTapGestureRecognizer *gr = [[PSTileViewTapGestureRecognizer alloc] initWithTarget:self action:@selector(didSelectCell:)];
+//                gr.delegate = self;
+//                [newCell addGestureRecognizer:gr];
+//                newCell.userInteractionEnabled = YES;
+//            }
             
             [self.visibleCells setObject:newCell forKey:key];
         }
@@ -459,6 +468,148 @@ static inline NSInteger PSTileViewIndexForKey(NSString *key) {
     } else {
         return NO;
     }
+}
+
+#pragma mark - Touches
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [touches anyObject];
+    CGPoint touchLoc = [touch locationInView:self];
+    
+    self.touchOrigin = touchLoc;
+    
+    [self touchesBeganOrMoved:touches withEvent:event];
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    [self touchesBeganOrMoved:touches withEvent:event];
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+    [self touchesEndedOrCancelled:touches withEvent:event];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    [self touchesEndedOrCancelled:touches withEvent:event];
+}
+
+- (void)touchesBeganOrMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [touches anyObject];
+    CGPoint touchLoc = [touch locationInView:self];
+    
+    self.scrollEnabled = NO;
+//    NSLog(@"Began or Moved: %@", touches);
+    
+    [self.visibleCells enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        PSTileViewCell *cell = (PSTileViewCell *)obj;
+        CGRect cellRect = cell.frame;
+        
+        if (CGRectContainsPoint(cellRect, touchLoc)) {
+            cell.alpha = 0.5;
+        }
+    }];
+}
+
+- (void)touchesEndedOrCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+    UITouch *touch = [touches anyObject];
+    CGPoint touchLoc = [touch locationInView:self];
+    
+    self.scrollEnabled = YES;
+//    NSLog(@"Ended or Cancelled: %@", touches);
+    
+    CGFloat left = MIN(self.touchOrigin.x, touchLoc.x);
+    CGFloat top = MIN(self.touchOrigin.y, touchLoc.y);
+    CGFloat width = fabsf(self.touchOrigin.x - touchLoc.x);
+    CGFloat height = fabsf(self.touchOrigin.y - touchLoc.y);
+    
+    [self.visibleCells enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        PSTileViewCell *cell = (PSTileViewCell *)obj;
+        CGRect cellRect = cell.frame;
+        
+        if (CGRectContainsPoint(cellRect, CGPointMake(left, top))) {
+            self.originCell = cell;
+        }
+    }];
+    
+    
+    
+    
+    CGRect box = CGRectUnion(self.originCell.frame, CGRectMake(left, top, width, height));
+        
+    NSLog(@"%@", NSStringFromCGRect(box));
+    
+//    NSLog(@"%@", self.);
+    
+//    NSMutableArray *cellsTouched
+    
+    [self.visibleCells enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        PSTileViewCell *cell = (PSTileViewCell *)obj;
+        CGRect cellRect = cell.frame;
+        
+        if (CGRectIntersectsRect(box, cellRect)) {
+//            cell.alpha = 0.2;
+        } else {
+//            cell.alpha = 1.0;
+        }
+        cell.alpha = 1.0;
+    }];
+    
+    // Update template and reload layout
+    NSMutableArray *template = [self.tileViewDataSource templateForTileView:self];
+    
+    CGFloat dim = self.width / self.numCols;
+    int i = 0;
+    int originIndex = 0;
+
+    
+    NSMutableArray *expanded = [NSMutableArray array];
+    BOOL shouldIncrement = NO;
+    
+    NSString *originType;
+    
+    for (int row = 0; row < template.count; row++) {
+        for (int col = 0; col < [[template objectAtIndex:row] count]; col++) {
+            CGRect gridFrame = CGRectMake(col * dim, row * dim, dim, dim);
+            
+            if (CGRectContainsPoint(gridFrame, self.originCell.frame.origin)) {
+                originIndex = i;
+                originType = [[template objectAtIndex:row] objectAtIndex:col];
+                if ([originType isEqualToString:@"."]) {
+                    [[template objectAtIndex:row] replaceObjectAtIndex:col withObject:[NSString stringWithFormat:@"%d", self.typeIncrement]];
+                    shouldIncrement = YES;
+                } else {
+                    [[template objectAtIndex:row] replaceObjectAtIndex:col withObject:originType];
+                }
+            }
+            
+            if (CGRectIntersectsRect(box, gridFrame)) {
+                if ([originType isEqualToString:@"."]) {
+                    [[template objectAtIndex:row] replaceObjectAtIndex:col withObject:[NSString stringWithFormat:@"%d", self.typeIncrement]];
+                    shouldIncrement = YES;
+                } else {
+                    [[template objectAtIndex:row] replaceObjectAtIndex:col withObject:originType];
+                }
+                
+                [expanded addObject:[NSString stringWithFormat:@"%d", i]];
+            }
+            
+            
+//            [self.gridToRectMap setObject:NSStringFromCGRect(gridFrame) forKey:[NSString stringWithFormat:@"%d", i]];
+            i++;
+        }
+    }
+    
+    if (shouldIncrement) {
+        self.typeIncrement++;
+    }
+    
+//    [self.gridToRectMap key]
+    
+    NSLog(@"%d", originIndex);
+    
+    [self relayoutTiles];
+    
+    
 }
 
 @end

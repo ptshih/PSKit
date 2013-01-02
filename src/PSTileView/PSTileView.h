@@ -52,7 +52,7 @@
 
 @required
 - (NSInteger)numberOfTilesInTileView:(PSTileView *)tileView;
-- (NSArray *)templateForTileView:(PSTileView *)tileView;
+- (NSMutableArray *)templateForTileView:(PSTileView *)tileView;
 - (PSTileViewCell *)tileView:(PSTileView *)tileView cellForItemAtIndex:(NSInteger)index;
 
 @end
