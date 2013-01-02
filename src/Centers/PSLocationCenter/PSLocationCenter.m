@@ -109,7 +109,7 @@ static const NSTimeInterval __pollDuration = 30;
         
         [[NSNotificationCenter defaultCenter] postNotificationName:kPSLocationCenterDidUpdate object:nil];
         
-        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Location Unknown" message:@"1. Open the iOS Settings App\r\n2. Tap on Location Services\r\n3. Switch Mosaic to \"On\"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Location Unknown" message:@"1. Open the iOS Settings App\r\n2. Tap on Location Services\r\n3. Switch Grid to \"On\"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [av show];
     } else {
         self.foregroundDate = [NSDate date];
@@ -164,11 +164,11 @@ static const NSTimeInterval __pollDuration = 30;
     return self.location.coordinate;
 }
 
-- (CLLocationDegrees)latitude {
+- (CLLocationDegrees)lat {
     return self.location.coordinate.latitude;
 }
 
-- (CLLocationDegrees)longitude {
+- (CLLocationDegrees)lng {
     return self.location.coordinate.longitude;
 }
 
@@ -178,7 +178,7 @@ static const NSTimeInterval __pollDuration = 30;
 
 - (NSString *)locationString {
     if ([self hasAcquiredLocation]) {
-        return [NSString stringWithFormat:@"%f,%f", [self latitude], [self longitude]];
+        return [NSString stringWithFormat:@"%f,%f", [self lat], [self lng]];
     } else {
         return nil;
     }

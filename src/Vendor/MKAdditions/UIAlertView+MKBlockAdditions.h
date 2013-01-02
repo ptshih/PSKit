@@ -17,11 +17,12 @@
                             message:(NSString*) message
                   cancelButtonTitle:(NSString*) cancelButtonTitle;
 
-+ (UIAlertView*) alertViewWithTitle:(NSString*) title                    
-                            message:(NSString*) message 
++ (UIAlertView*) alertViewWithTitle:(NSString*) title
+                              style:(UIAlertViewStyle)style
+                            message:(NSString*) message
                   cancelButtonTitle:(NSString*) cancelButtonTitle
                   otherButtonTitles:(NSArray*) otherButtons
-                          onDismiss:(DismissBlock) dismissed                   
+                          onDismiss:(DismissBlock) dismissed
                            onCancel:(CancelBlock) cancelled;
 
 @property (nonatomic, copy) DismissBlock dismissBlock;

@@ -136,24 +136,26 @@ static inline NSCalendarUnit NSCalendarUnitFromString(NSString *string) {
     if (self.usesAbbreviatedCalendarUnits) {
         switch (unit) {
             case NSYearCalendarUnit:
-                return singular ? NSLocalizedString(@"yr.", @"Year Unit (Singular, Abbreviated)") : NSLocalizedString(@"yrs.", @"Year Unit (Plural, Abbreviated)");
+                return singular ? NSLocalizedString(@"yr", @"Year Unit (Singular, Abbreviated)") : NSLocalizedString(@"yrs", @"Year Unit (Plural, Abbreviated)");
             case NSMonthCalendarUnit:
-                return singular ? NSLocalizedString(@"mo.", @"Month Unit (Singular, Abbreviated)") : NSLocalizedString(@"mos.", @"Month Unit (Plural, Abbreviated)");
+                return singular ? NSLocalizedString(@"mo", @"Month Unit (Singular, Abbreviated)") : NSLocalizedString(@"mos", @"Month Unit (Plural, Abbreviated)");
             case NSWeekCalendarUnit:
-                return singular ? NSLocalizedString(@"wk.", @"Week Unit (Singular, Abbreviated)") : NSLocalizedString(@"wks.", @"Week Unit (Plural, Abbreviated)");
+                return singular ? NSLocalizedString(@"wk", @"Week Unit (Singular, Abbreviated)") : NSLocalizedString(@"wks", @"Week Unit (Plural, Abbreviated)");
             case NSDayCalendarUnit:
                 return singular ? NSLocalizedString(@"day", @"Day Unit (Singular, Abbreviated)") : NSLocalizedString(@"days", @"Day Unit (Plural, Abbreviated)");
             case NSHourCalendarUnit:
-                return singular ? NSLocalizedString(@"hr", @"Hour Unit (Singular, Abbreviated)") : NSLocalizedString(@"hrs.", @"Hour Unit (Plural, Abbreviated)");
+                return singular ? NSLocalizedString(@"hr", @"Hour Unit (Singular, Abbreviated)") : NSLocalizedString(@"hrs", @"Hour Unit (Plural, Abbreviated)");
             case NSMinuteCalendarUnit:
-                return singular ? NSLocalizedString(@"min.", @"Minute Unit (Singular, Abbreviated)") : NSLocalizedString(@"mins.", @"Minute Unit (Plural, Abbreviated)");
+                return singular ? NSLocalizedString(@"min", @"Minute Unit (Singular, Abbreviated)") : NSLocalizedString(@"mins", @"Minute Unit (Plural, Abbreviated)");
             case NSSecondCalendarUnit:
-                return singular ? NSLocalizedString(@"s.", @"Second Unit (Singular, Abbreviated)") : NSLocalizedString(@"s.", @"Second Unit (Plural, Abbreviated)");
+                return singular ? NSLocalizedString(@"s", @"Second Unit (Singular, Abbreviated)") : NSLocalizedString(@"s", @"Second Unit (Plural, Abbreviated)");
+            default:
+                return nil;
         }
     } else {
         switch (unit) {
             case NSYearCalendarUnit:
-                return singular ? NSLocalizedString(@"year", @"Year Unit (Singular¥)") : NSLocalizedString(@"years", @"Year Unit (Plural)");
+                return singular ? NSLocalizedString(@"year", @"Year Unit (Singular)") : NSLocalizedString(@"years", @"Year Unit (Plural)");
             case NSMonthCalendarUnit:
                 return singular ? NSLocalizedString(@"month", @"Month Unit (Singular)") : NSLocalizedString(@"months", @"Month Unit (Plural)");
             case NSWeekCalendarUnit:
@@ -166,10 +168,10 @@ static inline NSCalendarUnit NSCalendarUnitFromString(NSString *string) {
                 return singular ? NSLocalizedString(@"minute", @"Minute Unit (Singular)") : NSLocalizedString(@"minutes", @"Minute Unit (Plural)");
             case NSSecondCalendarUnit:
                 return singular ? NSLocalizedString(@"second", @"Second Unit (Singular)") : NSLocalizedString(@"seconds", @"Second Unit (Plural)");
+            default:
+                return nil;
         }
     }
-
-    return nil;
 }
 
 #pragma mark -
@@ -186,21 +188,21 @@ static inline NSCalendarUnit NSCalendarUnitFromString(NSString *string) {
 - (NSString *)enRelativeDateStringForComponents:(NSDateComponents *)components {
     if ([components year] == -1) {
         return @"last year";
-    } else if ([components month] == -1) {
+    } else if ([components month] == -1 && [components year] == 0) {
         return @"last month";
-    } else if ([components week] == -1) {
+    } else if ([components week] == -1 && [components year] == 0 && [components month] == 0) {
         return @"last week";
-    } else if ([components day] == -1) {
+    } else if ([components day] == -1 && [components year] == 0 && [components month] == 0 && [components week] == 0) {
         return @"yesterday";
     }
 
     if ([components year] == 1) {
         return @"next year";
-    } else if ([components month] == 1) {
+    } else if ([components month] == 1 && [components year] == 0) {
         return @"next month";
-    } else if ([components week] == 1) {
+    } else if ([components week] == 1 && [components year] == 0 && [components month] == 0) {
         return @"next week";
-    } else if ([components day] == 1) {
+    } else if ([components day] == 1 && [components year] == 0 && [components month] == 0 && [components week] == 0) {
         return @"tomorrow";
     }
 

@@ -12,6 +12,7 @@ static DismissBlock _dismissBlock;
 static CancelBlock _cancelBlock;
 static PhotoPickedBlock _photoPickedBlock;
 static UIViewController *_presentVC;
+static UIPopoverController *_popoverVC;
 
 @implementation UIActionSheet (MKBlockAdditions)
 
@@ -125,6 +126,10 @@ static UIViewController *_presentVC;
     [actionSheet release];    
 }
 
++ (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
+    _cancelBlock();
+}
+
 
 + (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
@@ -133,7 +138,11 @@ static UIViewController *_presentVC;
         editedImage = (UIImage*) [info valueForKey:UIImagePickerControllerOriginalImage];
     
     _photoPickedBlock(editedImage);
-	[picker dismissModalViewControllerAnimated:YES];	
+    if (isDeviceIPad()) {
+        [_popoverVC dismissPopoverAnimated:YES];
+    } else {
+        [picker dismissModalViewControllerAnimated:YES];
+    }
 	[picker autorelease];
 }
 
@@ -141,7 +150,11 @@ static UIViewController *_presentVC;
 + (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
     // Dismiss the image selection and close the program
-    [_presentVC dismissModalViewControllerAnimated:YES];    
+    if (isDeviceIPad()) {
+        [_popoverVC dismissPopoverAnimated:YES];
+    } else {
+        [picker dismissModalViewControllerAnimated:YES];
+    }
 	[picker autorelease];
     [_presentVC release];
     _cancelBlock();
@@ -169,7 +182,12 @@ static UIViewController *_presentVC;
             
             UIImagePickerController *picker = [[UIImagePickerController alloc] init];
             picker.delegate = (id)[self class];
-            picker.allowsEditing = YES;
+            picker.allowsEditing = NO;
+//            
+//            NSArray *availableMediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
+//            if ([availableMediaTypes containsObject:(NSString *)kUTTypeImage]) {
+//                picker.mediaTypes = [NSArray arrayWithObject:(NSString *)kUTTypeImage];
+//            }
             
             if(buttonIndex == 1) 
             {                
@@ -180,11 +198,18 @@ static UIViewController *_presentVC;
                 picker.sourceType = UIImagePickerControllerSourceTypeCamera;;
             }
             
-            [_presentVC presentModalViewController:picker animated:YES];
+//            [_presentVC presentViewController:picker animated:YES completion:NULL];
+            if (isDeviceIPad()) {
+                _popoverVC = [[UIPopoverController alloc] initWithContentViewController:picker];
+                _popoverVC.delegate = self;
+                [_popoverVC presentPopoverFromRect:CGRectZero inView:_presentVC.view permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+            } else {
+                [_presentVC presentModalViewController:picker animated:YES];
+            }
         }
         else
         {
-            _dismissBlock(buttonIndex);
+            _dismissBlock(buttonIndex, nil);
         }
     }
 }

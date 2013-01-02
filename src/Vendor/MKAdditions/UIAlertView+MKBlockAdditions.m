@@ -38,7 +38,8 @@ static char CANCEL_IDENTIFER;
 }
 
 
-+ (UIAlertView*) alertViewWithTitle:(NSString*) title                    
++ (UIAlertView*) alertViewWithTitle:(NSString*) title
+                              style:(UIAlertViewStyle)style
                     message:(NSString*) message 
           cancelButtonTitle:(NSString*) cancelButtonTitle
           otherButtonTitles:(NSArray*) otherButtons
@@ -50,6 +51,7 @@ static char CANCEL_IDENTIFER;
                                                    delegate:[self class]
                                           cancelButtonTitle:cancelButtonTitle
                                           otherButtonTitles:nil];
+    alert.alertViewStyle = style;
     
     [alert setDismissBlock:dismissed];
     [alert setCancelBlock:cancelled];
@@ -93,7 +95,8 @@ static char CANCEL_IDENTIFER;
     else
     {
         if (alertView.dismissBlock) {
-            alertView.dismissBlock(buttonIndex - 1); // cancel button is button 0
+            NSString *textInput = (alertView.alertViewStyle == UIAlertViewStylePlainTextInput) ? [alertView textFieldAtIndex:0].text : nil;
+            alertView.dismissBlock(buttonIndex - 1, textInput); // cancel button is button 0
         }
     }
 }

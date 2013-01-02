@@ -8,16 +8,15 @@
 
 #import "PSYouTubeView.h"
 
-static NSString *kYouTubeEmbedHTML = @"<html>"
+static NSString *kYouTubeEmbedHTML = @"<html><head"
+"<meta name=\"viewport\" content=\"width=device-width, maximum-scale=1.0, initial-scale=1.0, user-scalable=no\">"
+"</head>"
 "<body style=\"background:#000000;margin:0\">"
 "<param name=\"wmode\" value=\"transparent\"></param>"
-"<embed id=\"yt\" src=\"%@\""
-"type=\"application/x-shockwave-flash\" wmode=\"transparent\" width=\"%0.0f\" height=\"%0.0f\"></embed>"
+"<iframe id=\"yt\" src=\"%@\" width=\"%0.0f\" height=\"%0.0f\"></iframe>"
 "</body></html>";
 
 @interface PSYouTubeView ()
-
-- (UIButton *)findButtonInView:(UIView *)view;
 
 @end
 
@@ -27,6 +26,19 @@ static NSString *kYouTubeEmbedHTML = @"<html>"
     self = [super initWithFrame:frame];
     if (self) {
         self.delegate = self;
+        self.scrollView.scrollsToTop = NO;
+        self.scrollView.scrollEnabled = NO;
+        self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+//        self.scalesPageToFit = YES;
+        
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        BOOL ok;
+        NSError *setCategoryError = nil;
+        ok = [audioSession setCategory:AVAudioSessionCategoryPlayback
+                                 error:&setCategoryError];
+        if (!ok) {
+            NSLog(@"%s setCategoryError=%@", __PRETTY_FUNCTION__, setCategoryError);
+        }
     }
     return self;
 }
@@ -38,27 +50,11 @@ static NSString *kYouTubeEmbedHTML = @"<html>"
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    
+//    NSString *s = [self stringByEvaluatingJavaScriptFromString:<#(NSString *)#>]
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-//    UIButton *b = [self findButtonInView:webView];
-//    [b sendActionsForControlEvents:UIControlEventTouchUpInside];
-}
-
-- (UIButton *)findButtonInView:(UIView *)view {
-    UIButton *button = nil;
-    
-    if ([view isMemberOfClass:[UIButton class]]) {
-        return (UIButton *)view;
-    }
-    
-    if (view.subviews && [view.subviews count] > 0) {
-        for (UIView *subview in view.subviews) {
-            button = [self findButtonInView:subview];
-            if (button) return button;
-        }
-    }
-    return button;
 }
 
 @end

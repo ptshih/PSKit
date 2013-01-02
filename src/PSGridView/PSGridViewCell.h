@@ -8,16 +8,33 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol PSGridViewCellDelegate;
+
 @interface PSGridViewCell : UIView
 
 @property (nonatomic, strong) NSSet *indices;
-@property (nonatomic, strong, readonly) NSDictionary *content;
+@property (nonatomic, strong) NSDictionary *content;
 
-- (void)loadContent:(NSDictionary *)content;
+@property (nonatomic, assign) UIView *parentView;
+@property (nonatomic, assign) NSMutableSet *cells;
 
-- (void)loadText:(NSString *)text;
-- (void)loadImageAtURL:(NSURL *)URL;
-- (void)loadColor:(UIColor *)color;
-- (void)loadImage:(UIImage *)image;
+// Config
+
+
+@property (nonatomic, unsafe_unretained) id <PSGridViewCellDelegate> delegate;
+
+- (void)loadContent;
+- (void)showHighlight;
+- (void)hideHighlight;
+- (void)enableVideoTouch;
+- (void)disableVideoTouch;
+
+@end
+
+@protocol PSGridViewCellDelegate <NSObject>
+
+@optional
+- (void)gridViewCell:(PSGridViewCell *)gridViewCell didTapWithWithState:(UIGestureRecognizerState)state;
+- (void)gridViewCell:(PSGridViewCell *)gridViewCell didLongPressWithState:(UIGestureRecognizerState)state;
 
 @end
