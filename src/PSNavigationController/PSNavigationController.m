@@ -8,6 +8,21 @@
 
 #import "PSNavigationController.h"
 
+@implementation UIViewController (PSNavigationControllerExtension)
+
+- (PSNavigationController *)psNavigationController {
+    UIViewController *viewController = self.parentViewController;
+    while (!(viewController == nil || [viewController isKindOfClass:[PSNavigationController class]])) {
+        viewController = viewController.parentViewController;
+    }
+    
+    return (PSNavigationController *)viewController;
+}
+
+@end
+
+
+
 @interface PSNavigationController ()
 
 @property (nonatomic, strong) UIView *overlayView;
@@ -31,9 +46,9 @@
 - (id)initWithRootViewController:(UIViewController *)rootViewController {
     self = [self initWithNibName:nil bundle:nil];
     if (self) {
-        if ([rootViewController isKindOfClass:[PSViewController class]]) {
-            [(PSViewController *)rootViewController setNavigationController:self];
-        }
+//        if ([rootViewController isKindOfClass:[PSViewController class]]) {
+//            [(PSViewController *)rootViewController setNavigationController:self];
+//        }
         [self.viewControllers addObject:rootViewController];
     }
     return self;
@@ -96,9 +111,9 @@ const CGFloat kAnimationDuration = 0.35;
         return;
     }
     
-    if ([viewController isKindOfClass:[PSViewController class]]) {
-        [(PSViewController *)viewController setNavigationController:self];
-    }
+//    if ([viewController isKindOfClass:[PSViewController class]]) {
+//        [(PSViewController *)viewController setNavigationController:self];
+//    }
     
     UIViewController *disappearingViewController = nil;
     

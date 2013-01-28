@@ -18,7 +18,7 @@
 @interface PSViewController : UIViewController <PSStateMachine>
 
 // References
-@property (nonatomic, assign) PSNavigationController *navigationController;
+//@property (nonatomic, assign) PSNavigationController *navigationController;
 @property (nonatomic, assign) PSSpringboardController *springboardController;
 @property (nonatomic, assign) PSCurtainController *curtainController;
 

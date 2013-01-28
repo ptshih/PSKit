@@ -71,3 +71,9 @@ typedef enum {
 - (void)psNavigationController:(PSNavigationController *)psNavigationController didHideViewController:(UIViewController *)viewController animated:(BOOL)animated;
 
 @end
+
+@interface UIViewController (PSNavigationControllerExtension)
+
+- (PSNavigationController *)psNavigationController;
+
+@end
