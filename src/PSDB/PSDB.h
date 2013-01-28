@@ -12,7 +12,7 @@
 
 + (id)sharedDatabase;
 
-// Server
+// Persistence
 - (void)syncCollections;
 
 // Collections
@@ -21,10 +21,9 @@
 // Documents
 - (void)findDocumentForKey:(NSString *)key inCollection:(NSString *)collectionName completionBlock:(void (^)(NSMutableDictionary *document))completionBlock;
 - (void)saveDocument:(NSMutableDictionary *)document forKey:(NSString *)key inCollection:(NSString *)collectionName completionBlock:(void (^)(NSMutableDictionary *savedDocument))completionBlock;
+- (void)deleteDocumentForKey:(NSString *)key inCollection:(NSString *)collection completionBlock:(void (^)())completionBlock;
 //- (BOOL)insertDocument:(NSDictionary *)document forCollection:(NSString *)collection;
 //- (BOOL)updateDocument:(NSDictionary *)document forCollection:(NSString *)collection;
-- (void)deleteDocumentForKey:(NSString *)key inCollection:(NSString *)collection completionBlock:(void (^)())completionBlock;
-
 
 
 @end

@@ -47,6 +47,12 @@
 - (void)dealloc {
 }
 
+// Persistence
+
+- (void)syncCollections {
+    // TBD
+}
+
 
 // Collections
 
