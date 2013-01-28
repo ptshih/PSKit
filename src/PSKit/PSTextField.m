@@ -10,8 +10,6 @@
 
 @interface PSTextField ()
 
-@property (nonatomic, assign) CGSize margins;
-
 - (CGRect)fieldRectWithMargins:(CGSize)margins;
 
 @end

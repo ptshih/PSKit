@@ -11,6 +11,8 @@
 
 @interface PSTextField : UITextField
 
+@property (nonatomic, assign) CGSize margins;
+
 - (id)initWithFrame:(CGRect)frame withMargins:(CGSize)margins;
 
 @end
