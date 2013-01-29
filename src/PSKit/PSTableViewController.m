@@ -310,6 +310,11 @@
     return [PSCell class];
 }
 
+- (UIView *)accessoryViewAtIndexPath:(NSIndexPath *)indexPath {
+    // Subclass should/may implement
+    return nil;
+}
+
 - (UITableViewCellAccessoryType)accessoryTypeAtIndexPath:(NSIndexPath *)indexPath {
     // Subclass should/may implement
     return UITableViewCellAccessoryNone;
@@ -367,6 +372,7 @@
     if (!cell) { 
         cell = [[cellClass alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
         [(UITableViewCell *)cell setAccessoryType:[self accessoryTypeAtIndexPath:indexPath]];
+        [(UITableViewCell *)cell setAccessoryView:[self accessoryViewAtIndexPath:indexPath]];
         [(UITableViewCell *)cell setSelectionStyle:[self selectionStyleAtIndexPath:indexPath]];
     }
     
