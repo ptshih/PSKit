@@ -88,10 +88,9 @@
         self.shouldShowNullView = NO;
         self.shouldAddRoundedCorners = NO;
         self.shouldSwipeToPop = NO;
-        self.shouldAdjustViewForKeyboard = NO;
         
-        self.headerHeight = 44.0;
-        self.footerHeight = 44.0;
+        self.headerHeight = 0.0;
+        self.footerHeight = 0.0;
         
         self.headerLeftWidth = 44.0;
         self.headerRightWidth = 44.0;
@@ -101,7 +100,7 @@
         self.minId = nil;
         self.maxId = nil;
         
-        self.nullBackgroundColor = BASE_BG_COLOR;
+        self.nullBackgroundColor = TEXTURE_ALUMINUM;
         self.nullLabelStyle = @"loadingDarkLabel";
         self.nullIndicatorStyle = UIActivityIndicatorViewStyleGray;
         
@@ -145,14 +144,12 @@
     // Setup Subviews
     [self setupSubviews];
     
-    // Null View
-    [self setupNullView];
-    
     // Add rounded corners
     if (self.shouldAddRoundedCorners) {
         [self addRoundedCorners];
     }
     
+    // Swipe to pop view controller if using either PSNavigationController or UINavigationController
     if (self.shouldSwipeToPop) {
         PSSwipePopGestureRecognizer *swipePopGesture = [[PSSwipePopGestureRecognizer alloc] initWithTarget:self action:@selector(swipePopController:)];
         swipePopGesture.direction = UISwipeGestureRecognizerDirectionRight;
@@ -189,15 +186,19 @@
     [super viewDidDisappear:animated];
 }
 
-/*
- This creates and adds subviews
- */
-- (void)setupSubviews {
-    // subclass should implement
+// This creates and adds subviews
+// subclass should implement
+- (void)setupSubviews {    
+    // View Config
+    self.viewToAdjustForKeyboard = nil;
+    
     [self setupHeader];
     [self setupFooter];
     [self setupContent];
     [self updateSubviews];
+    
+    // Null View
+    [self setupNullView];
     
     [self.view bringSubviewToFront:self.footerView];
     [self.view bringSubviewToFront:self.headerView];
@@ -207,6 +208,7 @@
  This relayouts the subviews
  */
 - (void)updateSubviews {
+    ASSERT_MAIN_THREAD;
     CGFloat visibleHeaderHeight = (self.headerView) ? self.headerView.bottom : 0.0;
     CGFloat visibleFooterHeight = (self.footerView) ? self.view.height - self.footerView.top : 0.0;
     CGRect frame = CGRectMake(0, visibleHeaderHeight, self.view.width, self.view.height - visibleHeaderHeight - visibleFooterHeight);
@@ -303,7 +305,12 @@
 #pragma mark - Gestures
 
 - (void)swipePopController:(UISwipeGestureRecognizer *)gr {
-    [self.navigationController popViewControllerAnimated:YES];
+    ASSERT_MAIN_THREAD;
+    if (self.psNavigationController) {
+        [self.psNavigationController popViewControllerAnimated:YES];
+    } else if (self.navigationController) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 #pragma mark - DataSource
@@ -426,12 +433,11 @@
 }
 
 - (void)orientationChangedFromNotification:(NSNotification *)notification {
-    // may should implement
 }
 
 #pragma mark - Scroll State
-- (void)updateScrollsToTop:(BOOL)isEnabled {
 
+- (void)updateScrollsToTop:(BOOL)isEnabled {
     if (self.activeScrollView) {
         self.activeScrollView.scrollsToTop = isEnabled;
     }
@@ -440,7 +446,7 @@
 #pragma mark - Keyboard Notifications
 
 - (void)keyboardWillShow:(NSNotification *)notification {
-    if (!self.shouldAdjustViewForKeyboard) return;
+    if (!self.viewToAdjustForKeyboard) return;
     
     // Get animation info from userInfo
     NSTimeInterval animationDuration;
@@ -453,14 +459,14 @@
     CGRect keyboardFrame = [frameValue CGRectValue];
     CGFloat keyboardHeight = keyboardFrame.size.height;
     [UIView animateWithDuration:animationDuration delay:0.0 options:animationOptions animations:^{
-        self.view.height -= keyboardHeight;
+        self.viewToAdjustForKeyboard.height -= keyboardHeight;
     } completion:^(BOOL finished) {
         
     }];
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification {
-    if (!self.shouldAdjustViewForKeyboard) return;
+    if (!self.viewToAdjustForKeyboard) return;
     
     // Get animation info from userInfo
     NSTimeInterval animationDuration;
@@ -473,7 +479,7 @@
     CGRect keyboardFrame = [frameValue CGRectValue];
     CGFloat keyboardHeight = keyboardFrame.size.height;
     [UIView animateWithDuration:animationDuration delay:0.0 options:animationOptions animations:^{
-        self.view.height += keyboardHeight;
+        self.viewToAdjustForKeyboard.height += keyboardHeight;
     } completion:^(BOOL finished) {
         
     }];

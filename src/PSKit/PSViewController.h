@@ -44,7 +44,9 @@
 @property (nonatomic, assign) BOOL shouldShowNullView;
 @property (nonatomic, assign) BOOL shouldAddRoundedCorners;
 @property (nonatomic, assign) BOOL shouldSwipeToPop;
-@property (nonatomic, assign) BOOL shouldAdjustViewForKeyboard;
+
+// View Config
+@property (nonatomic, assign) UIView *viewToAdjustForKeyboard;
 
 @property (nonatomic, strong) UIColor *nullBackgroundColor;
 @property (nonatomic, strong) NSString *nullLabelStyle;
