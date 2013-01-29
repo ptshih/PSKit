@@ -48,6 +48,14 @@
 #include "TargetConditionals.h"
 #endif
 
+// Custom Colors
+#define TEXTURE_BLACK_SQUARES [UIColor colorWithPatternImage:[UIImage imageNamed:@"TextureBlackSquares"]]
+#define TEXTURE_DARK_WOVEN [UIColor colorWithPatternImage:[UIImage imageNamed:@"TextureDarkWoven"]]
+#define TEXTURE_DARK_LINEN [UIColor colorWithPatternImage:[UIImage imageNamed:@"TextureDarkLinen"]]
+#define TEXTURE_DARK_WOOD [UIColor colorWithPatternImage:[UIImage imageNamed:@"TextureDarkWood"]]
+#define TEXTURE_ALUMINUM [UIColor colorWithPatternImage:[UIImage imageNamed:@"TextureAluminum"]]
+#define TEXTURE_LIGHT_SKETCH [UIColor colorWithPatternImage:[UIImage imageNamed:@"TextureLightSketch"]]
+
 /**
  Assertions
  */
