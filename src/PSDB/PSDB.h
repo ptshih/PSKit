@@ -10,20 +10,19 @@
 
 @interface PSDB : NSObject
 
+// Singleton
 + (id)sharedDatabase;
 
 // Persistence
-- (void)syncCollections;
+- (void)syncDatabase;
 
-// Collections
-- (NSMutableArray *)documentsForCollection:(NSString *)collectionName;
+// Retrieve a collection, if it doesn't exist, create one
+- (NSMutableDictionary *)collectionWithName:(NSString *)name;
 
 // Documents
-- (void)findDocumentForKey:(NSString *)key inCollection:(NSString *)collectionName completionBlock:(void (^)(NSMutableDictionary *document))completionBlock;
+- (void)findDocumentsInCollection:(NSString *)collectionName completionBlock:(void (^)(NSMutableArray *documents))completionBlock;
+- (void)findOneDocumentForKey:(NSString *)key inCollection:(NSString *)collectionName completionBlock:(void (^)(NSMutableDictionary *document))completionBlock;
 - (void)saveDocument:(NSMutableDictionary *)document forKey:(NSString *)key inCollection:(NSString *)collectionName completionBlock:(void (^)(NSMutableDictionary *savedDocument))completionBlock;
-- (void)deleteDocumentForKey:(NSString *)key inCollection:(NSString *)collection completionBlock:(void (^)())completionBlock;
-//- (BOOL)insertDocument:(NSDictionary *)document forCollection:(NSString *)collection;
-//- (BOOL)updateDocument:(NSDictionary *)document forCollection:(NSString *)collection;
-
+- (void)deleteDocumentForKey:(NSString *)key inCollection:(NSString *)collectionName completionBlock:(void (^)())completionBlock;
 
 @end
