@@ -105,12 +105,11 @@
 
 - (void)saveDocument:(NSMutableDictionary *)document forKey:(NSString *)key inCollection:(NSString *)collectionName completionBlock:(void (^)(NSMutableDictionary *savedDocument))completionBlock {
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
-        if (![document objectForKey:@"_id"]) {
-            [document setObject:key forKey:@"_id"];
-        }
+        NSString *documentKey = key ? key : [NSString stringWithFormat:@"%0.f", [[NSDate date] millisecondsSince1970]];
+        [document setObject:documentKey forKey:@"_id"];
         NSMutableDictionary *collection = [self collectionWithName:collectionName];
         NSString *json = [NSJSONSerialization stringWithJSONObject:document options:0 error:nil];
-        [collection setObject:json forKey:key];
+        [collection setObject:json forKey:documentKey];
         if (completionBlock) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 completionBlock(document);
