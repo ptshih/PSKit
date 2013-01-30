@@ -37,6 +37,8 @@
 
 - (id)init {
     if (self = [super init]) {
+        self.shouldSyncWithRemote = YES;
+        
         self.transactions = [[NSOperationQueue alloc] init];
         self.transactions.maxConcurrentOperationCount = 1;
         
@@ -215,7 +217,6 @@
         
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url method:@"POST" headers:headers parameters:parameters];
         
-        
         NSError *error = nil;
         NSHTTPURLResponse *response = nil;
         NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
@@ -225,8 +226,11 @@
             error = [NSError errorWithDomain:@"PSURLCacheErrorDomain" code:response.statusCode userInfo:nil];
         }
         
-        NSLog(@"%@", [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]);
+        NSMutableDictionary *downloadedDatabase = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
         
+        if (downloadedDatabase) {
+            self.database = downloadedDatabase;
+        }
     }];
     
     [self.transactions addOperation:op];

@@ -10,6 +10,8 @@
 
 @interface PSDB : NSObject
 
+@property (nonatomic, assign) BOOL shouldSyncWithRemote;
+
 // Singleton
 + (id)sharedDatabase;
 
