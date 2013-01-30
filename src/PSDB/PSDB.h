@@ -16,6 +16,7 @@
 // Persistence
 - (void)syncDatabase;
 - (void)syncDatabaseWithRemote;
+- (BOOL)resetDatabase;
 
 // Retrieve a collection, if it doesn't exist, create one
 - (NSMutableDictionary *)collectionWithName:(NSString *)name;

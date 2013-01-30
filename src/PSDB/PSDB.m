@@ -66,12 +66,11 @@
     
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
         NSMutableDictionary *collection = [self collectionWithName:collectionName];
-        
-        NSArray *jsonValues = [collection allValues];
+
         NSMutableArray *documents = [NSMutableArray array];
-        for (NSString *jsonValue in jsonValues) {
-            [documents addObject:[NSJSONSerialization JSONObjectWithData:[jsonValue dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:nil]];
-        }
+        [collection enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+            [documents addObject:obj];
+        }];
         
         [documents sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"modified" ascending:NO]]];
                 
@@ -90,13 +89,8 @@
     
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
         NSMutableDictionary *collection = [self collectionWithName:collectionName];
-        NSString *json = [collection objectForKey:key];
         
-        NSMutableDictionary *document = nil;
-        
-        if (json) {
-            document = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:nil];
-        }
+        NSMutableDictionary *document = [collection objectForKey:key];
         
         if (completionBlock) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -114,12 +108,12 @@
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
         BOOL isNew = key ? NO : YES;
         
-        // Write the document _id key
+        // Write the document id key
         // If a key is passed in, No-Op
         // If no key is passed in, generate a new key based on timestamp
         NSString *uuid = [NSString stringFromUUID];
         NSString *documentKey = key ? key : uuid;
-        [document setObject:documentKey forKey:@"_id"];
+        [document setObject:documentKey forKey:@"id"];
         
         // Created/Modified Timestamps
         if (isNew) {
@@ -129,8 +123,7 @@
         
         // Write to the document
         NSMutableDictionary *collection = [self collectionWithName:collectionName];
-        NSString *json = [NSJSONSerialization stringWithJSONObject:document options:0 error:nil];
-        [collection setObject:json forKey:documentKey];
+        [collection setObject:document forKey:documentKey];
         
         // Sync the DB to file
         [self syncDatabase];
@@ -179,23 +172,31 @@
     return [[NSNumber numberWithDouble:[[NSDate date] millisecondsSince1970]] stringValue];
 }
 
+- (NSString *)databaseJsonRepresentation {
+    return [NSJSONSerialization stringWithJSONObject:self.database options:0 error:nil];
+}
+
 - (void)syncDatabase {
     NSData *dbData = nil;
-    if (self.database) {
-        [self.database setObject:[self timestampString] forKey:@"timestamp"];
-        dbData = [NSPropertyListSerialization dataFromPropertyList:self.database format:NSPropertyListBinaryFormat_v1_0 errorDescription:nil];
-        [dbData writeToFile:[self databasePath] atomically:YES];
-    } else {
+    
+    if (!self.database) {
+        // Try to read from file
         dbData = [NSData dataWithContentsOfFile:[self databasePath]];
         NSPropertyListFormat format;
         self.database = [NSPropertyListSerialization propertyListFromData:dbData mutabilityOption:NSPropertyListMutableContainers format:&format errorDescription:nil];
         
-        // First time launch, create a new one
+        // If no file, create a new db
         if (!self.database) {
             self.database = [NSMutableDictionary dictionary];
-            [self.database setObject:[self timestampString] forKey:@"timestamp"];
+            NSString *uuid = [NSString stringFromUUID];
+            [self.database setObject:uuid forKey:@"id"];
         }
     }
+    
+    // Update timestamp and write to file
+    [self.database setObject:[self timestampString] forKey:@"timestamp"];
+    dbData = [NSPropertyListSerialization dataFromPropertyList:self.database format:NSPropertyListBinaryFormat_v1_0 errorDescription:nil];
+    [dbData writeToFile:[self databasePath] atomically:YES];
 }
 
 - (void)syncDatabaseWithRemote {
@@ -203,6 +204,38 @@
     // Server determines if local or remote copy is newer
     // Server sends back newer copy
     // Local is overwritten with copy the server sends back
+    
+    NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
+        NSMutableDictionary *headers = [NSMutableDictionary dictionary];
+        
+        NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+        [parameters setObject:[self databaseJsonRepresentation] forKey:@"database"];
+        
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/v1/sync", API_BASE_URL]];
+        
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url method:@"POST" headers:headers parameters:parameters];
+        
+        
+        NSError *error = nil;
+        NSHTTPURLResponse *response = nil;
+        NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+        
+        // Handle HTTP response codes
+        if ([response isKindOfClass:[NSHTTPURLResponse class]] && response.statusCode != 200) {
+            error = [NSError errorWithDomain:@"PSURLCacheErrorDomain" code:response.statusCode userInfo:nil];
+        }
+        
+        NSLog(@"%@", [NSJSONSerialization JSONObjectWithData:data options:0 error:nil]);
+        
+    }];
+    
+    [self.transactions addOperation:op];
+}
+
+- (BOOL)resetDatabase {
+    NSString *databasePath = [self databasePath];
+    NSError *error;
+    return [[NSFileManager defaultManager] removeItemAtPath:databasePath error:&error];
 }
 
 @end
