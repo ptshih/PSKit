@@ -113,19 +113,17 @@
         // Write the document id key
         // If a key is passed in, No-Op
         // If no key is passed in, generate a new key based on timestamp
-        NSString *uuid = [NSString stringFromUUID];
-        NSString *documentKey = key ? key : uuid;
-        [document setObject:documentKey forKey:@"id"];
         
         // Created/Modified Timestamps
         if (isNew) {
+            [document setObject:[NSString stringFromUUID] forKey:@"id"];
             [document setObject:[self timestampString] forKey:@"created"];
          }
         [document setObject:[self timestampString] forKey:@"modified"];
         
         // Write to the document
         NSMutableDictionary *collection = [self collectionWithName:collectionName];
-        [collection setObject:document forKey:documentKey];
+        [collection setObject:document forKey:[document objectForKey:@"id"]];
         
         // Sync the DB to file
         [self syncDatabase];
