@@ -127,6 +127,8 @@ static NSTimeInterval const kAFNetworkActivityIndicatorInvisibilityDelay = 0.17;
 }
 
 - (void)networkingOperationDidStart:(NSNotification *)notification {
+    [self incrementActivityCount];
+    return;
     AFURLConnectionOperation *connectionOperation = [notification object];
     if (connectionOperation.request.URL) {
         [self incrementActivityCount];
@@ -134,6 +136,8 @@ static NSTimeInterval const kAFNetworkActivityIndicatorInvisibilityDelay = 0.17;
 }
 
 - (void)networkingOperationDidFinish:(NSNotification *)notification {
+    [self decrementActivityCount];
+    return;
     AFURLConnectionOperation *connectionOperation = [notification object];
     if (connectionOperation.request.URL) {
         [self decrementActivityCount];

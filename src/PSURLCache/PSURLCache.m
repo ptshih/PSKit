@@ -155,7 +155,7 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
         PSURLCacheNetworkBlock networkBlock = ^(void) {
             ASSERT_NOT_MAIN_THREAD;
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidStartNotification object:nil];
             
             DLog(@"### Request: %@", request.URL.absoluteString);
             DLog(@"### Request: %d remaining in low priority queue", self.networkQueue.operationCount);
@@ -177,7 +177,7 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 ASSERT_MAIN_THREAD;
                 
-                [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:blockSelf];
+                [[NSNotificationCenter defaultCenter] postNotificationName:AFNetworkingOperationDidFinishNotification object:nil];
                 
                 NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[cachedURL copy], @"cachedURL", [NSNumber numberWithInteger:cacheType], @"cacheType", nil];
                 [[NSNotificationCenter defaultCenter] postNotificationName:kPSURLCacheDidCache object:self userInfo:userInfo];
