@@ -35,30 +35,7 @@
 #pragma mark - Cell Actions
 
 - (void)editTarget {
-    [UIActionSheet actionSheetWithTitle:@"Add/Edit Content" message:nil destructiveButtonTitle:nil buttons:@[@"Link", @"Remove"] showInView:self onDismiss:^(int buttonIndex, NSString *textInput) {
-        switch (buttonIndex) {
-            case 0: {
-                [UIAlertView alertViewWithTitle:@"Enter Link" style:UIAlertViewStylePlainTextInput message:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@[@"Ok"] onDismiss:^(int buttonIndex, NSString *textInput){
-                    NSLog(@"%@", textInput);
-                    
-                    if (textInput.length > 0) {
-                        NSDictionary *action = @{@"type" : @"link", @"href": textInput};
-                        self.action = action;
-                    }
-                } onCancel:^{
-                }];
-                break;
-            }
-            case 1: {
-                [self removeTarget];
-                break;
-            }
-            default:
-                break;
-        }
-    } onCancel:^{
-        
-    }];
+
 }
 
 - (void)removeTarget {

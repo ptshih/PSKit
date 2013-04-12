@@ -66,7 +66,7 @@ NSString *PSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
     [request addValue:[NSString stringWithFormat:@"%@, en-us;q=0.8", preferredLanguageCodes] forHTTPHeaderField:@"Accept-Language"];
     
     // Add custom headers
-    if (headers) {
+    if (headers && headers.count > 0) {
         [headers enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
             // Header keys and values MUST be strings
             if ([key isKindOfClass:[NSString class]] && [obj isKindOfClass:[NSString class]]) {
@@ -76,7 +76,7 @@ NSString *PSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
     }
     
     // Configure Parameters
-    if (parameters) {
+    if (parameters && parameters.count > 0) {
         method = [method uppercaseString];
         if ([method isEqualToString:@"GET"] || [method isEqualToString:@"HEAD"] || [method isEqualToString:@"DELETE"]) {
             // Embedded query string in URL

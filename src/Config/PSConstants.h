@@ -40,9 +40,6 @@
 #import "PSCurtainController.h"
 #import "PSReachabilityCenter.h"
 
-#import "UIActionSheet+MKBlockAdditions.h"
-#import "UIAlertView+MKBlockAdditions.h"
-
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
