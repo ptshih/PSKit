@@ -30,7 +30,6 @@
 #import "PSTextFieldCell.h"
 #import "PSLabel.h"
 #import "PSURLCache.h"
-#import "PSAlertView.h"
 #import "PSTextField.h"
 #import "PSTextView.h"
 #import "PSSearchField.h"
