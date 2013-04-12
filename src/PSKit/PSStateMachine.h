@@ -51,10 +51,6 @@
 - (void)beginLoadMore;
 - (void)endLoadMore;
 
-// Views
-- (void)setupSubviews;
-- (void)updateSubviews;
-
 // Tables
 - (void)setupTableHeader;
 - (void)setupTableFooter;
@@ -73,6 +69,7 @@
 - (void)setupHeader;
 - (void)setupFooter;
 - (void)setupSubviews;
+- (void)updateSubviews;
 
 
 // DEPRECATED
