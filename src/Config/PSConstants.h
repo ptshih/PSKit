@@ -33,6 +33,7 @@
 #import "PSTextField.h"
 #import "PSTextView.h"
 #import "PSSearchField.h"
+#import "PSNetworkActivityIndicatorManager.h"
 
 #import "PSSpringboardController.h"
 #import "PSNavigationController.h"
