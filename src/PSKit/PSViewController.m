@@ -229,11 +229,11 @@
     self.headerView.backgroundColor = HEADER_BG_COLOR;
     self.headerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
     
-    self.leftButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navButton" target:self action:@selector(leftAction)];
+    self.leftButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navigationButton" target:self action:@selector(leftAction)];
     self.leftButton.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
     //    [self.leftButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonLeftBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
-    self.rightButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navButton" target:self action:@selector(rightAction)];
+    self.rightButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navigationButton" target:self action:@selector(rightAction)];
     self.rightButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     //    [self.rightButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonRightBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     

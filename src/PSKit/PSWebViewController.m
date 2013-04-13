@@ -104,13 +104,13 @@
 - (void)setupFooter {
     [super setupFooter];
     
-    UIButton *backButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navButton" target:self action:@selector(back)];
+    UIButton *backButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navigationButton" target:self action:@selector(back)];
     backButton.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
     [backButton setBackgroundImage:[UIImage stretchableImageNamed:@"ToolbarDarkLeft" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     [backButton setImage:[UIImage imageNamed:@"IconLeftWhite"] forState:UIControlStateNormal];
     self.backButton = backButton;
     
-    UIButton *forwardButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navButton" target:self action:@selector(forward)];
+    UIButton *forwardButton = [UIButton buttonWithFrame:CGRectZero andStyle:@"navigationButton" target:self action:@selector(forward)];
     forwardButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     [forwardButton setBackgroundImage:[UIImage stretchableImageNamed:@"ToolbarDarkRight" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     [forwardButton setImage:[UIImage imageNamed:@"IconRightWhite"] forState:UIControlStateNormal];
