@@ -75,6 +75,8 @@ NSString *PSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
         }];
     }
     
+    BOOL isJson = [headers objectForKey:@"Content-Type"] && [[headers objectForKey:@"Content-Type"] isEqualToString:@"application/json"] ? YES : NO;
+    
     // Configure Parameters
     if (parameters && parameters.count > 0) {
         method = [method uppercaseString];
@@ -124,6 +126,8 @@ NSString *PSQueryStringFromParametersWithEncoding(NSDictionary *parameters, NSSt
                     
                     [request setHTTPBody:data];
                 }
+            } if (isJson) {
+                [request setHTTPBody:[[NSJSONSerialization stringWithJSONObject:parameters options:NSJSONWritingPrettyPrinted error:nil] dataUsingEncoding:NSUTF8StringEncoding]];
             } else {
                 // URLEncoded
                 [request setValue:[NSString stringWithFormat:@"application/x-www-form-urlencoded; charset=%@", charset] forHTTPHeaderField:@"Content-Type"];
