@@ -165,12 +165,12 @@ static inline NSString * PSURLCacheKeyWithURL(NSURL *URL) {
             NSData *cachedData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
             
             // Handle HTTP response codes
-            if ([response isKindOfClass:[NSHTTPURLResponse class]] && response.statusCode != 200) {
+            if ([response isKindOfClass:[NSHTTPURLResponse class]] && response.statusCode >= 400) {
                 error = [NSError errorWithDomain:@"PSURLCacheErrorDomain" code:response.statusCode userInfo:nil];
             }
             
             // Cache data if exists
-            if (cachedData && !error) {
+            if (cachedData && !error && [request.HTTPMethod isEqualToString:@"GET"]) {
                 [blockSelf cacheData:cachedData URL:cachedURL cacheType:cacheType];
             }
             
