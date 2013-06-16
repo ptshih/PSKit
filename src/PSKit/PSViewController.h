@@ -63,6 +63,10 @@
 @property (nonatomic, assign) NSString *minId;
 @property (nonatomic, assign) NSString *maxId;
 
+- (void)leftAction;
+- (void)centerAction;
+- (void)rightAction;
+
 /**
  Used to update the view when the orientation changes
  */

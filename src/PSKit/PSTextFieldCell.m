@@ -17,7 +17,7 @@ static CGSize margin() {
 
 #import "PSTextFieldCell.h"
 
-@interface PSTextFieldCell ()
+@interface PSTextFieldCell () <UITextFieldDelegate>
 
 @end
 
@@ -31,6 +31,7 @@ static CGSize margin() {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
         self.textField = [[UITextField alloc] initWithFrame:CGRectZero];
+        self.textField.delegate = self;
         self.textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
@@ -78,6 +79,11 @@ static CGSize margin() {
 
 + (CGFloat)rowHeightForObject:(id)object atIndexPath:(NSIndexPath *)indexPath forInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     return 44.0;
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [textField resignFirstResponder];
+    return YES;
 }
 
 @end

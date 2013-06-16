@@ -10,6 +10,11 @@
 
 @interface PSWebViewController : PSViewController
 
+@property (nonatomic, strong) UIWebView *webView;
+
 - (id)initWithURLPath:(NSString *)URLPath title:(NSString *)title;
+
+- (void)webViewDidStartLoad:(UIWebView *)webView;
+- (void)webViewDidFinishLoad:(UIWebView *)webView;
 
 @end

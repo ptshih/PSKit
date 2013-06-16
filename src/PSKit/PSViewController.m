@@ -103,9 +103,6 @@
         self.nullBackgroundColor = TEXTURE_ALUMINUM;
         self.nullLabelStyle = @"loadingDarkLabel";
         self.nullIndicatorStyle = UIActivityIndicatorViewStyleGray;
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     }
     return self;
 }
@@ -172,10 +169,15 @@
     if (self.isBeingPresented || self.isMovingToParentViewController) {
         
     }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -458,6 +460,9 @@
     NSValue *frameValue = [[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey];
     CGRect keyboardFrame = [frameValue CGRectValue];
     CGFloat keyboardHeight = keyboardFrame.size.height;
+    if (self.footerHeight > 0) {
+        keyboardHeight -= self.footerHeight;
+    }
     [UIView animateWithDuration:animationDuration delay:0.0 options:animationOptions animations:^{
         self.viewToAdjustForKeyboard.height -= keyboardHeight;
     } completion:^(BOOL finished) {
@@ -478,6 +483,9 @@
     NSValue *frameValue = [[notification userInfo] objectForKey:UIKeyboardFrameBeginUserInfoKey];
     CGRect keyboardFrame = [frameValue CGRectValue];
     CGFloat keyboardHeight = keyboardFrame.size.height;
+    if (self.footerHeight > 0) {
+        keyboardHeight -= self.footerHeight;
+    }
     [UIView animateWithDuration:animationDuration delay:0.0 options:animationOptions animations:^{
         self.viewToAdjustForKeyboard.height += keyboardHeight;
     } completion:^(BOOL finished) {

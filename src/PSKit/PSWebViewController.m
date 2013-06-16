@@ -10,7 +10,6 @@
 
 @interface PSWebViewController () <UIWebViewDelegate>
 
-@property (nonatomic, strong) UIWebView *webView;
 @property (nonatomic, strong) UIActivityIndicatorView *activityView;
 @property (nonatomic, copy) NSString *URLPath;
 @property (nonatomic, copy) NSString *webTitle;
@@ -81,7 +80,7 @@
 - (void)setupHeader {
     [super setupHeader];
     
-    [self.leftButton setImage:[UIImage imageNamed:@"IconBackWhite"] forState:UIControlStateNormal];
+    [self.leftButton setImage:[UIImage imageNamed:@"IconXWhite"] forState:UIControlStateNormal];
     [self.leftButton setBackgroundImage:[UIImage stretchableImageNamed:@"NavButtonLeftBlack" withLeftCapWidth:9 topCapWidth:0] forState:UIControlStateNormal];
     
     NSString *title = self.webTitle ? self.webTitle : @"Loading...";
@@ -128,7 +127,7 @@
 #pragma mark - Actions
 
 - (void)leftAction {
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)centerAction {
